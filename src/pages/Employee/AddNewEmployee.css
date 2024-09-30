@@ -1,0 +1,5 @@
+  .employeeInput:focus {
+    outline: none;
+    border-color: #73a4f5; /* Blue border color on focus */
+    box-shadow: 0 0 5px rgba(99, 154, 243, 0.5); /* Light blue shadow */
+  }

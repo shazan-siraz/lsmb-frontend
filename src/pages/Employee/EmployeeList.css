@@ -1,0 +1,11 @@
+.employeeTable {
+    border-collapse: collapse;
+    width: 100%;
+    padding: 20px;
+  }
+  
+  td, th {
+    border: 1px solid #b99191;
+    text-align: left;
+    padding: 8px;
+  }
