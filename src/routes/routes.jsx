@@ -35,6 +35,7 @@ import WithdrawStatement from "../pages/Withdraw/WithdrawStatement";
 import SavingWithdraw from "../pages/Withdraw/SavingWithdraw";
 import FdrWithdraw from "../pages/Withdraw/FdrWithdraw";
 import DpsWithdraw from "../pages/Withdraw/DpsWithdraw";
+import ProtectedRoute from "../components/layout/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +48,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <MainLayout></MainLayout>,
+    element: (
+      <ProtectedRoute>
+        <MainLayout></MainLayout>
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -171,15 +176,15 @@ const router = createBrowserRouter([
       },
       {
         path: "withdraw/savings/:id",
-        element: <SavingWithdraw></SavingWithdraw>
+        element: <SavingWithdraw></SavingWithdraw>,
       },
       {
         path: "withdraw/fdr/:id",
-        element: <FdrWithdraw></FdrWithdraw>
+        element: <FdrWithdraw></FdrWithdraw>,
       },
       {
         path: "withdraw/dps/:id",
-        element: <DpsWithdraw></DpsWithdraw>
+        element: <DpsWithdraw></DpsWithdraw>,
       },
     ],
   },

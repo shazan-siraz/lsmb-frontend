@@ -1,27 +1,28 @@
 import { useForm } from "react-hook-form";
 // import { NavLink } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLoginMutation } from "../../redux/features/auth/authApi";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/features/auth/authSlice";
+import { verifyToken } from "../../utils/verifyToken/verifyToken";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit } = useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [login, { data, error }] = useLoginMutation();
-
-  console.log("data =>", data);
-  console.log("error =>", error);
+  const [login, { isLoading }] = useLoginMutation();
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
+      const res = await login(data).unwrap();
 
-      const res = login(data);
+      const user = verifyToken(res?.data?.accessToken);
 
-      if (res?.data) {
-        toast.success(`User Login is Successfully`);
-        reset();
-      }
+      dispatch(setUser({ user: user, token: res?.data?.accessToken }));
+      navigate("/dashboard");
     } catch (err) {
       console.log(err);
     }
@@ -65,13 +66,11 @@ const Login = () => {
 
             <div className="text-center py-10">
               <input
-                className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+                className="font-semibold transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
                 type="submit"
-                value={"LOG IN"}
-                // value={isLoading ? "Loading..." : "Submit"}
-                // disabled={isLoading}
+                value={isLoading ? "Loading..." : "LOG IN"}
+                disabled={isLoading}
               />
-              <ToastContainer />
             </div>
           </div>
         </form>

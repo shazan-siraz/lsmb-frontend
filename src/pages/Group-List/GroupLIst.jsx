@@ -85,7 +85,7 @@ const GroupLIst = () => {
               {groupData?.data.map((item, index) => (
                 <GroupTable
                   item={item}
-                  key={item.groupCode}
+                  key={item._id}
                   index={index}
                 ></GroupTable>
               ))}
