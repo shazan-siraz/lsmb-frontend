@@ -31,8 +31,6 @@ const CreateLoan = () => {
     setGuarantorRefValue(guarantorRefValue);
   };
 
-  console.log(guarantorRefValue);
-
   const onSubmit = async (data) => {
     setIsLoading(true);
 

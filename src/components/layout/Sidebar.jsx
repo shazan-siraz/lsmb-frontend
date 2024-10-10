@@ -13,8 +13,14 @@ import { BiSolidUserMinus, BiSolidUserPlus } from "react-icons/bi";
 import { MdOutlineCircle } from "react-icons/md";
 import { IoHome, IoSaveSharp } from "react-icons/io5";
 import { LiaIconsSolid } from "react-icons/lia";
+import RegisterPackage from "../RegisterPackageSidebar/RegisterPackage";
+import BranchCreateSidebar from "../BranchCreateSidebar/BranchCreateSidebar";
+import CreateAdminSidebar from "../CreateAdminSidebar/CreateAdminSidebar";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const Sidebar = () => {
+  const { email } = useSelector(useCurrentUser);
   const [isActive, setActive] = useState(false);
   const [isSavingsDropdownOpen, setSavingsDropdownOpen] = useState(false);
   const [isLoanDropdownOpen, setLoanDropdownOpen] = useState(false);
@@ -26,7 +32,6 @@ const Sidebar = () => {
 
   const sidebarRef = useRef(null);
   const location = useLocation();
-
   const handleToggle = () => setActive(!isActive);
   const savingsDropdown = () => setSavingsDropdownOpen(!isSavingsDropdownOpen);
   const loanDropdown = () => setLoanDropdownOpen(!isLoanDropdownOpen);
@@ -34,7 +39,8 @@ const Sidebar = () => {
   const fdrDropdown = () => setFdrDropdownOpen(!isFdrDropdownOpen);
   const branchDropdown = () => setBranchDropdownOpen(!isBranchDropdownOpen);
   const staffDropdown = () => setStaffDropdownOpen(!isStaffDropdownOpen);
-  const withdrawDropdown = () => setWithdrawDropdownOpen(!isWithdrawDropdownOpen);
+  const withdrawDropdown = () =>
+    setWithdrawDropdownOpen(!isWithdrawDropdownOpen);
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -75,7 +81,7 @@ const Sidebar = () => {
       </div>
       <div
         ref={sidebarRef}
-        className={`z-10 md:fixed flex flex-col justify-between overflow-x-hidden bg-[#0b3442] w-[250px] space-y-6 px-2 py-4 absolute inset-y-0 left-0 transform ${
+        className={`z-10 md:fixed flex flex-col justify-between overflow-x-hidden bg-[#0e303b] w-[280px] space-y-6 px-2 py-4 absolute inset-y-0 left-0 transform ${
           isActive ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
@@ -120,10 +126,23 @@ const Sidebar = () => {
                 <Link className="text-slate-400 font-bold">Dashboard</Link>
               </div>
 
-              <div className="dropDownStyle">
-                <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
-                <NavLink to="home">HOME</NavLink>
-              </div>
+              <NavLink to="home">
+                <div className="dropDownStyle ">
+                  <div className="flex gap-5">
+                    <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
+                    <p className="font-semibold">HOME</p>
+                  </div>
+                </div>
+              </NavLink>
+
+              {/* Conditionally Render create admin */}
+              <CreateAdminSidebar></CreateAdminSidebar>
+
+              {/* Conditionally Render Register Package */}
+              <RegisterPackage></RegisterPackage>
+
+              {/* Conditionally Render Branch */}
+              <BranchCreateSidebar></BranchCreateSidebar>
 
               {/* Branch Dropdown Menu */}
               <div className="relative">
@@ -137,6 +156,23 @@ const Sidebar = () => {
                       isBranchDropdownOpen ? "-rotate-90" : ""
                     }`}
                   />
+                </div>
+                <div
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    isBranchDropdownOpen ? "max-h-screen" : "max-h-0"
+                  }`}
+                >
+                  <NavLink
+                    to={`branch-details/${email}`}
+                    className={({ isActive }) =>
+                      `dropDownListStyle ${
+                        isActive ? "activeColor" : "text-gray-600"
+                      }`
+                    }
+                  >
+                    <MdOutlineCircle className="iconListStyle" />
+                    <span className="font-medium">BRANCH DETAILS</span>
+                  </NavLink>
                 </div>
                 <div
                   className={`transition-all duration-300 ease-in-out overflow-hidden ${

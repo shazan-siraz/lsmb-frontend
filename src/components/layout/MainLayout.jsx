@@ -8,7 +8,7 @@ const MainLayout = () => {
   return (
     <div className="relative min-h-screen md:flex">
       <Sidebar />
-      <div className="flex-1  md:ml-[250px]">
+      <div className="flex-1  md:ml-[280px]">
         <Header />
         <div className="mb-[40px] mt-[55px] bg-slate-100 min-h-screen">
           <Outlet />

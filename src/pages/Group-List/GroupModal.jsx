@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Modal } from "antd";
 import { useUpdateGroupMutation } from "../../redux/features/groupList/groupListApi";
 
+
 const GroupModal = ({ modalData }) => {
   const [open, setOpen] = useState(false);
   const { register, handleSubmit } = useForm();
@@ -12,7 +13,7 @@ const GroupModal = ({ modalData }) => {
     setOpen(true);
   };
 
-  const [updateGroup, { data, isLoading: groupUpdateLoading }] = useUpdateGroupMutation();
+  const [updateGroup, { isLoading: groupUpdateLoading }] = useUpdateGroupMutation();
 
   const handleCancel = () => {
     setOpen(false);

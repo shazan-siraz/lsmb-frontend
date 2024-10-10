@@ -1,14 +1,14 @@
 import { useForm } from "react-hook-form";
-// import { NavLink } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLoginMutation } from "../../redux/features/auth/authApi";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/features/auth/authSlice";
 import { verifyToken } from "../../utils/verifyToken/verifyToken";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Login = () => {
+  const [isError, setIsError] = useState(null);
   const { register, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,6 +25,7 @@ const Login = () => {
       navigate("/dashboard");
     } catch (err) {
       console.log(err);
+      setIsError(err?.data?.message);
     }
   };
 
@@ -36,6 +37,7 @@ const Login = () => {
             <h1 className="text-[30px] text-center font-bold pb-8">
               LS Micro Banking
             </h1>
+            <p className="text-center text-red-600 font-semibold text-[20px]">{isError}</p>
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="email">
                 Email*

@@ -1,46 +1,68 @@
 import { useForm } from "react-hook-form";
 import "./AddNewEmployee.css";
-import { useCreateEmployeeMutation } from "../../redux/features/employee/employeeApi";
+
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useEffect, useState } from "react";
+import { useCreateEmployeeMutation } from "../../redux/features/employee/employeeApi";
 
 const AddNewEmployee = () => {
-  const { register, handleSubmit } = useForm();
+  const [isError, setIsError] = useState(null);
+  const { email } = useSelector(useCurrentUser);
+  const [isLoading, setIsLoading] = useState(false);
+  const { register, handleSubmit, reset } = useForm();
 
-  const [addEmployee, { isLoading }] = useCreateEmployeeMutation();
+  const [addEmployee, { error, isLoading: createEmoloyeeLoading }] =
+    useCreateEmployeeMutation();
+
+  useEffect(() => {
+    if (error) {
+      setIsError(error?.data?.message);
+    }
+  }, [error]); // Runs only when the error changes
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
+
     try {
       const uploadedImageUrl = await uploadImageToCloudinary(data.imageUrl[0]);
 
       const employeeData = {
-        name: data.name,
-        employeeId: data.employeeId,
-        designation: data.designation,
-        joiningDate: data.joiningDate,
-        employeeType: data.employeeType,
-        phoneNo: data.phoneNo,
-        employeeEmail: data.employeeEmail,
-        employeeNid: data.employeeNid,
-        address: data.presentAddress,
-        fatherName: data.fatherName,
-        motherName: data.motherName,
-        bloodGroup: data.bloodGroup,
-        degree: data.degree,
-        basicSalary: data.basicSalary,
-        mobileBill: data.mobileBill,
-        conveyanceAllowance: data.conveyanceAllowance,
-        medicalAllowance: data.medicalAllowance,
-        houseRent: data.houseRent,
-        incentiveBonus: data.incentiveBonus,
-        others: data.other,
-        professionalTax: data.professionalTax,
-        incomeTax: data.incomeTax,
-        providentFund: data.providentFund,
-        totalSalary: data.totalSalary,
-        imageUrl: uploadedImageUrl,
+        password: data?.employeePassword,
+        employee: {
+          employeeId: data?.employeeId,
+          employeeEmail: data?.employeeEmail,
+          branchEmail: email,
+          employeeName: data?.name,
+          joiningDate: data?.joiningDate,
+          employeeType: data?.employeeType,
+          phoneNo: data?.phoneNo,
+          employeeNid: data?.employeeNid,
+          presentAddress: data?.presentAddress,
+          fatherName: data?.fatherName,
+          motherName: data?.motherName,
+          bloodGroup: data?.bloodGroup,
+          degree: data?.degree,
+          basicSalary: Number(data?.basicSalary),
+          mobileBill: Number(data?.mobileBill),
+          conveyanceAllowance: Number(data?.conveyanceAllowance),
+          medicalAllowance: Number(data?.medicalAllowance),
+          houseRent: Number(data?.houseRent),
+          incentiveBonus: Number(data?.incentiveBonus),
+          others: Number(data?.other),
+          professionalTax: Number(data?.professionalTax),
+          incomeTax: Number(data?.incomeTax),
+          providentFund: Number(data?.providentFund),
+          totalSalary: Number(data?.totalSalary),
+          profileImage: uploadedImageUrl,
+        },
       };
 
+      setIsLoading(false);
+
+      setIsError(error?.data?.message);
       const res = await addEmployee(employeeData);
 
       if (res?.data) {
@@ -51,36 +73,26 @@ const AddNewEmployee = () => {
           showConfirmButton: false,
           timer: 1500,
         });
+        reset();
       }
-      console.log(res);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <div className="bg-[#E1E2E1] h-screen">
+    <div className="bg-[#E1E2E1]">
       <h1 className="px-5 py-2 text-2xl font-bold">Make A New Employee </h1>
       <div className="py-3">
         <div className="border-b-2"></div>
       </div>
 
-      <div className="px-5">
+      <div className="px-10 ">
         <form onSubmit={handleSubmit(onSubmit)}>
+          <p className="text-center text-red-600 font-semibold text-[20px]">
+            {isError}
+          </p>
           <div className="grid grid-cols-3 gap-5">
-            <div className="flex flex-col">
-              <label className="font-bold" htmlFor="name">
-                Name*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
-                id="name"
-                placeholder="Employee Name"
-                {...register("name")}
-                required={true}
-              />
-            </div>
             <div className="flex flex-col">
               <label className="font-bold" htmlFor="employeeId">
                 Employee ID*
@@ -95,18 +107,46 @@ const AddNewEmployee = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-bold" htmlFor="designation">
-                Designation*
+              <label className="font-bold" htmlFor="email">
+                Email*
+              </label>
+              <input
+                className="py-2 px-2 my-1 rounded-sm employeeInput"
+                type="email"
+                id="email"
+                placeholder="Enter Email Address"
+                {...register("employeeEmail")}
+                required={true}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-bold" htmlFor="password">
+                Password*
+              </label>
+              <input
+                className="py-2 px-2 my-1 rounded-sm employeeInput"
+                type="password"
+                id="password"
+                placeholder="Employee Login Password"
+                {...register("employeePassword")}
+                required={true}
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="font-bold" htmlFor="name">
+                Name*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 type="text"
-                id="designation"
-                placeholder="Enter Employee Designation"
-                {...register("designation")}
+                id="name"
+                placeholder="Employee Name"
+                {...register("name")}
                 required={true}
               />
             </div>
+
             <div className="flex flex-col">
               <label className="font-bold" htmlFor="joining">
                 Joining*
@@ -150,19 +190,6 @@ const AddNewEmployee = () => {
                 id="phoneNo"
                 placeholder="Enter Phone No"
                 {...register("phoneNo")}
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="font-bold" htmlFor="email">
-                Email*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="email"
-                id="email"
-                placeholder="Enter Email Address"
-                {...register("employeeEmail")}
                 required={true}
               />
             </div>
@@ -431,15 +458,18 @@ const AddNewEmployee = () => {
                 required={true}
               />
             </div>
-
-            <div className="text-center">
-              <input
-                className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
-                type="submit"
-                value={isLoading ? "Loading..." : "Submit"}
-                disabled={isLoading}
-              />
-            </div>
+          </div>
+          <div className="text-center pb-[30px]">
+            <input
+              className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-20 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+              type="submit"
+              value={
+                isLoading || createEmoloyeeLoading
+                  ? "Loading..."
+                  : "Create Employee"
+              }
+              disabled={isLoading || createEmoloyeeLoading}
+            />
           </div>
         </form>
       </div>

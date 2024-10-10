@@ -2,6 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import MainLayout from "../components/layout/MainLayout";
 import Home from "../pages/Home/Home";
+import RegisterPackage from "../pages/RegisterPackage/RegisterPackage";
+import CreateAdmin from "../pages/CreateAdmin/CreateAdmin";
+import AdminList from "../pages/CreateAdmin/AdminList";
+import PackageList from "../pages/RegisterPackage/PackageList";
+import BranchCreate from "../pages/BranchCreate/BranchCreate";
+import BranchList from "../pages/BranchCreate/BranchList";
+import BranchDetails from "../pages/BranchCreate/BranchDetails";
 import Login from "../pages/Login/Login";
 import LoanRequest from "../pages/Loan/LoanRequest";
 import ActiveLoan from "../pages/Loan/ActiveLoan";
@@ -61,6 +68,34 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home></Home>,
+      },
+      {
+        path: "admin-create",
+        element: <CreateAdmin></CreateAdmin>,
+      },
+      {
+        path: "admin-list",
+        element: <AdminList></AdminList>,
+      },
+      {
+        path: "registerPackage-create",
+        element: <RegisterPackage></RegisterPackage>,
+      },
+      {
+        path: "registerPackage-list",
+        element: <PackageList></PackageList>,
+      },
+      {
+        path: "branch-create",
+        element: <BranchCreate></BranchCreate>,
+      },
+      {
+        path: "branch-list/",
+        element: <BranchList></BranchList>,
+      },
+      {
+        path: "branch-details/:email",
+        element: <BranchDetails></BranchDetails>,
       },
       {
         path: "loan-create",
