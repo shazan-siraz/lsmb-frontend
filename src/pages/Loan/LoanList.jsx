@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 
 
 const LoanList = ({ item, index }) => {
-  const [updateStatusLoan] = useUpdateLoanMutation();
+  const [activeLoan, {isLoading: activeLoanLoading}] = useUpdateLoanMutation();
 
 
   const handleUpdateStatus = async (id) => {
@@ -15,7 +15,7 @@ const LoanList = ({ item, index }) => {
       status: "Active",
     };
 
-    const res = await updateStatusLoan(updatedStatusData);
+    const res = await activeLoan(updatedStatusData);
 
     if (res?.data?.data) {
       toast.success(
@@ -47,7 +47,7 @@ const LoanList = ({ item, index }) => {
             onClick={() => handleUpdateStatus(item._id)}
             className="border rounded-md bg-green-600 hover:bg-green-700 text-white px-2"
           >
-            Active
+            {activeLoanLoading ? "Lading..." : "Active"}
             <ToastContainer />
           </button>
           <button className="border rounded-md bg-red-600 hover:bg-red-700 text-white px-2">

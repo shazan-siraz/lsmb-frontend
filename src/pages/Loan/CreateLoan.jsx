@@ -8,8 +8,11 @@ import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadI
 import { useCreateLoanMutation } from "../../redux/features/loan/loanApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const CreateLoan = () => {
+  const { email } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
   const selectRef = useRef(null);
   const guarantorRef = useRef(null);
@@ -42,6 +45,7 @@ const CreateLoan = () => {
 
       const loanData = {
         memberOfApplying: data.memberOfApplying,
+        branchEmail: email,
         startDate: data.startDate,
         endDate: data.endDate,
         loanNo: data.loanNo,
@@ -57,7 +61,7 @@ const CreateLoan = () => {
         installmentAmount: data.installmentAmount,
         attachment: attachmentImageUrl,
         loanType: data.loanType,
-        guarantorUser: data.guarantorUser,
+        guarantorEmployee: data.guarantorUser,
         gurantorMember: data.gurantorMember,
         loanGuarantor: {
           name: data.name,
@@ -344,27 +348,27 @@ const CreateLoan = () => {
                 onChange={handleGuarantorChange} // Handle the change event
               >
                 <option>Select Guarantor Type</option>
-                <option value="user">User</option>
+                <option value="employee">Employee</option>
                 <option value="member">Member</option>
               </select>
             </div>
 
             {/* Conditionally render based on guarantorRefValue */}
-            {guarantorRefValue === "user" && (
+            {guarantorRefValue === "employee" && (
               <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="guarantorUser">
-                  Guarantor User*
+                <label className="font-semibold" htmlFor="guarantorEmployee">
+                  Guarantor Employee*
                 </label>
                 <select
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  id="guarantorUser"
-                  {...register("guarantorUser")}
+                  id="guarantorEmployee"
+                  {...register("guarantorEmployee")}
                   required={true}
                 >
-                  <option>Select Guarantor User</option>
+                  <option>Select Guarantor Employee</option>
                   {employeeData?.data.map((item) => (
-                    <option key={item._id} value={item?.name}>
-                      {item?.name}
+                    <option key={item._id} value={item?._id}>
+                      {item?.employeeName}
                     </option>
                   ))}
                 </select>
@@ -385,7 +389,7 @@ const CreateLoan = () => {
                 >
                   <option>Select Guarantor Member</option>
                   {memberShipData?.data.map((item) => (
-                    <option key={item._id} value={item?.memberName}>
+                    <option key={item._id} value={item?._id}>
                       {item?.memberName}
                     </option>
                   ))}

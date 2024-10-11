@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import MainLayout from "../components/layout/MainLayout";
-import Home from "../pages/Home/Home";
+import DashboardHome from "../pages/DashboardHome/DashboardHome";
 import RegisterPackage from "../pages/RegisterPackage/RegisterPackage";
 import CreateAdmin from "../pages/CreateAdmin/CreateAdmin";
 import AdminList from "../pages/CreateAdmin/AdminList";
@@ -66,8 +66,8 @@ const router = createBrowserRouter([
         element: <Dashboard></Dashboard>,
       },
       {
-        path: "home",
-        element: <Home></Home>,
+        path: "dashboard-home",
+        element: <DashboardHome></DashboardHome>,
       },
       {
         path: "admin-create",

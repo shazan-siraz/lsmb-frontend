@@ -35,12 +35,12 @@ const EmployeeList = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.data.map((item, index) => (
-              <tr key={item.employeeId}>
+            {data?.data?.map((item, index) => (
+              <tr key={item._id}>
                 <td>{index + 1} </td>
-                <td>{item.name}</td>
+                <td>{item.employeeName}</td>
                 <td>{item.employeeId}</td>
-                <td>{item.designation}</td>
+                <td>{item.userId.role}</td>
                 <td>{item.phoneNo}</td>
                 <td>{item.joiningDate}</td>
                 <td>{item.fatherName}</td>

@@ -5,9 +5,14 @@ import {
 } from "../../redux/features/groupList/groupListApi";
 import "./GroupList.css";
 import GroupTable from "./GroupTable";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import Swal from "sweetalert2";
+
 
 const GroupLIst = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
+  const { email } = useSelector(useCurrentUser);
 
   const [addGroup, { isLoading: groupCreatingLoading }] =
     useCreateGroupMutation();
@@ -16,8 +21,23 @@ const GroupLIst = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await addGroup(data);
-      console.log("res", res);
+      const groupData = {
+        groupCode: data?.groupCode,
+        groupTitle: data?.groupTitle,
+        branchEmail: email,
+      };
+
+      const res = await addGroup(groupData);
+      if (res?.data) {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Group Created Successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        reset();
+      }
     } catch (err) {
       console.log(err);
     }

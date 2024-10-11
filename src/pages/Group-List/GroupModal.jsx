@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Modal } from "antd";
 import { useUpdateGroupMutation } from "../../redux/features/groupList/groupListApi";
+import { FaEdit } from "react-icons/fa";
 
 
 const GroupModal = ({ modalData }) => {
@@ -36,7 +37,7 @@ const GroupModal = ({ modalData }) => {
 
   return (
     <div>
-      <p onClick={showModal}>Edit</p>
+      <p onClick={showModal}><FaEdit /></p>
       <Modal
         open={open}
         title="Quick Access"

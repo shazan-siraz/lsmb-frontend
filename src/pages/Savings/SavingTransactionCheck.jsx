@@ -5,14 +5,21 @@ import { useGetSingleMembershipQuery } from "../../redux/features/membership/mem
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import { useCreateSavingTransactionMutation } from "../../redux/features/savingTransaction/savingTransactionApi";
 import { ToastContainer, toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import generateTransactionId from "../../utils/createTransactionId/generateTransactionId";
 
 const SavingTransactionCheck = () => {
+  const { email } = useSelector(useCurrentUser);
   const { id } = useParams();
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
 
-  const { data: singleMemberData, isLoading: singleMemberDataQueryLoading, refetch } =
-    useGetSingleMembershipQuery(id);
+  const {
+    data: singleMemberData,
+    isLoading: singleMemberDataQueryLoading,
+    refetch,
+  } = useGetSingleMembershipQuery(id);
 
   const [addSavingTransaction, { isLoading: addSavingTransactionLoading }] =
     useCreateSavingTransactionMutation();
@@ -28,6 +35,9 @@ const SavingTransactionCheck = () => {
         dateOfCollection: data.dateOfCollection,
         savingAmount: Number(data.savingAmount),
         savingTransactionInfo: data.savingTransactionInfo,
+        branchEmail: email,
+        transactionId: generateTransactionId(),
+        transactionType: "saving",
       };
 
       const res = await addSavingTransaction(savingTransactionData);
@@ -36,7 +46,7 @@ const SavingTransactionCheck = () => {
         toast.success("Saving Transaction Successfully Completed");
         reset();
         refetch();
-        navigate("/dashboard/savings-transaction")
+        navigate("/dashboard/savings-transaction");
       }
     } catch (err) {
       console.log(err);

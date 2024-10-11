@@ -12,7 +12,6 @@ const SingleMember = () => {
   if(isLoading) {
     return <p>Loading...</p>
   }
-
   
 
   return (

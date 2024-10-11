@@ -11,14 +11,14 @@ const savingTransactionApi = baseApi.injectEndpoints({
       invalidatesTags: ["savingTransaction"],
     }),
 
-    // getAllMembership: builder.query({
-    //   query: () => ({
-    //     url: "/membership",
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["membership"],
-    // }),
+    getAllSavingTransaction: builder.query({
+      query: () => ({
+        url: "/savingTransaction",
+        method: "GET",
+      }),
+      providesTags: ["savingTransaction"],
+    }),
   }),
 });
 
-export const { useCreateSavingTransactionMutation } = savingTransactionApi;
+export const { useCreateSavingTransactionMutation, useGetAllSavingTransactionQuery } = savingTransactionApi;

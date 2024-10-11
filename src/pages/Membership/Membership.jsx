@@ -4,34 +4,34 @@ import "./Membership.css";
 import { useGetAllGroupQuery } from "../../redux/features/groupList/groupListApi";
 import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useRef, useState } from "react";
-import { useCreateMembershipMutation } from "../../redux/features/membership/membershipApi";
+import {
+  useCreateMembershipMutation,
+  useGetAllMembershipQuery,
+} from "../../redux/features/membership/membershipApi";
+import { toast, ToastContainer } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import { Divider } from "antd";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const Membership = () => {
-  const { register, handleSubmit } = useForm();
+  const { email } = useSelector(useCurrentUser);
+  const { register, handleSubmit, reset } = useForm();
   const selectRef = useRef(null);
   const [selectedRefValue, setSelectedRefValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  //   const [addEmployee, { isLoading }] = useCreateEmployeeMutation();
-  const [addMembership, { isLoading: membershipLoading }] =
+  const [addMembership, { isLoading: membershipLoading , error}] =
     useCreateMembershipMutation();
 
-  const { data, isLoading: groupQueryLoading } = useGetAllGroupQuery();
+  const { data: groupData, isLoading: groupQueryLoading } =
+    useGetAllGroupQuery();
   const { data: employeeData, isLoading: employeeQueryLoading } =
     useGetAllEmployeeQuery();
+  const { data: membershipData, isLoading: membersQueryLoading } =
+    useGetAllMembershipQuery();
 
-  const groupData = data?.data;
-
-  const employeeFilteredData = employeeData?.data?.filter(
-    (item) => item.designation === "Field Officer"
-  );
-
-  if (groupQueryLoading && employeeQueryLoading) {
-    return <p>Loading...</p>;
-  }
-  if (isLoading) {
+  if (groupQueryLoading || employeeQueryLoading || membersQueryLoading) {
     return <p>Loading...</p>;
   }
 
@@ -55,8 +55,9 @@ const Membership = () => {
       const membershipData = {
         memberName: data.memberName,
         memberId: data.memberId,
-        groupName: data.groupName,
-        assignFieldUser: data.assignFieldUser,
+        branchEmail: email,
+        group: data.groupName,
+        assignFieldOfficer: data.assignFieldOfficer,
         phoneNo: data.phoneNo,
         email: data.email,
         memberNid: data.memberNid,
@@ -78,7 +79,7 @@ const Membership = () => {
         signature: memberSignatureImageUrl,
         passportOrNid: memberPassportNidImageUrl,
         chequeBook: memberChequeBookImageUrl,
-        referenceUser: data.referenceUser,
+        referenceEmployee: data.referenceEmployee,
         referenceMember: data.referenceMember,
         nominee: {
           nomineeName: data.nominee.nomineeName,
@@ -90,8 +91,12 @@ const Membership = () => {
       };
 
       const res = await addMembership(membershipData);
+      console.log(error);
 
-      console.log(res);
+      if (res?.data) {
+        toast.success("Branch Created Successfully");
+        reset();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -154,8 +159,8 @@ const Membership = () => {
                 required={true}
               >
                 <option>Select Group Name</option>
-                {groupData?.map((item) => (
-                  <option key={item._id} value={item?.groupTitle}>
+                {groupData?.data?.map((item) => (
+                  <option key={item._id} value={item?._id}>
                     {item.groupTitle}
                   </option>
                 ))}
@@ -163,19 +168,19 @@ const Membership = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="assignFieldUser">
-                Assign Field User*
+              <label className="font-semibold" htmlFor="assignFieldOfficer">
+                Assign Field Officer*
               </label>
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
-                id="assignFieldUser"
-                {...register("assignFieldUser")}
+                id="assignFieldOfficer"
+                {...register("assignFieldOfficer")}
                 required={true}
               >
                 <option>Select Field Officer</option>
-                {employeeFilteredData?.map((item) => (
-                  <option key={item._id} value={item?.name}>
-                    {item?.name}
+                {employeeData?.data?.map((item) => (
+                  <option key={item._id} value={item?._id}>
+                    {item?.employeeName}
                   </option>
                 ))}
               </select>
@@ -479,26 +484,26 @@ const Membership = () => {
                 onChange={handleSelectChange} // Handle the change event
               >
                 <option value="">Select Reference</option>
-                <option value="user">User</option>
+                <option value="employee">Employee</option>
                 <option value="member">Member</option>
               </select>
             </div>
 
             {/* Conditionally render based on selectedRefValue */}
-            {selectedRefValue === "user" && (
+            {selectedRefValue === "employee" && (
               <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="referenceUser">
-                  Reference User
+                <label className="font-semibold" htmlFor="referenceEmployee">
+                  Reference Employee
                 </label>
                 <select
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  id="referenceUser"
-                  {...register("referenceUser")}
+                  id="referenceEmployee"
+                  {...register("referenceEmployee")}
                 >
-                  <option>Select User</option>
-                  {employeeFilteredData?.map((item) => (
-                    <option key={item._id} value={item?.name}>
-                      {item?.name}
+                  <option>Select Employee</option>
+                  {employeeData?.data?.map((item) => (
+                    <option key={item._id} value={item?._id}>
+                      {item?.employeeName}
                     </option>
                   ))}
                 </select>
@@ -515,9 +520,12 @@ const Membership = () => {
                   id="referenceMember"
                   {...register("referenceMember")}
                 >
-                  <option value="">Select Member</option>
-                  <option value="user">User</option>
-                  <option value="member">Member</option>
+                  <option>Select Member</option>
+                  {membershipData?.data?.map((item) => (
+                    <option key={item._id} value={item?._id}>
+                      {item?.memberName}
+                    </option>
+                  ))}
                 </select>
               </div>
             )}
@@ -601,9 +609,12 @@ const Membership = () => {
             <input
               className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
               type="submit"
-              value={membershipLoading ? "Loading..." : "Submit"}
-              disabled={membershipLoading}
+              value={
+                membershipLoading || isLoading ? "Loading..." : "Create Member"
+              }
+              disabled={membershipLoading || isLoading}
             />
+            <ToastContainer></ToastContainer>
           </div>
         </form>
       </div>

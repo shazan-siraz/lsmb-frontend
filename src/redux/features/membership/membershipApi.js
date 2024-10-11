@@ -24,7 +24,8 @@ const membershipApi = baseApi.injectEndpoints({
         url: `/membership/single-membership/${id}`,
         method: "GET",
       }),
-      invalidatesTags: ["membership"],
+      // invalidatesTags: ["membership"],
+      providesTags: ["membership"],
     }),
   }),
 });

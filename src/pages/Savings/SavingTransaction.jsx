@@ -1,14 +1,19 @@
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
 import { NavLink } from "react-router-dom";
 import { useRef, useState } from "react";
+import { useGetAllSavingTransactionQuery } from "../../redux/features/savingTransaction/savingTransactionApi";
+import { timeFormat } from "../../utils/timeFormat/timeFormat";
 
 const SavingTransaction = () => {
   const transactionRef = useRef();
   const [istransactionRef, setIsTransactionRef] = useState();
+
   const { data: membershipData, isLoading: membershipQueryLoading } =
     useGetAllMembershipQuery();
+  const { data: savingTxnData, isLoading: savingTxnQueryLaoding } =
+    useGetAllSavingTransactionQuery();
 
-  if (membershipQueryLoading) {
+  if (membershipQueryLoading || savingTxnQueryLaoding) {
     return <p>Loading...</p>;
   }
 
@@ -18,7 +23,7 @@ const SavingTransaction = () => {
   };
 
   return (
-    <div className="pt-[100px]">
+    <div className="pt-[60px]">
       <div className="max-w-[580px] mx-auto bg-white p-8 rounded-lg">
         <div>
           <h1 className="text-[40px] font-bold text-center">
@@ -52,6 +57,33 @@ const SavingTransaction = () => {
             Find Saving A/C
           </NavLink>
         </div>
+      </div>
+
+      <div className="p-10">
+        <table className="max-w-[100%] w-[100%] mx-auto">
+          <thead className="bg-slate-600 text-white uppercase">
+            <tr>
+              <th className="text-center">TxnId</th>
+              <th className="text-center">Member</th>
+              <th className="text-center">Date</th>
+              <th className="text-center">Txn Type</th>
+              <th className="text-center">Txn Note</th>
+              <th className="text-center">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {savingTxnData?.data?.map((item) => (
+              <tr key={item._id}>
+                <td className="text-center">{item.transactionId}</td>
+                <td className="text-center">{item.memberId.memberName}</td>
+                <td className="text-center">{timeFormat(item.createdAt)}</td>
+                <td className="text-center">{item.transactionType}</td>
+                <td className="text-center">{item.savingTransactionInfo}</td>
+                <td className="text-center">{item.savingAmount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ const SavingsAccount = () => {
   const { data: membershipData, isLoading: membershipQueryLoading } =
     useGetAllMembershipQuery();
 
-//   console.log(membershipData?.data);
 
   if (membershipQueryLoading) {
     return <p>Loading...</p>;
@@ -46,7 +45,7 @@ const SavingsAccount = () => {
               </tr>
             </thead>
             <tbody>
-              {membershipData?.data.map((item, index) => (
+              {membershipData?.data?.map((item, index) => (
                 <tr key={item._id}>
                   <td className="text-center">{index + 1}</td>
                   <td>{item.memberName}</td>

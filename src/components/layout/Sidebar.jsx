@@ -126,7 +126,7 @@ const Sidebar = () => {
                 <Link className="text-slate-400 font-bold">Dashboard</Link>
               </div>
 
-              <NavLink to="home">
+              <NavLink to="dashboard-home">
                 <div className="dropDownStyle ">
                   <div className="flex gap-5">
                     <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
