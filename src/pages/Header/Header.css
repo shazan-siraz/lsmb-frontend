@@ -1,0 +1,13 @@
+.header-btn {
+    border: 1px solid white;
+    border-radius: 4px;
+    padding: 3px 6px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.header-btn:hover {
+    background-color: white;
+    color: black;
+}
