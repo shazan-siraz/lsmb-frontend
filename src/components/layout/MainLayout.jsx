@@ -10,7 +10,7 @@ const MainLayout = () => {
       <Sidebar />
       <div className="flex-1  md:ml-[280px]">
         <Header />
-        <div className="mb-[40px] mt-[55px] bg-slate-100 min-h-screen">
+        <div className="mb-[40px] mt-[45px] bg-slate-100 min-h-screen">
           <Outlet />
         </div>
         <Footer />
