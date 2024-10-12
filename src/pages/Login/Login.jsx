@@ -22,7 +22,7 @@ const Login = () => {
       const user = verifyToken(res?.data?.accessToken);
 
       dispatch(setUser({ user: user, token: res?.data?.accessToken }));
-      navigate("/dashboard");
+      navigate("/dashboard/dashboard-home");
     } catch (err) {
       console.log(err);
       setIsError(err?.data?.message);

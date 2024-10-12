@@ -43,6 +43,15 @@ const loanApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["loan"],
     }),
+
+    getOverdueLoan: builder.query({
+      query: () => ({
+        url: "/loan/overdue-loan",
+        method: "GET",
+      }),
+      invalidatesTags: ["loan"],
+    }),
+
   }),
 });
 
@@ -52,4 +61,5 @@ export const {
   useGetPendingLoanQuery,
   useGetActiveLoanQuery,
   useUpdateLoanMutation,
+  useGetOverdueLoanQuery
 } = loanApi;

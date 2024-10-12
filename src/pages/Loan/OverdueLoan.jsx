@@ -1,29 +1,26 @@
-import { useGetAllLoanQuery } from "../../redux/features/loan/loanApi";
-
-
+import { useGetOverdueLoanQuery } from "../../redux/features/loan/loanApi";
+import ActiveLoanList from "./ActiveLoanList";
 
 const OverdueLoan = () => {
+  const { data: overdueLoanData, isLoading: overdueLoanQueryLoading } =
+    useGetOverdueLoanQuery();
 
-    const { data: loanQueryData, isLoading: loanQueryLoading } =
-    useGetAllLoanQuery();
-
-  if (loanQueryLoading) {
+  if (overdueLoanQueryLoading) {
     return <p>Loading...</p>;
   }
 
-
-    return (
-        <div>
+  return (
+    <div>
       <div>
-        <div className="px-5 py-2">
-          <h1>OverDue Loan List</h1>
+        <div className="px-5 py-2 font-semibold text-[20px]">
+          <h1 >Active Loan List</h1>
         </div>
         <div className="border-b my-2"></div>
 
         <div className="p-5">
           <table className="employeeTable">
             <thead>
-              <tr>
+              <tr className="bg-slate-600 text-white uppercase">
                 <th>SL</th>
                 <th>Name</th>
                 <th>ID</th>
@@ -39,28 +36,15 @@ const OverdueLoan = () => {
               </tr>
             </thead>
             <tbody>
-              {loanQueryData?.data.map((item, index) => (
-                <tr key={item._id}>
-                  <td>{index + 1} </td>
-                  <td>{item.memberOfApplying?.groupName} </td>
-                  <td>{item.memberOfApplying?.memberId} </td>
-                  <td>{item.loanNo} </td>
-                  <td>{item.loanType} </td>
-                  <td>{item.loanAmount} </td>
-                  <td>{item.percentageOfInterest}</td>
-                  <td>{(item.loanAmount * 10) / 100} tk</td>
-                  <td>{item.installmentMode?.installType}</td>
-                  <td>{item.endDate}</td>
-                  <td>{item.status}</td>
-                  <td>...</td>
-                </tr>
+              {overdueLoanData?.data.map((item, index) => (
+                <ActiveLoanList key={item._id} index={index} item={item}></ActiveLoanList>
               ))}
             </tbody>
           </table>
         </div>
       </div>
     </div>
-    );
+  );
 };
 
 export default OverdueLoan;
