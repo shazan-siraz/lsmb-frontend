@@ -10,14 +10,6 @@ const savingWithdrawApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["savingWithdraw"],
     }),
-
-    // getAllMembership: builder.query({
-    //   query: () => ({
-    //     url: "/membership",
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["membership"],
-    // }),
   }),
 });
 

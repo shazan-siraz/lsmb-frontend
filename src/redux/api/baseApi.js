@@ -56,6 +56,7 @@ export const baseApi = createApi({
     "loan",
     "savingTransaction",
     "savingWithdraw",
+    "superAdmin",
   ],
   endpoints: () => ({}),
 });

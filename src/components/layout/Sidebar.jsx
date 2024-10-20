@@ -9,7 +9,11 @@ import { IoIosSpeedometer } from "react-icons/io";
 import { TiChevronLeft } from "react-icons/ti";
 import ModalComponents from "../../pages/Modal/ModalComponents";
 import "./Sidebar.css";
-import { BiSolidUserMinus, BiSolidUserPlus } from "react-icons/bi";
+import {
+  BiMoneyWithdraw,
+  BiSolidUserMinus,
+  BiSolidUserPlus,
+} from "react-icons/bi";
 import { MdOutlineCircle } from "react-icons/md";
 import { IoHome, IoSaveSharp } from "react-icons/io5";
 import { LiaIconsSolid } from "react-icons/lia";
@@ -18,6 +22,9 @@ import BranchCreateSidebar from "../BranchCreateSidebar/BranchCreateSidebar";
 import CreateAdminSidebar from "../CreateAdminSidebar/CreateAdminSidebar";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import CreateSuperAdminSidebar from "../CreateSuperAdminSidebar/CreateSuperAdminSidebar";
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import BranchSidebar from "../BranchSidebar/BranchSidebar";
 
 const Sidebar = () => {
   const { email } = useSelector(useCurrentUser);
@@ -26,7 +33,7 @@ const Sidebar = () => {
   const [isLoanDropdownOpen, setLoanDropdownOpen] = useState(false);
   const [isDpsDropdownOpen, setDpsDropdownOpen] = useState(false);
   const [isFdrDropdownOpen, setFdrDropdownOpen] = useState(false);
-  const [isBranchDropdownOpen, setBranchDropdownOpen] = useState(false);
+
   const [isStaffDropdownOpen, setStaffDropdownOpen] = useState(false);
   const [isWithdrawDropdownOpen, setWithdrawDropdownOpen] = useState(false);
 
@@ -37,10 +44,12 @@ const Sidebar = () => {
   const loanDropdown = () => setLoanDropdownOpen(!isLoanDropdownOpen);
   const dpsDropdown = () => setDpsDropdownOpen(!isDpsDropdownOpen);
   const fdrDropdown = () => setFdrDropdownOpen(!isFdrDropdownOpen);
-  const branchDropdown = () => setBranchDropdownOpen(!isBranchDropdownOpen);
+
   const staffDropdown = () => setStaffDropdownOpen(!isStaffDropdownOpen);
   const withdrawDropdown = () =>
     setWithdrawDropdownOpen(!isWithdrawDropdownOpen);
+
+  const { data: branchData } = useGetSingleBranchQuery(email);
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -89,7 +98,9 @@ const Sidebar = () => {
           {/* Branding & Profile Info */}
           <div>
             <div className="w-full hidden md:flex -m-2 justify-center items-center mx-auto text-slate-300 text-2xl">
-              <marquee className="font-semibold">LSMB</marquee>
+              <marquee className="font-semibold">
+                {branchData?.data?.branchName || "LSMB"}
+              </marquee>
             </div>
             <div className="flex flex-col items-center mt-6 -mx-2">
               <div className="text-white flex justify-center items-center gap-5 border rounded">
@@ -97,7 +108,7 @@ const Sidebar = () => {
                   <FaWallet />
                 </div>
                 <div>
-                  <h2>451254</h2>
+                  <h2>000000</h2>
                 </div>
                 <div className="border px-6 rounded py-2">
                   <HiOutlineRefresh />
@@ -108,7 +119,7 @@ const Sidebar = () => {
                   <FcBusinessman />
                 </div>
                 <div>
-                  <h2>451254</h2>
+                  <h2>000000</h2>
                 </div>
                 <div className="border px-6 rounded py-2">
                   <FaSearch />
@@ -135,6 +146,9 @@ const Sidebar = () => {
                 </div>
               </NavLink>
 
+              {/* Conditionally Render create Super admin */}
+              <CreateSuperAdminSidebar></CreateSuperAdminSidebar>
+
               {/* Conditionally Render create admin */}
               <CreateAdminSidebar></CreateAdminSidebar>
 
@@ -144,71 +158,8 @@ const Sidebar = () => {
               {/* Conditionally Render Branch */}
               <BranchCreateSidebar></BranchCreateSidebar>
 
-              {/* Branch Dropdown Menu */}
-              <div className="relative">
-                <div className="dropDownStyle" onClick={branchDropdown}>
-                  <div className="flex items-center">
-                    <IoHome className="text-[24px]" />
-                    <span className="mx-4 font-medium">BRANCH</span>
-                  </div>
-                  <TiChevronLeft
-                    className={`w-5 h-5 transition-transform duration-300 ${
-                      isBranchDropdownOpen ? "-rotate-90" : ""
-                    }`}
-                  />
-                </div>
-                <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isBranchDropdownOpen ? "max-h-screen" : "max-h-0"
-                  }`}
-                >
-                  <NavLink
-                    to={`branch-details/${email}`}
-                    className={({ isActive }) =>
-                      `dropDownListStyle ${
-                        isActive ? "activeColor" : "text-gray-600"
-                      }`
-                    }
-                  >
-                    <MdOutlineCircle className="iconListStyle" />
-                    <span className="font-medium">BRANCH DETAILS</span>
-                  </NavLink>
-                </div>
-                <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isBranchDropdownOpen ? "max-h-screen" : "max-h-0"
-                  }`}
-                >
-                  <NavLink
-                    to="group-list"
-                    className={({ isActive }) =>
-                      `dropDownListStyle ${
-                        isActive ? "activeColor" : "text-gray-600"
-                      }`
-                    }
-                  >
-                    <MdOutlineCircle className="iconListStyle" />
-                    <span className="font-medium">GROUP LIST</span>
-                  </NavLink>
-                </div>
-                <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isBranchDropdownOpen ? "max-h-screen" : "max-h-0"
-                  }`}
-                >
-                  <NavLink
-                    to="all-members"
-                    className={({ isActive }) =>
-                      `dropDownListStyle ${
-                        isActive ? "activeColor" : "text-gray-600"
-                      }`
-                    }
-                  >
-                    <MdOutlineCircle className="iconListStyle" />
-                    <span className="font-medium">MEMBERSHIP</span>
-                  </NavLink>
-                </div>
-              </div>
+              {/* Conditionally Render when login as a branchManager */}
+              <BranchSidebar></BranchSidebar>
 
               {/* Savings Dropdown Menu */}
               <div className="relative">
@@ -423,7 +374,7 @@ const Sidebar = () => {
               <div className="relative">
                 <div className="dropDownStyle" onClick={withdrawDropdown}>
                   <div className="flex items-center">
-                    <LiaIconsSolid className="text-[26px] mr-3" />
+                    <BiMoneyWithdraw className="text-[26px] mr-3" />
                     <span className="font-medium text-left">WITHDRAW</span>
                   </div>
 

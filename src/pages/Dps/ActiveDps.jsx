@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useGetAllDpsQuery } from "../../redux/features/dps/dpsApi";
+import { FaEdit } from "react-icons/fa";
 
 const ActiveDps = () => {
   const { data: dpsData, isLoading: dpsDataQueryLoading } = useGetAllDpsQuery();
@@ -7,7 +8,6 @@ const ActiveDps = () => {
   if (dpsDataQueryLoading) {
     return <p>Loading...</p>;
   }
-
 
   return (
     <div>
@@ -39,14 +39,27 @@ const ActiveDps = () => {
               {dpsData?.data.map((item, index) => (
                 <tr key={item._id}>
                   <td>{index + 1} </td>
-                  <td>{item.memberOfApplying.memberName}</td>
+                  <td>
+                    <NavLink
+                      target="_blank"
+                      to={`/dashboard/single-member/${item.memberOfApplying?._id}`}
+                      className="border border-lime-900 px-4 py-1 rounded-md hover:bg-slate-800 hover:text-white"
+                    >
+                      <button>{item.memberOfApplying?.memberName}</button>
+                    </NavLink>
+                  </td>
+
                   <td>{item.memberOfApplying.memberId}</td>
                   <td>{item.dpsAcNo}</td>
                   <td>{item.dpsStart}</td>
                   <td>{item.installmentType}</td>
                   <td>{item.returnInterest}</td>
-                  <td>{item.durationOfYear}</td>
-                  <td>...</td>
+                  <td>{item.durationOfYear} Year</td>
+                  <td className="">
+                    <div className="flex justify-center items-center">
+                      <FaEdit />
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

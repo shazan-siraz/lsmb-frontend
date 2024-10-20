@@ -4,6 +4,8 @@ import MainLayout from "../components/layout/MainLayout";
 import DashboardHome from "../pages/DashboardHome/DashboardHome";
 import RegisterPackage from "../pages/RegisterPackage/RegisterPackage";
 import CreateAdmin from "../pages/CreateAdmin/CreateAdmin";
+import CreateSuperAdmin from "../pages/CreateSuperAdmin/CreateSuperAdmin";
+import SuperAdminList from "../pages/CreateSuperAdmin/SuperAdminList";
 import AdminList from "../pages/CreateAdmin/AdminList";
 import PackageList from "../pages/RegisterPackage/PackageList";
 import BranchCreate from "../pages/BranchCreate/BranchCreate";
@@ -43,6 +45,10 @@ import SavingWithdraw from "../pages/Withdraw/SavingWithdraw";
 import FdrWithdraw from "../pages/Withdraw/FdrWithdraw";
 import DpsWithdraw from "../pages/Withdraw/DpsWithdraw";
 import ProtectedRoute from "../components/layout/ProtectedRoute";
+import SuperAdminProfile from "../pages/Profile/SuperAdminProfile/SuperAdminProfile"
+import AdminProfile from "../pages/Profile/AdminProfile/AdminProfile"
+import BranchProfile from "../pages/Profile/BranchProfile/BranchProfilePage"
+import ChangePassword from "../pages/ChangePassword/ChangePassword"
 
 const router = createBrowserRouter([
   {
@@ -68,6 +74,14 @@ const router = createBrowserRouter([
       {
         path: "dashboard-home",
         element: <DashboardHome></DashboardHome>,
+      },
+      {
+        path: "superAdmin-create",
+        element: <CreateSuperAdmin></CreateSuperAdmin>,
+      },
+      {
+        path: "superAdmin-list",
+        element: <SuperAdminList></SuperAdminList>
       },
       {
         path: "admin-create",
@@ -220,6 +234,22 @@ const router = createBrowserRouter([
       {
         path: "withdraw/dps/:id",
         element: <DpsWithdraw></DpsWithdraw>,
+      },
+      {
+        path: "superAdmin-profile",
+        element: <SuperAdminProfile></SuperAdminProfile>
+      },
+      {
+        path: "admin-profile",
+        element: <AdminProfile></AdminProfile>
+      },
+      {
+        path: "branch-profile",
+        element: <BranchProfile></BranchProfile>
+      },
+      {
+        path: "changePassword",
+        element: <ChangePassword></ChangePassword>
       },
     ],
   },

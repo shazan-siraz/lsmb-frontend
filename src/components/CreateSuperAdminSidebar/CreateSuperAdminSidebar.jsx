@@ -3,38 +3,40 @@ import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useState } from "react";
 import { TiChevronLeft } from "react-icons/ti";
 import { NavLink } from "react-router-dom";
-import { MdOutlineCircle } from "react-icons/md";
-import { RiAdminFill } from "react-icons/ri";
+import { MdAdminPanelSettings, MdOutlineCircle } from "react-icons/md";
 
-const CreateAdminSidebar = () => {
+const CreateSuperAdminSidebar = () => {
   const { role } = useSelector(useCurrentUser);
-  const [isAdminCreate, setIsAdminCreate] = useState(false);
+  const [isSuperAdminCreate, setIsSuperAdminCreate] = useState(false);
 
-  const adminCreateDropdown = () => setIsAdminCreate(!isAdminCreate);
+  const superAdminCreateDropdown = () =>
+    setIsSuperAdminCreate(!isSuperAdminCreate);
 
   return (
     <div>
       {/* Conditionally Render Branch */}
       {role === "superAdmin" && (
         <div className="relative">
-          <div className="dropDownStyle" onClick={adminCreateDropdown}>
+          <div className="dropDownStyle" onClick={superAdminCreateDropdown}>
             <div className="flex items-center">
-              <RiAdminFill className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">Create Admin</span>
+              <MdAdminPanelSettings className="text-[24px]" />
+              <span className="mx-4 font-medium uppercase">
+                Create Su. Admin
+              </span>
             </div>
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
-                isAdminCreate ? "-rotate-90" : ""
+                isSuperAdminCreate ? "-rotate-90" : ""
               }`}
             />
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isAdminCreate ? "max-h-screen" : "max-h-0"
+              isSuperAdminCreate ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="admin-create"
+              to="superAdmin-create"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -42,16 +44,16 @@ const CreateAdminSidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Create Admin</span>
+              <span className="font-medium uppercase">Create Super Admin</span>
             </NavLink>
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isAdminCreate ? "max-h-screen" : "max-h-0"
+              isSuperAdminCreate ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="admin-list"
+              to="superAdmin-list"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -59,7 +61,7 @@ const CreateAdminSidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Admin List</span>
+              <span className="font-medium uppercase">Super Admin List</span>
             </NavLink>
           </div>
         </div>
@@ -68,4 +70,4 @@ const CreateAdminSidebar = () => {
   );
 };
 
-export default CreateAdminSidebar;
+export default CreateSuperAdminSidebar;

@@ -11,11 +11,21 @@ const adminApi = baseApi.injectEndpoints({
     }),
     getAllAdmin: builder.query({
       query: () => ({
-        url: "/dps",
+        url: "/admin",
+        method: "GET",
+      }),
+    }),
+    getSingleAdmin: builder.query({
+      query: (email) => ({
+        url: `/admin/${email}`,
         method: "GET",
       }),
     }),
   }),
 });
 
-export const { useCreateAdminMutation, useGetAllAdminQuery } = adminApi;
+export const {
+  useCreateAdminMutation,
+  useGetAllAdminQuery,
+  useGetSingleAdminQuery,
+} = adminApi;

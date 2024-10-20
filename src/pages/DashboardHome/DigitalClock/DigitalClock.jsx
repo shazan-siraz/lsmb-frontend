@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 const DigitalClock = () => {
@@ -12,10 +13,16 @@ const DigitalClock = () => {
   }, []);
 
   const formatTime = (date) => {
-    const hours = String(date.getHours()).padStart(2, '0');
+    let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12 || 12; // Convert to 12-hour format, '0' becomes '12'
+
+    hours = String(hours).padStart(2, '0'); // Ensure 2-digit format for hours
+    
+    return `${hours}:${minutes}:${seconds} ${ampm}`;
   };
 
   return (

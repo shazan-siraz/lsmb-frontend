@@ -6,8 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
 import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useCreateFdrMutation } from "../../redux/features/fdr/fdrApi";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const FdrCreate = () => {
+  const { email } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
   const [inputDepositValue, setInputDepositValue] = useState("");
   const [interestPercent, setInterestPercent] = useState("");
@@ -169,7 +172,7 @@ const FdrCreate = () => {
   const { data: employeeData, isLoading: employeeDataLoading } =
     useGetAllEmployeeQuery();
 
-  const [addFdr] = useCreateFdrMutation();
+  const [addFdr, {isLoading: fdrCreateLoading, error}] = useCreateFdrMutation();
 
   if (membersDataLoading || employeeDataLoading) {
     return <p>Loading...</p>;
@@ -179,6 +182,7 @@ const FdrCreate = () => {
     try {
       const fdrData = {
         memberOfFdrApplying: data.memberOfFdrApplying,
+        branchEmail: email,
         FdrStart: data.FdrStart,
         FdrAcNo: data.FdrAcNo,
         FixedDepositAmount: parseInt(data.FixedDepositAmount),
@@ -198,7 +202,7 @@ const FdrCreate = () => {
         reset();
       }
     } catch (err) {
-      console.log(err);
+      console.log(error);
     }
   };
 
@@ -388,7 +392,7 @@ const FdrCreate = () => {
                 <option>Select Reference Employee</option>
                 {employeeData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
-                    {item?.name}
+                    {item?.employeeName}
                   </option>
                 ))}
               </select>
@@ -416,12 +420,12 @@ const FdrCreate = () => {
 
           <div className="border-b border-slate-300 my-5"></div>
 
-          <div className="text-center py-10">
+          <div className="text-center py-10 max-w-[500px] mx-auto">
             <input
-              className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+              className="w-[100%] transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
               type="submit"
-              // value={isLoading ? "Loading..." : "Submit"}
-              // disabled={isLoading}
+              value={fdrCreateLoading ? "Loading..." : "Create FDR"}
+              disabled={fdrCreateLoading}
             />
             <ToastContainer />
           </div>
