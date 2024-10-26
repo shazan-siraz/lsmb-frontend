@@ -1,40 +1,40 @@
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useState } from "react";
 import { TiChevronLeft } from "react-icons/ti";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { MdOutlineCircle } from "react-icons/md";
-import { FaCodeBranch } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 
-const BranchCreateSidebar = () => {
+const SoftwareUsersSidebar = () => {
   const { role } = useSelector(useCurrentUser);
-  const [isBranchCreate, setIsBranchCreate] = useState(false);
+  const [softwareUsers, setSoftwareUsers] = useState(false);
 
-  const branchCreateDropdown = () => setIsBranchCreate(!isBranchCreate);
+  const softwareUsersDropdownOpen = () => setSoftwareUsers(!softwareUsers);
 
   return (
     <div>
-      {/* Conditionally Render Branch */}
-      {(!role === "superAdmin" || !role === "admin") && (
+      {(role === "superAdmin" || role === "admin") && (
         <div className="relative">
-          <div className="dropDownStyle" onClick={branchCreateDropdown}>
+          <div className="dropDownStyle" onClick={softwareUsersDropdownOpen}>
             <div className="flex items-center">
-              <FaCodeBranch className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">Branch Create</span>
+              <FaUsers className="text-[24px]" />
+              <span className="mx-4 font-medium uppercase">Software Users</span>
             </div>
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
-                isBranchCreate ? "-rotate-90" : ""
+                softwareUsers ? "-rotate-90" : ""
               }`}
             />
           </div>
+
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isBranchCreate ? "max-h-screen" : "max-h-0"
+              softwareUsers ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="branch-create"
+              to="added-softwareUsers"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -42,16 +42,18 @@ const BranchCreateSidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Create Branch</span>
+              <span className="font-medium uppercase">
+                Added Software Users
+              </span>
             </NavLink>
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isBranchCreate ? "max-h-screen" : "max-h-0"
+              softwareUsers ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="branch-list"
+              to="softwareUsersList"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -59,7 +61,7 @@ const BranchCreateSidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Branch List</span>
+              <span className="font-medium uppercase">Software Users List</span>
             </NavLink>
           </div>
         </div>
@@ -68,4 +70,4 @@ const BranchCreateSidebar = () => {
   );
 };
 
-export default BranchCreateSidebar;
+export default SoftwareUsersSidebar;

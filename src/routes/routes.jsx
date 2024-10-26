@@ -55,6 +55,12 @@ import SubscriberList from "../pages/Subscriber/SubscriberList";
 import Sms from "../pages/SMS/Sms";
 import AddedAddVideoTutorial from "../pages/AdVideoTutorial/AddedAdVideoTutorial";
 import AddVideoTutorialList from "../pages/AdVideoTutorial/AddVideoTutorialList";
+import AddedSoftwareUsers from "../pages/SoftwareUsers/AddedSoftwareUsers";
+import SoftwareUsersList from "../pages/SoftwareUsers/SoftwareUsersList";
+import TinyMCEEditor from "../pages/TextEditor/TinyMCEEditor";
+import ArticleList from "../pages/TextEditor/ArticleList";
+import Article from "../pages/Article/Article";
+import SingleArticle from "../pages/Article/SingleArticle";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +74,14 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register></Register>,
+  },
+  {
+    path: "article",
+    element: <Article></Article>
+  },
+  {
+    path: "article/:id",
+    element: <SingleArticle></SingleArticle>
   },
   {
     path: "/dashboard",
@@ -263,7 +277,7 @@ const router = createBrowserRouter([
       },
       {
         path: "create-subscriber",
-        element: <CreateSubscriber></CreateSubscriber>
+        element: <CreateSubscriber></CreateSubscriber>,
       },
       {
         path: "subscriberList",
@@ -279,8 +293,26 @@ const router = createBrowserRouter([
       },
       {
         path: "addvideotutorial-list",
-        element: <AddVideoTutorialList></AddVideoTutorialList>
+        element: <AddVideoTutorialList></AddVideoTutorialList>,
       },
+      {
+        path: "added-softwareUsers",
+        element: <AddedSoftwareUsers></AddedSoftwareUsers>,
+      },
+      {
+        path: "softwareUsersList",
+        element: <SoftwareUsersList></SoftwareUsersList>,
+      },
+      {
+        path: "tinymceEditor",
+        element: <TinyMCEEditor></TinyMCEEditor>
+      },
+      {
+        path: "article-list",
+        element: <ArticleList></ArticleList>
+      },
+      
+      
     ],
   },
 ]);

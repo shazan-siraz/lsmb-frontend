@@ -3,24 +3,24 @@ import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { toast, ToastContainer } from "react-toastify";
 import {
-  useDeleteRegisterPackageMutation,
-  useGetAllRegisterPackageQuery,
-} from "../../redux/features/registerPackage/registerPackage";
+  useDeleteSoftwareUsersMutation,
+  useGetAllSoftwareUsersQuery,
+} from "../../redux/features/softwareUsers/softwareUsers";
 
-const PackageList = () => {
-  const { data: registerPackageData, isLoading: registerPackageLoading } =
-    useGetAllRegisterPackageQuery();
+const SoftwareUsersList = () => {
+  const { data: softwareUserData, isLoading: softwareUserDataLoading } =
+    useGetAllSoftwareUsersQuery();
 
-  const [deleteRegisterPackage] = useDeleteRegisterPackageMutation();
+  const [deleteSoftwareUsers] = useDeleteSoftwareUsersMutation();
 
-  if (registerPackageLoading) {
+  if (softwareUserDataLoading) {
     return <p>Loading...</p>;
   }
 
-  const handleDeleteRegisterPackage = async (id) => {
-    const res = await deleteRegisterPackage(id);
+  const handleDeleteSoftwareUsers = async (id) => {
+    const res = await deleteSoftwareUsers(id);
     if (res?.data) {
-      toast.success("Register Package is Deleted Successfully");
+      toast.success("Software User is Deleted Successfully");
     }
   };
 
@@ -29,13 +29,13 @@ const PackageList = () => {
       <ToastContainer></ToastContainer>
       <div className="flex justify-between items-center">
         <h1 className="font-semibold text-[20px]">
-          Register Package List: {registerPackageData?.data?.length}
+          Software Users: {softwareUserData?.data?.length}
         </h1>
         <NavLink
-          to="/dashboard/registerPackage-create"
+          to="/dashboard/added-softwareUsers"
           className="border border-slate-500 text-slate-600 hover:bg-slate-500 px-5 py-2 hover:text-white font-semibold rounded transition-all duration-300 ease-in-out"
         >
-          Added Register Package
+          Added Software Users
         </NavLink>
       </div>
 
@@ -44,26 +44,30 @@ const PackageList = () => {
           <thead className="bg-slate-500 text-white">
             <tr className="">
               <th>#</th>
-              <th>Package Name</th>
-              <th>Package Price</th>
-              <th>Member Limit</th>
-              <th>User Limit</th>
-              <th>Created At</th>
+              <th>Software Users Logo</th>
+              <th>Software Users Name</th>
+              <th>Software Users Address</th>
+              <th>Uploaded At</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {registerPackageData?.data?.map((item, index) => (
+            {softwareUserData?.data?.map((item, index) => (
               <tr key={item._id}>
                 <td>{index + 1}</td>
-                <td>{item.packageName}</td>
-                <td>{item.packagePrice}</td>
-                <td>{item.memberLimit}</td>
-                <td>{item.userLimit}</td>
+                <td>
+                  <img
+                    className="w-[50px]"
+                    src={item.softwareUsersLogo}
+                    alt=""
+                  />
+                </td>
+                <td>{item.softwareUsersName}</td>
+                <td>{item.softwareUsersAddress}</td>
                 <td>{timeFormat(item.createdAt)}</td>
                 <td>{item.status}</td>
-                <td onClick={() => handleDeleteRegisterPackage(item._id)}>
+                <td onClick={() => handleDeleteSoftwareUsers(item._id)}>
                   <div className="flex justify-center items-center text-[20px] border border-red-500 py-1 rounded text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 ease-in-out cursor-pointer">
                     <RiDeleteBin6Fill />
                   </div>
@@ -77,4 +81,4 @@ const PackageList = () => {
   );
 };
 
-export default PackageList;
+export default SoftwareUsersList;

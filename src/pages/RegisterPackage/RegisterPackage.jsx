@@ -11,12 +11,10 @@ const RegisterPackage = () => {
   const onSubmit = async (data) => {
     try {
       const registerPackageData = {
-        packageId: Number(data?.packageId),
         packageName: data?.packageName,
         packagePrice: Number(data?.packagePrice),
         memberLimit: Number(data?.maximumCreatedMember),
-        branchLimit: Number(data?.maximumCreatedBranch),
-        userLimit: Number(data?.userLimit),
+        userLimit: Number(data?.maximumCreatedUser),
       };
 
       const res = await addRegisterPackage(registerPackageData);
@@ -39,23 +37,9 @@ const RegisterPackage = () => {
 
         <div className="border-b border-slate-300 my-3"></div>
 
-        <div className="px-5">
+        <div className="px-10 max-w-[1100px] mx-auto">
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid md:grid-cols-3 gap-5">
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="packageId">
-                  Package ID*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  placeholder="Package ID"
-                  type="number"
-                  id="packageId"
-                  {...register("packageId")}
-                  required={true}
-                />
-              </div>
-
+            <div className="grid md:grid-cols-2 gap-5">
               <div className="flex flex-col">
                 <label className="font-semibold" htmlFor="packageName">
                   Package Name*
@@ -99,29 +83,15 @@ const RegisterPackage = () => {
               </div>
 
               <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="maximumCreatedBranch">
-                  Maximum Created Branch*
+                <label className="font-semibold" htmlFor="maximumCreatedUser">
+                  Maximum Created User*
                 </label>
                 <input
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  placeholder="Maximum Created Branch"
+                  placeholder="Maximum Created User"
                   type="number"
-                  id="maximumCreatedBranch"
-                  {...register("maximumCreatedBranch")}
-                  required={true}
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="userLimit">
-                  User Limit*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  placeholder="User Limit"
-                  type="number"
-                  id="userLimit"
-                  {...register("userLimit")}
+                  id="maximumCreatedUser"
+                  {...register("maximumCreatedUser")}
                   required={true}
                 />
               </div>

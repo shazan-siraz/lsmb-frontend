@@ -1,40 +1,39 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
-import { useState } from "react";
+import { BiSolidUserPlus } from "react-icons/bi";
 import { TiChevronLeft } from "react-icons/ti";
 import { NavLink } from "react-router-dom";
 import { MdOutlineCircle } from "react-icons/md";
-import { FaCodeBranch } from "react-icons/fa";
 
-const BranchCreateSidebar = () => {
+const SavingsSidebar = () => {
   const { role } = useSelector(useCurrentUser);
-  const [isBranchCreate, setIsBranchCreate] = useState(false);
 
-  const branchCreateDropdown = () => setIsBranchCreate(!isBranchCreate);
+  const [isSavingsDropdownOpen, setSavingsDropdownOpen] = useState(false);
+  const savingsDropdown = () => setSavingsDropdownOpen(!isSavingsDropdownOpen);
 
   return (
     <div>
-      {/* Conditionally Render Branch */}
       {(!role === "superAdmin" || !role === "admin") && (
         <div className="relative">
-          <div className="dropDownStyle" onClick={branchCreateDropdown}>
+          <div className="dropDownStyle" onClick={savingsDropdown}>
             <div className="flex items-center">
-              <FaCodeBranch className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">Branch Create</span>
+              <BiSolidUserPlus className="text-[28px] mr-3" />
+              <span className="font-medium">SAVINGS</span>
             </div>
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
-                isBranchCreate ? "-rotate-90" : ""
+                isSavingsDropdownOpen ? "-rotate-90" : ""
               }`}
             />
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isBranchCreate ? "max-h-screen" : "max-h-0"
+              isSavingsDropdownOpen ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="branch-create"
+              to="savings-account"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -42,16 +41,16 @@ const BranchCreateSidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Create Branch</span>
+              <span className="font-medium">SAVINGS ACCOUNT</span>
             </NavLink>
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isBranchCreate ? "max-h-screen" : "max-h-0"
+              isSavingsDropdownOpen ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="branch-list"
+              to="savings-statement"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -59,7 +58,24 @@ const BranchCreateSidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Branch List</span>
+              <span className="font-medium">SAVINGS STATEMENT</span>
+            </NavLink>
+          </div>
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              isSavingsDropdownOpen ? "max-h-screen" : "max-h-0"
+            }`}
+          >
+            <NavLink
+              to="savings-report"
+              className={({ isActive }) =>
+                `dropDownListStyle ${
+                  isActive ? "activeColor" : "text-gray-600"
+                }`
+              }
+            >
+              <MdOutlineCircle className="iconListStyle" />
+              <span className="font-medium">SAVINGS REPORT</span>
             </NavLink>
           </div>
         </div>
@@ -68,4 +84,4 @@ const BranchCreateSidebar = () => {
   );
 };
 
-export default BranchCreateSidebar;
+export default SavingsSidebar;

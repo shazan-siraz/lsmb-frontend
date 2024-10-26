@@ -15,7 +15,17 @@ const registerPackageApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    deleteRegisterPackage: builder.mutation({
+      query: (id) => ({
+        url: `/registerPackage/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useCreateRegisterPackageMutation, useGetAllRegisterPackageQuery } = registerPackageApi;
+export const {
+  useCreateRegisterPackageMutation,
+  useGetAllRegisterPackageQuery,
+  useDeleteRegisterPackageMutation,
+} = registerPackageApi;

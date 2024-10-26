@@ -13,7 +13,7 @@ const UserPriceList = () => {
 
   return (
     <div className="bg-slate-100 py-[100px]">
-      <div className="text-center">
+      <div className="text-center mb-10">
         <h1 className="text-[30px] font-semibold mb-5">মূল্য তালিকা</h1>
         <p className="text-[20px]">কোম্পানি রেজিস্ট্রেশন ফি 3000 টাকা।</p>
       </div>
@@ -34,10 +34,6 @@ const UserPriceList = () => {
                 <div className="flex items-center gap-3">
                   <FaCheck className="text-blue-600" />
                   <p>সর্বোচ্চ {item.memberLimit} মেম্বার</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <FaCheck className="text-blue-600" />
-                  <p>সর্বোচ্চ {item.branchLimit} টি ব্রাঞ্চ</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <FaCheck className="text-blue-600" />

@@ -63,6 +63,8 @@ export const baseApi = createApi({
     "savingWithdraw",
     "superAdmin",
     "videoTutorial",
+    "softwareUsers",
+    "article",
   ],
   endpoints: () => ({}),
 });
