@@ -4,6 +4,7 @@ import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 
 const BranchDetails = () => {
   const { email } = useSelector(useCurrentUser);
+
   const { data: branchData, isLoading: branchQueryLoading } =
     useGetSingleBranchQuery(email);
 

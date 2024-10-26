@@ -45,10 +45,16 @@ import SavingWithdraw from "../pages/Withdraw/SavingWithdraw";
 import FdrWithdraw from "../pages/Withdraw/FdrWithdraw";
 import DpsWithdraw from "../pages/Withdraw/DpsWithdraw";
 import ProtectedRoute from "../components/layout/ProtectedRoute";
-import SuperAdminProfile from "../pages/Profile/SuperAdminProfile/SuperAdminProfile"
-import AdminProfile from "../pages/Profile/AdminProfile/AdminProfile"
-import BranchProfile from "../pages/Profile/BranchProfile/BranchProfilePage"
-import ChangePassword from "../pages/ChangePassword/ChangePassword"
+import SuperAdminProfile from "../pages/Profile/SuperAdminProfile/SuperAdminProfile";
+import AdminProfile from "../pages/Profile/AdminProfile/AdminProfile";
+import BranchProfile from "../pages/Profile/BranchProfile/BranchProfilePage";
+import ChangePassword from "../pages/ChangePassword/ChangePassword";
+import Register from "../pages/Register/Register";
+import CreateSubscriber from "../pages/Subscriber/CreateSubscriber";
+import SubscriberList from "../pages/Subscriber/SubscriberList";
+import Sms from "../pages/SMS/Sms";
+import AddedAddVideoTutorial from "../pages/AdVideoTutorial/AddedAdVideoTutorial";
+import AddVideoTutorialList from "../pages/AdVideoTutorial/AddVideoTutorialList";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +64,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login></Login>,
+  },
+  {
+    path: "/register",
+    element: <Register></Register>,
   },
   {
     path: "/dashboard",
@@ -81,7 +91,7 @@ const router = createBrowserRouter([
       },
       {
         path: "superAdmin-list",
-        element: <SuperAdminList></SuperAdminList>
+        element: <SuperAdminList></SuperAdminList>,
       },
       {
         path: "admin-create",
@@ -237,19 +247,39 @@ const router = createBrowserRouter([
       },
       {
         path: "superAdmin-profile",
-        element: <SuperAdminProfile></SuperAdminProfile>
+        element: <SuperAdminProfile></SuperAdminProfile>,
       },
       {
         path: "admin-profile",
-        element: <AdminProfile></AdminProfile>
+        element: <AdminProfile></AdminProfile>,
       },
       {
         path: "branch-profile",
-        element: <BranchProfile></BranchProfile>
+        element: <BranchProfile></BranchProfile>,
       },
       {
         path: "changePassword",
-        element: <ChangePassword></ChangePassword>
+        element: <ChangePassword></ChangePassword>,
+      },
+      {
+        path: "create-subscriber",
+        element: <CreateSubscriber></CreateSubscriber>
+      },
+      {
+        path: "subscriberList",
+        element: <SubscriberList></SubscriberList>,
+      },
+      {
+        path: "sms",
+        element: <Sms></Sms>,
+      },
+      {
+        path: "added-addvideotutorial",
+        element: <AddedAddVideoTutorial></AddedAddVideoTutorial>,
+      },
+      {
+        path: "addvideotutorial-list",
+        element: <AddVideoTutorialList></AddVideoTutorialList>
       },
     ],
   },

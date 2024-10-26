@@ -1,5 +1,6 @@
 import "./Banner.css";
 import bannerImg from "../../../assets/images/banking.png"
+import { NavLink } from "react-router-dom";
 
 const Banner = () => {
   return (
@@ -10,11 +11,11 @@ const Banner = () => {
           <p className="text-white font-semibold py-5">
             হিসাব হবে স্বচ্ছ, ব্যবসা হবে গুচ্ছ।
           </p>
-          <div>
+          <NavLink to="./register">
             <button className="bg-white text-blue-600 px-5 py-2 rounded-full font-semibold border-2 hover:bg-transparent hover:text-white transition-all duration-300 ease-in-out">
               রেজিস্ট্রেশন করুন
             </button>
-          </div>
+          </NavLink>
         </div>
 
         <div>

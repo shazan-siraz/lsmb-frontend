@@ -1,43 +1,40 @@
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useState } from "react";
-import { LuPackagePlus } from "react-icons/lu";
 import { TiChevronLeft } from "react-icons/ti";
 import { NavLink } from "react-router-dom";
 import { MdOutlineCircle } from "react-icons/md";
+import { MdOutlineSubscriptions } from "react-icons/md";
 
-const RegisterPackage = () => {
+const SubscriberSidebar = () => {
   const { role } = useSelector(useCurrentUser);
-  const [isRegisterPackage, setIsRegisterPackage] = useState(false);
+  const [subscriber, setIsSubscriber] = useState(false);
 
-  const registerPackageDropdown = () =>
-    setIsRegisterPackage(!isRegisterPackage);
+  const subscriberDropdown = () => setIsSubscriber(!subscriber);
 
   return (
     <div>
-      {/* Conditionally Render Register Package */}
+      {/* Conditionally Render SubscriberSidebar */}
       {(role === "superAdmin" || role === "admin") && (
         <div className="relative">
-          <div className="dropDownStyle" onClick={registerPackageDropdown}>
+          <div className="dropDownStyle" onClick={subscriberDropdown}>
             <div className="flex items-center">
-              <LuPackagePlus className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">
-                Register Package
-              </span>
+              <MdOutlineSubscriptions className="text-[24px]" />
+              <span className="mx-4 font-medium uppercase">Subscriber</span>
             </div>
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
-                isRegisterPackage ? "-rotate-90" : ""
+                subscriber ? "-rotate-90" : ""
               }`}
             />
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isRegisterPackage ? "max-h-screen" : "max-h-0"
+              subscriber ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="registerPackage-create"
+              to="create-subscriber"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -45,16 +42,16 @@ const RegisterPackage = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Create Package</span>
+              <span className="font-medium uppercase">Create Subscriber</span>
             </NavLink>
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isRegisterPackage ? "max-h-screen" : "max-h-0"
+              subscriber ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="registerPackage-list"
+              to="subscriberList"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -62,7 +59,7 @@ const RegisterPackage = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Package List</span>
+              <span className="font-medium uppercase">Subscriber List</span>
             </NavLink>
           </div>
         </div>
@@ -71,4 +68,4 @@ const RegisterPackage = () => {
   );
 };
 
-export default RegisterPackage;
+export default SubscriberSidebar;

@@ -11,6 +11,15 @@ const superAdminApi = baseApi.injectEndpoints({
       invalidatesTags: ["superAdmin"],
     }),
 
+    getAllSuperAdmin: builder.query({
+      query: () => ({
+        url: "/superAdmin",
+        method: "GET",
+      }),
+
+      providesTags: ["superAdmin"],
+    }),
+
     getSingleSuperAdmin: builder.query({
       query: (email) => ({
         url: `/superAdmin/${email}`,
@@ -22,4 +31,8 @@ const superAdminApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useCreateSuperAdminMutation, useGetSingleSuperAdminQuery } = superAdminApi;
+export const {
+  useCreateSuperAdminMutation,
+  useGetSingleSuperAdminQuery,
+  useGetAllSuperAdminQuery,
+} = superAdminApi;

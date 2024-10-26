@@ -1,16 +1,12 @@
 import { useForm } from "react-hook-form";
+import LogoSoftbankBD from "../../../src/assets/icons/LogoSoftbankBD.png";
 import { useGetAllRegisterPackageQuery } from "../../redux/features/registerPackage/registerPackage";
-import { toast, ToastContainer } from "react-toastify";
-import { useCreateBranchMutation } from "../../redux/features/branch/branchApi";
 
-const BranchCreate = () => {
-  const { register, handleSubmit, reset } = useForm();
+const Register = () => {
+  const { register, handleSubmit } = useForm();
 
   const { data: registerPackageData, isLoading: registerPackageLoading } =
     useGetAllRegisterPackageQuery();
-
-  const [createBranch, { isLoading: branchCreateLoading }] =
-    useCreateBranchMutation();
 
   if (registerPackageLoading) {
     return <p>Loading...</p>;
@@ -42,20 +38,24 @@ const BranchCreate = () => {
   };
 
   return (
-    <div>
-      <div className="bg-[#EBECED] h-screen">
-        <div className="text-center px-10 pt-2">
-          <h1 className="font-bold text-[30px]">Make a New Branch</h1>
-        </div>
+    <div className="bg-[#EBECED] h-screen flex justify-center items-center">
 
-        <div className="border-b border-slate-300 my-3"></div>
+      <div className="max-w-[800px] mx-auto bg-[#F0F2F5] rounded-lg shadow-lg py-10">
+        <div className="flex flex-col items-center pb-10">
+          <img
+            className="w-[90px]"
+            src={LogoSoftbankBD}
+            alt="Logo SoftbankBD"
+          />
+          <h2 className="font-bold text-[40px]">SoftbankBD</h2>
+        </div>
 
         <div className="px-10">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid md:grid-cols-2 gap-5">
               <div className="flex flex-col">
                 <label className="font-semibold" htmlFor="branchId">
-                  Branch ID*
+                  Branc*
                 </label>
                 <input
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
@@ -163,14 +163,14 @@ const BranchCreate = () => {
 
             <div className="border-b border-slate-300 my-10"></div>
 
-            <div className="text-center py-10">
+            <div className="text-center">
               <input
                 className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
                 type="submit"
-                value={branchCreateLoading ? "Loading..." : "Create Branch"}
-                disabled={branchCreateLoading}
+                // value={branchCreateLoading ? "Loading..." : "Create Branch"}
+                // disabled={branchCreateLoading}
               />
-              <ToastContainer></ToastContainer>
+              {/* <ToastContainer></ToastContainer> */}
             </div>
           </form>
         </div>
@@ -179,4 +179,4 @@ const BranchCreate = () => {
   );
 };
 
-export default BranchCreate;
+export default Register;

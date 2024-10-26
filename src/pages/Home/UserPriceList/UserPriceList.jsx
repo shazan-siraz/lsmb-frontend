@@ -1,6 +1,7 @@
 import { FaCheck } from "react-icons/fa";
 import "./UserPriceList.css";
 import { useGetAllRegisterPackageQuery } from "../../../redux/features/registerPackage/registerPackage";
+import { NavLink } from "react-router-dom";
 
 const UserPriceList = () => {
   const { data: packageData, isLoading: packageDataLoading } =
@@ -44,9 +45,11 @@ const UserPriceList = () => {
                 </div>
               </div>
               <div className="text-center mt-8">
-                <button className="border rounded-full px-10 py-1 border-blue-600 text-[15px] text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out">
-                  রেজিস্ট্রেশন
-                </button>
+                <NavLink to="./register">
+                  <button className="border rounded-full px-10 py-1 border-blue-600 text-[15px] text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out">
+                    রেজিস্ট্রেশন
+                  </button>
+                </NavLink>
               </div>
             </div>
           ))}

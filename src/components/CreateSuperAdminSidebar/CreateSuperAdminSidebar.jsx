@@ -21,7 +21,7 @@ const CreateSuperAdminSidebar = () => {
             <div className="flex items-center">
               <MdAdminPanelSettings className="text-[24px]" />
               <span className="mx-4 font-medium uppercase">
-                Create Su. Admin
+                Super Admin
               </span>
             </div>
             <TiChevronLeft

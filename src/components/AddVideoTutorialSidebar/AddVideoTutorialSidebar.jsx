@@ -1,43 +1,40 @@
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useState } from "react";
-import { LuPackagePlus } from "react-icons/lu";
 import { TiChevronLeft } from "react-icons/ti";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { MdOutlineCircle } from "react-icons/md";
+import { FaVideo } from "react-icons/fa";
 
-const RegisterPackage = () => {
+const AddVideoTutorialSidebar = () => {
   const { role } = useSelector(useCurrentUser);
-  const [isRegisterPackage, setIsRegisterPackage] = useState(false);
+  const [videoTutorialOpen, setVideoTutorialOpen] = useState(false);
 
-  const registerPackageDropdown = () =>
-    setIsRegisterPackage(!isRegisterPackage);
+  const videoTutorialDropdown = () => setVideoTutorialOpen(!videoTutorialOpen);
 
   return (
     <div>
-      {/* Conditionally Render Register Package */}
       {(role === "superAdmin" || role === "admin") && (
         <div className="relative">
-          <div className="dropDownStyle" onClick={registerPackageDropdown}>
+          <div className="dropDownStyle" onClick={videoTutorialDropdown}>
             <div className="flex items-center">
-              <LuPackagePlus className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">
-                Register Package
-              </span>
+              <FaVideo className="text-[24px]" />
+              <span className="mx-4 font-medium">Video Tutorial</span>
             </div>
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
-                isRegisterPackage ? "-rotate-90" : ""
+                videoTutorialOpen ? "-rotate-90" : ""
               }`}
             />
           </div>
+          
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isRegisterPackage ? "max-h-screen" : "max-h-0"
+              videoTutorialOpen ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="registerPackage-create"
+              to="added-addvideotutorial"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -45,16 +42,16 @@ const RegisterPackage = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Create Package</span>
+              <span className="font-medium uppercase">Added Video Tutorial</span>
             </NavLink>
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isRegisterPackage ? "max-h-screen" : "max-h-0"
+              videoTutorialOpen ? "max-h-screen" : "max-h-0"
             }`}
           >
             <NavLink
-              to="registerPackage-list"
+              to="addvideotutorial-list"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -62,7 +59,7 @@ const RegisterPackage = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Package List</span>
+              <span className="font-medium uppercase">Video Tutorial List</span>
             </NavLink>
           </div>
         </div>
@@ -71,4 +68,4 @@ const RegisterPackage = () => {
   );
 };
 
-export default RegisterPackage;
+export default AddVideoTutorialSidebar;

@@ -14,7 +14,7 @@ import {
   BiSolidUserMinus,
   BiSolidUserPlus,
 } from "react-icons/bi";
-import { MdOutlineCircle } from "react-icons/md";
+import { MdOutlineCircle, MdSms } from "react-icons/md";
 import { IoHome, IoSaveSharp } from "react-icons/io5";
 import { LiaIconsSolid } from "react-icons/lia";
 import RegisterPackage from "../RegisterPackageSidebar/RegisterPackage";
@@ -25,9 +25,13 @@ import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import CreateSuperAdminSidebar from "../CreateSuperAdminSidebar/CreateSuperAdminSidebar";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import BranchSidebar from "../BranchSidebar/BranchSidebar";
+import ProfileInfo from "../ProfileInfo/ProfileInfo";
+import SubscriberSidebar from "../SubscriberSidebar/SubscriberSidebar";
+import SmsSidebar from "../SmsSidebar/SmsSidebar";
+import AddVideoTutorialSidebar from "../AddVideoTutorialSidebar/AddVideoTutorialSidebar";
 
 const Sidebar = () => {
-  const { email } = useSelector(useCurrentUser);
+  const { email, role } = useSelector(useCurrentUser);
   const [isActive, setActive] = useState(false);
   const [isSavingsDropdownOpen, setSavingsDropdownOpen] = useState(false);
   const [isLoanDropdownOpen, setLoanDropdownOpen] = useState(false);
@@ -95,62 +99,54 @@ const Sidebar = () => {
         } md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
         <div>
-          {/* Branding & Profile Info */}
-          <div>
-            <div className="w-full hidden md:flex -m-2 justify-center items-center mx-auto text-slate-300 text-2xl">
-              <marquee className="font-semibold">
-                {branchData?.data?.branchName || "LSMB"}
-              </marquee>
-            </div>
-            <div className="flex flex-col items-center mt-6 -mx-2">
-              <div className="text-white flex justify-center items-center gap-5 border rounded">
-                <div className="border px-6 rounded py-2">
-                  <FaWallet />
-                </div>
-                <div>
-                  <h2>000000</h2>
-                </div>
-                <div className="border px-6 rounded py-2">
-                  <HiOutlineRefresh />
-                </div>
-              </div>
-              <div className="text-white flex justify-center items-center gap-5 border rounded mt-3">
-                <div className="border px-6 rounded py-2">
-                  <FcBusinessman />
-                </div>
-                <div>
-                  <h2>000000</h2>
-                </div>
-                <div className="border px-6 rounded py-2">
-                  <FaSearch />
-                </div>
-              </div>
-            </div>
+          <div className="w-full hidden md:flex -m-2 justify-center items-center mx-auto text-slate-300 text-2xl">
+            <marquee className="font-semibold">
+              {branchData?.data?.branchName || "SoftbankBD"}
+            </marquee>
           </div>
+
+          {/* Conditionally Render Profile Info*/}
+          <ProfileInfo></ProfileInfo>
 
           {/* Nav Items */}
           <div className="flex flex-col justify-between flex-1 mt-6">
             <nav>
               {/* Dashboard */}
-              <div className="inline-flex w-full justify-center items-center px-2 rounded-md cursor-pointer text-gray-800 gap-2">
-                <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
-                <Link className="text-slate-400 font-bold">Dashboard</Link>
-              </div>
-
-              <NavLink to="dashboard-home">
+              <NavLink>
                 <div className="dropDownStyle ">
                   <div className="flex gap-5">
                     <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
-                    <p className="font-semibold">HOME</p>
+                    <p className="font-semibold uppercase">Dashboard</p>
                   </div>
                 </div>
               </NavLink>
+
+              {/* Home */}
+              {role === "manager" && (
+                <NavLink to="dashboard-home">
+                  <div className="dropDownStyle ">
+                    <div className="flex gap-5">
+                      <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
+                      <p className="font-semibold">HOME</p>
+                    </div>
+                  </div>
+                </NavLink>
+              )}
 
               {/* Conditionally Render create Super admin */}
               <CreateSuperAdminSidebar></CreateSuperAdminSidebar>
 
               {/* Conditionally Render create admin */}
               <CreateAdminSidebar></CreateAdminSidebar>
+
+              {/* Conditionally Render subscriber */}
+              <SubscriberSidebar></SubscriberSidebar>
+
+              {/* SMS */}
+              <SmsSidebar></SmsSidebar>
+
+              {/* Conditionally Render Video Tutorial */}
+              <AddVideoTutorialSidebar></AddVideoTutorialSidebar>
 
               {/* Conditionally Render Register Package */}
               <RegisterPackage></RegisterPackage>

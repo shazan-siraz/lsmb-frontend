@@ -20,7 +20,7 @@ const CreateAdminSidebar = () => {
           <div className="dropDownStyle" onClick={adminCreateDropdown}>
             <div className="flex items-center">
               <RiAdminFill className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">Create Admin</span>
+              <span className="mx-4 font-medium uppercase">Admin</span>
             </div>
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
