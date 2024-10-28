@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.1.5",
     "@reduxjs/toolkit": "^2.2.7",
+    "@tinymce/tinymce-react": "^5.1.1",
     "antd": "^5.19.4",
     "antd-style": "^3.6.2",
     "axios": "^1.7.3",
