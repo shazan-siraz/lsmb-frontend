@@ -60,20 +60,6 @@ const CreateAdmin = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid md:grid-cols-3 gap-5">
               <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="adminId">
-                  Admin ID*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  placeholder="Admin ID"
-                  type="text"
-                  id="adminId"
-                  {...register("adminId")}
-                  required={true}
-                />
-              </div>
-
-              <div className="flex flex-col">
                 <label className="font-semibold" htmlFor="adminEmail">
                   Admin Email*
                 </label>

@@ -61,8 +61,8 @@ import TinyMCEEditor from "../pages/TextEditor/TinyMCEEditor";
 import ArticleList from "../pages/TextEditor/ArticleList";
 import Article from "../pages/Article/Article";
 import SingleArticle from "../pages/Article/SingleArticle";
-import CreateCompany from "../pages/Company/CreateCompany";
-import CompanyList from "../pages/Company/CompanyList";
+import RegisteredUserList from "../pages/Register/RegisteredUserList";
+
 
 const router = createBrowserRouter([
   {
@@ -314,13 +314,10 @@ const router = createBrowserRouter([
         element: <ArticleList></ArticleList>,
       },
       {
-        path: "create-company",
-        element: <CreateCompany></CreateCompany>,
+        path: "registeredUser-list",
+        element: <RegisteredUserList></RegisteredUserList>
       },
-      {
-        path: "companyList",
-        element: <CompanyList></CompanyList>,
-      },
+      
     ],
   },
 ]);

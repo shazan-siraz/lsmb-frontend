@@ -1,32 +1,36 @@
 import { useForm } from "react-hook-form";
-import { useGetAllRegisterPackageQuery } from "../../redux/features/registerPackage/registerPackage";
 import { toast, ToastContainer } from "react-toastify";
 import { useCreateBranchMutation } from "../../redux/features/branch/branchApi";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useGetSingleCompanyQuery } from "../../redux/features/company/company";
 
 const BranchCreate = () => {
+  const { email } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
 
-  const { data: registerPackageData, isLoading: registerPackageLoading } =
-    useGetAllRegisterPackageQuery();
+  const { data: singleCompanyData, isLoading: singleCompanyDataQueryLoading } =
+    useGetSingleCompanyQuery(email);
 
   const [createBranch, { isLoading: branchCreateLoading }] =
     useCreateBranchMutation();
 
-  if (registerPackageLoading) {
+  if (singleCompanyDataQueryLoading) {
     return <p>Loading...</p>;
   }
+
+  const id = singleCompanyData?.data._id;
 
   const onSubmit = async (data) => {
     try {
       const branchData = {
         password: data?.branchPassword,
         branch: {
-          branchId: data?.branchId,
           branchName: data?.branchName,
           branchEmail: data?.branchEmail,
           branchMobile: data?.branchMobile,
           branchAddress: data?.branchAddress,
-          registeredPackage: data?.registeredPackage,
+          company: id,
         },
       };
 
@@ -53,20 +57,6 @@ const BranchCreate = () => {
         <div className="px-10">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid md:grid-cols-2 gap-5">
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="branchId">
-                  Branch ID*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  placeholder="Branch ID"
-                  type="text"
-                  id="branchId"
-                  {...register("branchId")}
-                  required={true}
-                />
-              </div>
-
               <div className="flex flex-col">
                 <label className="font-semibold" htmlFor="branchName">
                   Branch Name*
@@ -135,29 +125,6 @@ const BranchCreate = () => {
                   {...register("branchAddress")}
                   required={true}
                 />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="registeredPackage">
-                  Registered Package*
-                </label>
-                <select
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  id="registeredPackage"
-                  required
-                  defaultValue=""
-                  {...register("registeredPackage")}
-                >
-                  <option value="" disabled>
-                    Please select a package
-                  </option>
-                  {registerPackageData?.data?.map((item) => (
-                    <option key={item._id} value={item._id}>
-                      [ {item.packageName} - Monthly {item.packagePrice} BDT -{" "}
-                      {item.memberLimit} Member ]
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
 

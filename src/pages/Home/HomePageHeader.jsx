@@ -8,7 +8,7 @@ const HomePageHeader = () => {
           <div className="flex justify-between items-center">
             <NavLink to="/">
               <h1 className="text-yellow-300 font-bold text-4xl uppercase">
-                softbankbd
+                soft bank bd
               </h1>
             </NavLink>
             <div>

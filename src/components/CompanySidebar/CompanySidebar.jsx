@@ -1,25 +1,27 @@
-import { useState } from "react";
-import { TiChevronLeft } from "react-icons/ti";
 import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
-import { MdOutlineCircle, MdViewCompactAlt } from "react-icons/md";
+import { IoSaveSharp } from "react-icons/io5";
+import { TiChevronLeft } from "react-icons/ti";
+import { NavLink } from "react-router-dom";
+import { MdOutlineCircle } from "react-icons/md";
+import { useState } from "react";
 
 const CompanySidebar = () => {
   const { role } = useSelector(useCurrentUser);
-  const [company, setIsCompany] = useState(false);
 
-  const companyDropdown = () => setIsCompany(!company);
+  const [company, setCompany] = useState(false);
+  const companyDropdown = () => setCompany(!company);
 
   return (
     <div>
-      {(role === "superAdmin") | (role === "admin") && (
+      {role === "company" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={companyDropdown}>
             <div className="flex items-center">
-              <MdViewCompactAlt className="text-[24px]" />
-              <span className="mx-4 font-medium uppercase">Company</span>
+              <IoSaveSharp className="text-[22px] mr-4" />
+              <span className="font-medium text-left uppercase">Branch</span>
             </div>
+
             <TiChevronLeft
               className={`w-5 h-5 transition-transform duration-300 ${
                 company ? "-rotate-90" : ""
@@ -32,7 +34,7 @@ const CompanySidebar = () => {
             }`}
           >
             <NavLink
-              to="create-company"
+              to="branch-create"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -40,16 +42,10 @@ const CompanySidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Create Company</span>
+              <span className=" font-medium uppercase">Branch Create</span>
             </NavLink>
-          </div>
-          <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              company ? "max-h-screen" : "max-h-0"
-            }`}
-          >
             <NavLink
-              to="companyList"
+              to="maturity-dps"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -57,7 +53,7 @@ const CompanySidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium uppercase">Company List</span>
+              <span className="font-medium">MATURITY DPS</span>
             </NavLink>
           </div>
         </div>

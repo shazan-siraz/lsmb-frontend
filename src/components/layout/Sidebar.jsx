@@ -25,7 +25,9 @@ import DpsSidebar from "../DpsSidebar/DpsSidebar";
 import WithdrawSidebar from "../WithdrawSidebar/WithdrawSidebar";
 import FdrSidebar from "../FdrSidebar/FdrSidebar";
 import StaffSidebar from "../StaffSidebar/StaffSidebar";
+import RegisteredUserSidebar from "../RegisteredUserSidebar/RegisteredUserSidebar";
 import CompanySidebar from "../CompanySidebar/CompanySidebar";
+
 
 const Sidebar = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -121,8 +123,8 @@ const Sidebar = () => {
               {/* Conditionally Render create admin */}
               <CreateAdminSidebar></CreateAdminSidebar>
 
-              {/* Conditionally Render company */}
-              <CompanySidebar></CompanySidebar>
+              {/* Conditionally Render registered user */}
+              <RegisteredUserSidebar></RegisteredUserSidebar>
 
               {/* Conditionally Render subscriber */}
               <SubscriberSidebar></SubscriberSidebar>
@@ -165,6 +167,9 @@ const Sidebar = () => {
 
               {/* Stuff Dropdown Menu */}
               <StaffSidebar></StaffSidebar>
+
+              {/* Company Sidebar */}
+              <CompanySidebar></CompanySidebar>
 
               {/* Modal Button */}
               {(!role === "superAdmin" || !role === "admin") && (

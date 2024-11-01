@@ -65,6 +65,8 @@ export const baseApi = createApi({
     "videoTutorial",
     "softwareUsers",
     "article",
+    "company",
+    "user",
   ],
   endpoints: () => ({}),
 });

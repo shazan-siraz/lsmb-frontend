@@ -20,7 +20,6 @@ const CreateSuperAdmin = () => {
       const superAdminData = {
         password: data?.superAdminPassword,
         superAdmin: {
-          id: data?.superAdminId,
           name: {
             firstName: data?.firstName,
             lastName: data?.lastName,
@@ -60,20 +59,6 @@ const CreateSuperAdmin = () => {
         <div className="px-10">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid md:grid-cols-3 gap-5">
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="superAdminId">
-                  Super Admin ID*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  placeholder="Super Admin ID"
-                  type="text"
-                  id="superAdminId"
-                  {...register("superAdminId")}
-                  required={true}
-                />
-              </div>
-
               <div className="flex flex-col">
                 <label className="font-semibold" htmlFor="superAdminEmail">
                   Super Admin Email*
