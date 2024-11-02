@@ -1,10 +1,13 @@
 import { useGetAllBranchQuery } from "../../redux/features/branch/branchApi";
 import { FaEdit } from "react-icons/fa";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const BranchList = () => {
+  const { email } = useSelector(useCurrentUser);
   const { data: branchData, isLoading: branchDataQueryLoading } =
-    useGetAllBranchQuery();
+    useGetAllBranchQuery(email);
 
   if (branchDataQueryLoading) {
     return <p>Loading...</p>;
@@ -13,7 +16,9 @@ const BranchList = () => {
   return (
     <div className="p-5">
       <div className="bg-green-700">
-        <h1 className="text-center font-bold text-[40px] mb-4 uppercase text-white">All Branch</h1>
+        <h1 className="text-center font-bold text-[40px] mb-4 uppercase text-white">
+          All Branch
+        </h1>
       </div>
 
       <table className="w-[95%] mx-auto">
@@ -34,7 +39,6 @@ const BranchList = () => {
           {branchData?.data?.map((item, index) => (
             <tr key={item._id}>
               <td className="text-center"> {index + 1} </td>
-              <td className="text-center"> {item?.branchId} </td>
               <td className="text-center"> {item?.branchName} </td>
               <td className="text-center"> {item?.branchEmail} </td>
               <td className="text-center"> {item?.branchMobile} </td>

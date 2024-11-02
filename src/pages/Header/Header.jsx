@@ -1,17 +1,17 @@
 import "./Header.css";
-import { useDispatch, useSelector } from "react-redux";
-import { logOut, useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { logOut } from "../../redux/features/auth/authSlice";
 import { NavLink } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
 import profileImg from "../../assets/icons/userProfile.png";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const { role } = useSelector(useCurrentUser);
-  const navigate = useNavigate();
+  // const { role } = useSelector(useCurrentUser);
+  // const navigate = useNavigate();
   const [isProfileBoxOpen, setIsProfileBoxOpen] = useState(false);
   const profileBoxRef = useRef(null); // Create a ref for the profile box
   const buttonRef = useRef(null); // Create a ref for the button
@@ -25,19 +25,8 @@ const Header = () => {
     setIsProfileBoxOpen(!isProfileBoxOpen);
   };
 
-  const handleNavigation = () => {
-    if (role === "superAdmin") {
-      navigate("/dashboard/superAdmin-profile");
-    } else if (role === "admin") {
-      navigate("/dashboard/admin-profile");
-    } else if (role === "manager") {
-      navigate("/dashboard/branch-profile");
-    }
-  };
-
-
-   // Use effect to detect clicks outside the profile box
-   useEffect(() => {
+  // Use effect to detect clicks outside the profile box
+  useEffect(() => {
     const handleClickOutside = (event) => {
       // Check if the click is outside both the profile box and the button
       if (
@@ -51,17 +40,15 @@ const Header = () => {
     };
 
     if (isProfileBoxOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isProfileBoxOpen]);
-
-
 
   return (
     <div>
@@ -85,23 +72,25 @@ const Header = () => {
         </div>
 
         <div
-        ref={buttonRef} // Attach the ref to the button div
-        onClick={handleProfileBox}
-        className="flex justify-center items-center"
-      >
-        <button>
-          <img className="w-[30px]" src={profileImg} alt="Profile Image" />
-        </button>
-      </div>
+          ref={buttonRef} // Attach the ref to the button div
+          onClick={handleProfileBox}
+          className="flex justify-center items-center"
+        >
+          <button>
+            <img className="w-[30px]" src={profileImg} alt="Profile Image" />
+          </button>
+        </div>
       </div>
 
       {isProfileBoxOpen && (
         <div ref={profileBoxRef} className="profile-box">
           <div className="flex flex-col gap-3">
-            <div onClick={handleNavigation} className="flex items-center gap-3 cursor-pointer">
-              <FaUser />
-              <p>My Profile</p>
-            </div>
+            <NavLink to="profile">
+              <div className="flex items-center gap-3 cursor-pointer">
+                <FaUser />
+                <p>My Profile</p>
+              </div>
+            </NavLink>
 
             <div className="border-b"></div>
             <NavLink to="/dashboard/changePassword">
@@ -112,16 +101,16 @@ const Header = () => {
             </NavLink>
             <div className="border-b"></div>
 
-            <div onClick={handleLogOut} className="flex items-center gap-3 cursor-pointer">
+            <div
+              onClick={handleLogOut}
+              className="flex items-center gap-3 cursor-pointer"
+            >
               <IoLogOut />
               <p>Log Out</p>
             </div>
           </div>
         </div>
       )}
-  
-
-
     </div>
   );
 };

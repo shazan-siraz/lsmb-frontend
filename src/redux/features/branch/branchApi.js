@@ -10,8 +10,8 @@ const branchApi = baseApi.injectEndpoints({
       }),
     }),
     getAllBranch: builder.query({
-      query: () => ({
-        url: "/branch",
+      query: (email) => ({
+        url: `/branch/allBranch/${email}`,
         method: "GET",
       }),
     }),

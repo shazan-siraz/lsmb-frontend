@@ -14,7 +14,7 @@ const SavingsSidebar = () => {
 
   return (
     <div>
-      {(!role === "superAdmin" || !role === "admin") && (
+      {role === "branch" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={savingsDropdown}>
             <div className="flex items-center">

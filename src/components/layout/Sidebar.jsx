@@ -12,7 +12,6 @@ import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import CreateSuperAdminSidebar from "../CreateSuperAdminSidebar/CreateSuperAdminSidebar";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
-import BranchSidebar from "../BranchSidebar/BranchSidebar";
 import ProfileInfo from "../ProfileInfo/ProfileInfo";
 import SubscriberSidebar from "../SubscriberSidebar/SubscriberSidebar";
 import SmsSidebar from "../SmsSidebar/SmsSidebar";
@@ -27,7 +26,7 @@ import FdrSidebar from "../FdrSidebar/FdrSidebar";
 import StaffSidebar from "../StaffSidebar/StaffSidebar";
 import RegisteredUserSidebar from "../RegisteredUserSidebar/RegisteredUserSidebar";
 import CompanySidebar from "../CompanySidebar/CompanySidebar";
-
+import BranchProfile from "../BranchProfile/BranchProfile";
 
 const Sidebar = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -85,7 +84,7 @@ const Sidebar = () => {
         <div>
           <div className="w-full hidden md:flex -m-2 justify-center items-center mx-auto text-slate-300 text-2xl">
             <marquee className="font-semibold">
-              {branchData?.data?.branchName || "SoftbankBD"}
+              {branchData?.data?.branchName || "Soft Bank BD"}
             </marquee>
           </div>
 
@@ -96,7 +95,7 @@ const Sidebar = () => {
           <div className="flex flex-col justify-between flex-1 mt-6">
             <nav>
               {/* Dashboard */}
-              <NavLink>
+              <NavLink to="dashboard-home">
                 <div className="dropDownStyle ">
                   <div className="flex gap-5">
                     <IoIosSpeedometer className="w-5 h-5 text-slate-400" />
@@ -147,8 +146,8 @@ const Sidebar = () => {
               {/* Conditionally Render Branch */}
               <BranchCreateSidebar></BranchCreateSidebar>
 
-              {/* Conditionally Render when login as a branchManager */}
-              <BranchSidebar></BranchSidebar>
+              {/* Conditionally Render when login as a branch */}
+              <BranchProfile></BranchProfile>
 
               {/* Savings Dropdown Menu */}
               <SavingsSidebar></SavingsSidebar>
@@ -172,7 +171,7 @@ const Sidebar = () => {
               <CompanySidebar></CompanySidebar>
 
               {/* Modal Button */}
-              {(!role === "superAdmin" || !role === "admin") && (
+              {role === "branch" && (
                 <div className="modalButton">
                   <ModalComponents></ModalComponents>,
                 </div>

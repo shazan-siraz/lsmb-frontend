@@ -14,7 +14,7 @@ const FdrSidebar = () => {
 
   return (
     <div>
-      {(!role === "superAdmin" || !role === "admin") && (
+      {role === "branch" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={fdrDropdown}>
             <div className="flex items-center">

@@ -14,7 +14,7 @@ const StaffSidebar = () => {
 
   return (
     <div>
-      {(!role === "superAdmin" || !role === "admin") && (
+      {role === "branch" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={staffDropdown}>
             <div className="flex items-center">

@@ -13,7 +13,7 @@ const LoanSidebar = () => {
 
   return (
     <div>
-      {(!role === "superAdmin" || !role === "admin") && (
+      {role === "branch" && (
         <div>
           <div className="relative">
             <div className="dropDownStyle" onClick={loanDropdown}>

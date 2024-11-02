@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { MdOutlineCircle } from "react-icons/md";
 
-const BranchSidebar = () => {
+const BranchProfile = () => {
   const { email, role } = useSelector(useCurrentUser);
   const [isBranchDropdownOpen, setBranchDropdownOpen] = useState(false);
 
@@ -14,7 +14,7 @@ const BranchSidebar = () => {
 
   return (
     <div>
-      {role === "manager" && (
+      {role === "branch" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={branchDropdown}>
             <div className="flex items-center">
@@ -84,4 +84,4 @@ const BranchSidebar = () => {
   );
 };
 
-export default BranchSidebar;
+export default BranchProfile;

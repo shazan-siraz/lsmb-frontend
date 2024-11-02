@@ -4,10 +4,15 @@ import { useCreateBranchMutation } from "../../redux/features/branch/branchApi";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGetSingleCompanyQuery } from "../../redux/features/company/company";
+import { useGetSingleUserQuery } from "../../redux/features/user/user";
+import CompanyApprovedMessage from "../CompanyApprovedMessage/CompanyApprovedMessage";
 
 const BranchCreate = () => {
   const { email } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
+
+  const { data: singleUserData, isLoading: userQueryLoading } =
+    useGetSingleUserQuery(email);
 
   const { data: singleCompanyData, isLoading: singleCompanyDataQueryLoading } =
     useGetSingleCompanyQuery(email);
@@ -15,11 +20,11 @@ const BranchCreate = () => {
   const [createBranch, { isLoading: branchCreateLoading }] =
     useCreateBranchMutation();
 
-  if (singleCompanyDataQueryLoading) {
+  if (singleCompanyDataQueryLoading || userQueryLoading) {
     return <p>Loading...</p>;
   }
 
-  const id = singleCompanyData?.data._id;
+  const companyId = singleCompanyData?.data._id;
 
   const onSubmit = async (data) => {
     try {
@@ -30,7 +35,8 @@ const BranchCreate = () => {
           branchEmail: data?.branchEmail,
           branchMobile: data?.branchMobile,
           branchAddress: data?.branchAddress,
-          company: id,
+          companyEmail: email,
+          company: companyId,
         },
       };
 
@@ -44,6 +50,10 @@ const BranchCreate = () => {
       console.log(err);
     }
   };
+
+  if (singleUserData?.data.status === "pending") {
+    return <CompanyApprovedMessage></CompanyApprovedMessage>;
+  }
 
   return (
     <div>

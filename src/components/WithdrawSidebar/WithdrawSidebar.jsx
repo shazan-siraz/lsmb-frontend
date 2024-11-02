@@ -15,7 +15,7 @@ const WithdrawSidebar = () => {
 
   return (
     <div>
-      {(!role === "superAdmin" || !role === "admin") && (
+      {role === "branch" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={withdrawDropdown}>
             <div className="flex items-center">

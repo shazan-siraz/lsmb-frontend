@@ -14,7 +14,7 @@ const DpsSidebar = () => {
 
   return (
     <div>
-      {(!role === "superAdmin" || !role === "admin") && (
+      {role === "branch" && (
         <div className="relative">
           <div className="dropDownStyle" onClick={dpsDropdown}>
             <div className="flex items-center">

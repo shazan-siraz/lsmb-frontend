@@ -45,9 +45,6 @@ import SavingWithdraw from "../pages/Withdraw/SavingWithdraw";
 import FdrWithdraw from "../pages/Withdraw/FdrWithdraw";
 import DpsWithdraw from "../pages/Withdraw/DpsWithdraw";
 import ProtectedRoute from "../components/layout/ProtectedRoute";
-import SuperAdminProfile from "../pages/Profile/SuperAdminProfile/SuperAdminProfile";
-import AdminProfile from "../pages/Profile/AdminProfile/AdminProfile";
-import BranchProfile from "../pages/Profile/BranchProfile/BranchProfilePage";
 import ChangePassword from "../pages/ChangePassword/ChangePassword";
 import Register from "../pages/Register/Register";
 import CreateSubscriber from "../pages/Subscriber/CreateSubscriber";
@@ -62,7 +59,7 @@ import ArticleList from "../pages/TextEditor/ArticleList";
 import Article from "../pages/Article/Article";
 import SingleArticle from "../pages/Article/SingleArticle";
 import RegisteredUserList from "../pages/Register/RegisteredUserList";
-
+import Profile from "../pages/Profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -262,18 +259,6 @@ const router = createBrowserRouter([
         element: <DpsWithdraw></DpsWithdraw>,
       },
       {
-        path: "superAdmin-profile",
-        element: <SuperAdminProfile></SuperAdminProfile>,
-      },
-      {
-        path: "admin-profile",
-        element: <AdminProfile></AdminProfile>,
-      },
-      {
-        path: "branch-profile",
-        element: <BranchProfile></BranchProfile>,
-      },
-      {
         path: "changePassword",
         element: <ChangePassword></ChangePassword>,
       },
@@ -315,9 +300,12 @@ const router = createBrowserRouter([
       },
       {
         path: "registeredUser-list",
-        element: <RegisteredUserList></RegisteredUserList>
+        element: <RegisteredUserList></RegisteredUserList>,
       },
-      
+      {
+        path: "profile",
+        element: <Profile></Profile>
+      },
     ],
   },
 ]);

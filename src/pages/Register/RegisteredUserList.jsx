@@ -20,7 +20,7 @@ const RegisteredUserList = () => {
     try {
       const res = await updateCompanyStatus({ email });
       if (res?.data) {
-        toast.success("User Approved!");
+        toast.success("Status Updated!");
       } else {
         toast.error("Failed to update status");
       }
@@ -73,7 +73,9 @@ const RegisteredUserList = () => {
                 <td>
                   <div
                     className={`flex justify-center items-center flex-col ${
-                      loadingRow === item._id ? "bg-gray-400" : "hover:bg-slate-600 bg-slate-500"
+                      loadingRow === item._id
+                        ? "bg-gray-400"
+                        : "hover:bg-slate-600 bg-slate-500"
                     } cursor-pointer px-2 font-semibold text-white rounded`}
                     onClick={
                       loadingRow !== item._id
@@ -81,7 +83,12 @@ const RegisteredUserList = () => {
                         : undefined
                     }
                   >
-                    {loadingRow === item._id ? "Loading..." : "Active"}
+                    {/* {loadingRow === item._id ? "Loading" : "Active"} */}
+                    {item.user.status === "pending"
+                      ? "Active"
+                      : item.user.status === "in-progress"
+                      ? "Deactive"
+                      : ""}
                   </div>
                 </td>
               </tr>
