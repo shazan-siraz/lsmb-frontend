@@ -3,23 +3,19 @@ import LogoSoftbankBD from "../../../src/assets/icons/LogoSoftbankBD.png";
 import { useGetAllRegisterPackageQuery } from "../../redux/features/registerPackage/registerPackage";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import { useCreateCompanyMutation } from "../../redux/features/company/company";
-import { toast, ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
-import Popup from "./Popup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setToastMessage } from "../../redux/features/auth/toastSlice";
+
 
 const Register = () => {
+  const dispatch = useDispatch();
   const [isError, setIsError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
   const { register, handleSubmit, reset } = useForm();
-
-  const openPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-  };
+  const navigate = useNavigate();
 
   const { data: registerPackageData, isLoading: registerPackageLoading } =
     useGetAllRegisterPackageQuery();
@@ -38,9 +34,13 @@ const Register = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const profileImageUrl = await uploadImageToCloudinary(
-        data.profileImage[0]
-      );
+      let profileImageUrl;
+
+      if (data.profileImage[0] == undefined) {
+        profileImageUrl = "";
+      } else {
+        profileImageUrl = await uploadImageToCloudinary(data.profileImage[0]);
+      }
 
       const companyData = {
         password: data?.password,
@@ -60,10 +60,10 @@ const Register = () => {
       const res = await createCompany(companyData);
 
       if (res?.data) {
-        toast.success("Registration Successfully");
+        dispatch(setToastMessage("Registration Successful!"));
         reset();
         setIsError(""); // Clear error if successful
-        openPopup();
+        navigate("/login")
       }
     } catch (err) {
       console.log(err);
@@ -183,34 +183,31 @@ const Register = () => {
                       ))}
                 </select>
               </div>
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="profileImage">
-                  Profile Image
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput"
-                  type="file"
-                  id="profileImage"
-                  {...register("profileImage")}
-                  required={true}
-                />
-              </div>
+            </div>
+            
+            <div className="flex items-center px-10 mt-2">
+              <label className="font-semibold mr-1" htmlFor="profileImage">
+                Profile Image:
+              </label>
+              <input
+                className="py-2 px-2 my-1 rounded-sm membershipInput"
+                type="file"
+                id="profileImage"
+                {...register("profileImage")}
+              />
             </div>
 
-            <div className="border-b border-slate-300 my-10"></div>
+            <div className="border-b border-slate-300 my-5"></div>
 
             <div className="text-center">
               <input
-                className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+                className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-10 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
                 type="submit"
                 value={
                   loading | companyCreateLoading ? "Loading..." : "Register"
                 }
                 disabled={loading | companyCreateLoading}
               />
-              <ToastContainer></ToastContainer>
-
-              {isPopupOpen && <Popup onClose={closePopup} />}
             </div>
           </form>
         </div>

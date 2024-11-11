@@ -6,7 +6,6 @@ import { IoIosSpeedometer } from "react-icons/io";
 import ModalComponents from "../../pages/Modal/ModalComponents";
 import "./Sidebar.css";
 import RegisterPackage from "../RegisterPackageSidebar/RegisterPackage";
-import BranchCreateSidebar from "../BranchCreateSidebar/BranchCreateSidebar";
 import CreateAdminSidebar from "../CreateAdminSidebar/CreateAdminSidebar";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
@@ -142,9 +141,6 @@ const Sidebar = () => {
 
               {/* Conditionally Render article */}
               <AdArticleSidebar></AdArticleSidebar>
-
-              {/* Conditionally Render Branch */}
-              <BranchCreateSidebar></BranchCreateSidebar>
 
               {/* Conditionally Render when login as a branch */}
               <BranchProfile></BranchProfile>

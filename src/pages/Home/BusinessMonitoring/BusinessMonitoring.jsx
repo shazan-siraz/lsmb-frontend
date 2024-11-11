@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import BusinessMonitoringPic from "../../../assets/images/BusinessMonitoring.svg";
 
 const BusinessMonitoring = () => {
@@ -32,11 +33,13 @@ const BusinessMonitoring = () => {
             </div>
           </div>
 
+          <NavLink to="/register">
           <div className="py-5">
             <button className="px-5 border-2  border-blue-500 bg-blue-500 rounded-full font-semibold text-white py-1 hover:bg-transparent hover:text-blue-500 transition-all duration-300 ease-in-out">
               রেজিস্ট্রেশন করুন
             </button>
           </div>
+          </NavLink>
         </div>
         <div>
           <img width="500px" src={BusinessMonitoringPic} alt="" />

@@ -7,12 +7,21 @@ import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import { useCreateEmployeeMutation } from "../../redux/features/employee/employeeApi";
+import { FaMinus } from "react-icons/fa";
+import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 
 const AddNewEmployee = () => {
   const [isError, setIsError] = useState(null);
+  const [fileError, setFileError] = useState("");
+  const [signatureError, setSignatureError] = useState("");
+  const [nidPassportError, setnipPassportError] = useState("");
+  const [attachments, setAttachments] = useState([{}]);
   const { email } = useSelector(useCurrentUser);
   const [isLoading, setIsLoading] = useState(false);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, setError, clearErrors } = useForm();
+
+  const { data: branchData } = useGetSingleBranchQuery(email);
 
   const [addEmployee, { error, isLoading: createEmoloyeeLoading }] =
     useCreateEmployeeMutation();
@@ -23,24 +32,99 @@ const AddNewEmployee = () => {
     }
   }, [error]); // Runs only when the error changes
 
+  // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
+  const validateFileSize = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setFileError("Image size more than 100kb");
+      setError("imageUrl", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setFileError("");
+      clearErrors("imageUrl");
+    }
+  };
+
+  // Signature size Validation
+  const validateSignatureImageSize = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setSignatureError("Image size more than 100kb");
+      setError("signatureImage", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setSignatureError("");
+      clearErrors("signature");
+    }
+  };
+
+  // Nid/Passport size Validation
+  const validateNidPassportImageSize = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setnipPassportError("Image size more than 100kb");
+      setError("nid_passport", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setnipPassportError("");
+      clearErrors("signature");
+    }
+  };
+
+  // Function to add a new attachment input
+  const addAttachmentField = () => {
+    setAttachments([...attachments, {}]);
+  };
+
+  // Function to remove an attachment input
+  const removeAttachmentField = (index) => {
+    const updatedAttachments = attachments.filter((_, i) => i !== index);
+    setAttachments(updatedAttachments);
+  };
+
+  const companyEmail = branchData?.data.company.companyEmail;
+
   const onSubmit = async (data) => {
     setIsLoading(true);
 
     try {
       const uploadedImageUrl = await uploadImageToCloudinary(data.imageUrl[0]);
 
+      // Map through all image files and upload each to Cloudinary
+      const uploadedImageUrls = await Promise.all(
+        data.attachment.map(async (attachments) => {
+          const imageUrl = await uploadImageToCloudinary(attachments[0]);
+          return imageUrl;
+        })
+      );
+
       const employeeData = {
         password: data?.employeePassword,
         employee: {
-          employeeId: data?.employeeId,
           employeeEmail: data?.employeeEmail,
+          branch: branchData?.data._id,
           branchEmail: email,
-          employeeName: data?.name,
+          companyEmail: companyEmail,
+          employeeName: data?.employeeName,
           joiningDate: data?.joiningDate,
           employeeType: data?.employeeType,
+          employeeDesignation: data?.employeeDesignation,
           phoneNo: data?.phoneNo,
           employeeNid: data?.employeeNid,
           presentAddress: data?.presentAddress,
+          permanentAddress: data?.permanentAddress,
           fatherName: data?.fatherName,
           motherName: data?.motherName,
           bloodGroup: data?.bloodGroup,
@@ -57,6 +141,7 @@ const AddNewEmployee = () => {
           providentFund: Number(data?.providentFund),
           totalSalary: Number(data?.totalSalary),
           profileImage: uploadedImageUrl,
+          attachments: uploadedImageUrls,
         },
       };
 
@@ -74,6 +159,7 @@ const AddNewEmployee = () => {
           timer: 1500,
         });
         reset();
+        setIsError("");
       }
     } catch (err) {
       console.log(err);
@@ -81,7 +167,7 @@ const AddNewEmployee = () => {
   };
 
   return (
-    <div className="bg-[#E1E2E1]">
+    <div>
       <h1 className="px-5 py-2 text-2xl font-bold">Make A New Employee </h1>
       <div className="py-3">
         <div className="border-b-2"></div>
@@ -92,41 +178,28 @@ const AddNewEmployee = () => {
           <p className="text-center text-red-600 font-semibold text-[20px]">
             {isError}
           </p>
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-4 gap-3 gap-x-5 items-center">
             <div className="flex flex-col">
-              <label className="font-bold" htmlFor="employeeId">
-                Employee ID*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
-                id="employeeId"
-                placeholder="Employee Software ID"
-                {...register("employeeId")}
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="font-bold" htmlFor="email">
-                Email*
+              <label className="font-bold" htmlFor="employeeEmail">
+                Employee Email*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 type="email"
-                id="email"
-                placeholder="Enter Email Address"
+                id="employeeEmail"
+                placeholder="Employee Login Email"
                 {...register("employeeEmail")}
                 required={true}
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-bold" htmlFor="password">
-                Password*
+              <label className="font-bold" htmlFor="employeePassword">
+                Employee Password*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 type="password"
-                id="password"
+                id="employeePassword"
                 placeholder="Employee Login Password"
                 {...register("employeePassword")}
                 required={true}
@@ -134,49 +207,71 @@ const AddNewEmployee = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-bold" htmlFor="name">
+              <label className="font-bold" htmlFor="employeeName">
                 Name*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 type="text"
-                id="name"
+                id="employeeName"
                 placeholder="Employee Name"
-                {...register("name")}
+                {...register("employeeName")}
                 required={true}
               />
             </div>
 
             <div className="flex flex-col">
               <label className="font-bold" htmlFor="joining">
-                Joining*
+                Joining Date*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 type="date"
                 id="joining"
+                defaultValue={todayDateFormated()}
                 {...register("joiningDate")}
                 required={true}
               />
             </div>
 
             <div className="flex flex-col">
-              <label className="font-bold" htmlFor="employeeType">
+              <label className="font-semibold" htmlFor="employeeType">
                 Employee Type*
               </label>
               <select
-                className="py-2 px-2 my-1 rounded-sm employeeInput"
+                className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="employeeType"
+                required
+                defaultValue=""
                 {...register("employeeType")}
-                required={true}
               >
-                <option selected disabled>
+                <option value="" disabled>
                   Select Job Type
                 </option>
-                <option value="FullTime">Full Time</option>
-                <option value="PartTime">Part Time</option>
-                <option value="Sesonal">Sesonal</option>
-                <option value="Temporary">Temporary</option>
+                <option value="fullTime">Full Time</option>
+                <option value="partTime">Part Time</option>
+                <option value="seasonal">Seasonal</option>
+                <option value="temporary">Temporary</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="font-semibold" htmlFor="employeeDesignation">
+                Employee Designation*
+              </label>
+              <select
+                className="py-2 px-2 my-1 rounded-sm membershipInput"
+                id="employeeDesignation"
+                required
+                defaultValue=""
+                {...register("employeeDesignation")}
+              >
+                <option value="" disabled>
+                  Select Employee Designation
+                </option>
+                <option value="manager">Manager</option>
+                <option value="accountant">Accountant</option>
+                <option value="fieldOfficer">Field Officer</option>
               </select>
             </div>
 
@@ -186,7 +281,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="number"
+                type="text"
                 id="phoneNo"
                 placeholder="Enter Phone No"
                 {...register("phoneNo")}
@@ -199,7 +294,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="number"
+                type="text"
                 id="nid"
                 placeholder="Voter ID No."
                 {...register("employeeNid")}
@@ -219,6 +314,20 @@ const AddNewEmployee = () => {
                 required={true}
               />
             </div>
+            <div className="flex flex-col">
+              <label className="font-bold" htmlFor="personalAddress">
+                Permanent Address*
+              </label>
+              <input
+                className="py-2 px-2 my-1 rounded-sm employeeInput"
+                type="text"
+                id="personalAddress"
+                placeholder="Permanent Address"
+                {...register("permanentAddress")}
+                required={true}
+              />
+            </div>
+
             <div className="flex flex-col">
               <label className="font-bold" htmlFor="fatherName">
                 Father Name*
@@ -253,10 +362,11 @@ const AddNewEmployee = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 id="bloodGroup"
+                required
+                defaultValue=""
                 {...register("bloodGroup")}
-                required={true}
               >
-                <option selected disabled>
+                <option value="" disabled>
                   Select Blood Group
                 </option>
                 <option value="A+">A+</option>
@@ -277,9 +387,11 @@ const AddNewEmployee = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
                 id="degree"
+                required
+                defaultValue=""
                 {...register("degree")}
               >
-                <option selected disabled>
+                <option value="" disabled>
                   Select Highest Degree
                 </option>
                 <option value="Five">Five</option>
@@ -297,7 +409,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="basicSalary"
                 placeholder="Enter Basic Salary"
                 {...register("basicSalary")}
@@ -311,7 +423,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="mobileBill"
                 placeholder="Enter Mobile Bill"
                 {...register("mobileBill")}
@@ -325,7 +437,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="conveyanceAllowance"
                 placeholder="Enter Conveyance Allowance"
                 {...register("conveyanceAllowance")}
@@ -339,7 +451,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="medicalAllowance"
                 placeholder="Enter Medical Allowance"
                 {...register("medicalAllowance")}
@@ -353,7 +465,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="houseRent"
                 placeholder="Enter House Rent"
                 {...register("houseRent")}
@@ -367,7 +479,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="incentiveBonus"
                 placeholder="Incentive Bonus"
                 {...register("incentiveBonus")}
@@ -377,15 +489,14 @@ const AddNewEmployee = () => {
 
             <div className="flex flex-col">
               <label className="font-bold" htmlFor="other">
-                Incentive Bonus
+                Other
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="other"
                 placeholder="Other"
                 {...register("other")}
-                required={true}
               />
             </div>
 
@@ -395,7 +506,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="professionalTax"
                 placeholder="Professional Tax"
                 {...register("professionalTax")}
@@ -409,7 +520,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="incomeTax"
                 placeholder="Income Tax"
                 {...register("incomeTax")}
@@ -423,7 +534,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="providentFund"
                 placeholder="providentFund"
                 {...register("providentFund")}
@@ -437,7 +548,7 @@ const AddNewEmployee = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="text"
+                type="number"
                 id="totalSalary"
                 placeholder="Total Salary"
                 {...register("totalSalary")}
@@ -445,20 +556,107 @@ const AddNewEmployee = () => {
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="font-bold" htmlFor="imageUrl">
-                Choose Profile Image:
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm employeeInput"
-                type="file"
-                id="imageUrl"
-                placeholder="Profile Image"
-                {...register("imageUrl")}
-                required={true}
-              />
+            <div className="flex flex-col">
+              {fileError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {fileError}
+                </p>
+              )}
+              <div className="flex flex-col">
+                <label className="font-bold" htmlFor="imageUrl">
+                  Profile Image*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                  type="file"
+                  id="imageUrl"
+                  {...register("imageUrl", { required: true })}
+                  onChange={validateFileSize}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              {signatureError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {signatureError}
+                </p>
+              )}
+              <div className="flex flex-col">
+                <label className="font-bold" htmlFor="signature">
+                  Signature*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                  type="file"
+                  id="signature"
+                  {...register("signatureImage", { required: true })}
+                  onChange={validateSignatureImageSize}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              {nidPassportError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {nidPassportError}
+                </p>
+              )}
+              <div className="flex flex-col">
+                <label className="font-bold" htmlFor="nid_passport">
+                  Nid/Passport*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                  type="file"
+                  id="nid_passport"
+                  {...register("nid_passport", { required: true })}
+                  onChange={validateNidPassportImageSize}
+                />
+              </div>
+            </div>
+
+            {attachments.map((_, index) => (
+              <div className="flex" key={index}>
+                <div>
+                  <label className="font-bold" htmlFor={`attachment-${index}`}>
+                    Attachment:
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm employeeInput"
+                    type="file"
+                    id={`attachment-${index}`}
+                    placeholder="Profile Image"
+                    {...register(`attachment[${index}]`)}
+                    required={index === 0}
+                  />
+                </div>
+                {index > 0 && (
+                  <div className="flex justify-center items-center">
+                    <button
+                      type="button"
+                      className="ml-2 px-2 py-2 bg-red-500 text-white rounded"
+                      onClick={() => removeAttachmentField(index)}
+                    >
+                      <FaMinus></FaMinus>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+            <div>
+              <button
+                type="button"
+                className=" px-4 py-2 bg-slate-400 hover:bg-slate-500 transition-all duration-300 ease-in-out text-white rounded-md"
+                onClick={addAttachmentField}
+              >
+                Add More Attachment
+              </button>
             </div>
           </div>
+
+          <hr className="py-2" />
+
           <div className="text-center pb-[30px]">
             <input
               className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-20 rounded hover:bg-blue-500 hover:text-white cursor-pointer"

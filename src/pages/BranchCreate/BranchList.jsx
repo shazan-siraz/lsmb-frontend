@@ -3,35 +3,43 @@ import { FaEdit } from "react-icons/fa";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useGetSingleUserQuery } from "../../redux/features/user/user";
+import CompanyApprovedMessage from "../CompanyApprovedMessage/CompanyApprovedMessage";
 
 const BranchList = () => {
   const { email } = useSelector(useCurrentUser);
   const { data: branchData, isLoading: branchDataQueryLoading } =
     useGetAllBranchQuery(email);
 
-  if (branchDataQueryLoading) {
+  const { data: singleUserData, isLoading: userQueryLoading } =
+    useGetSingleUserQuery(email);
+
+  if (branchDataQueryLoading || userQueryLoading) {
     return <p>Loading...</p>;
   }
 
+  if (singleUserData?.data.status === "pending") {
+    return <CompanyApprovedMessage></CompanyApprovedMessage>;
+  }
+
   return (
-    <div className="p-5">
-      <div className="bg-green-700">
-        <h1 className="text-center font-bold text-[40px] mb-4 uppercase text-white">
+    <div className="px-10 py-2">
+      <div>
+        <h1 className="text-center font-bold text-[35px] mb-2 uppercase">
           All Branch
         </h1>
       </div>
 
-      <table className="w-[95%] mx-auto">
+      <table className="w-full">
         <thead>
           <tr>
             <th className="text-center">#</th>
-            <th className="text-center">Branch ID</th>
             <th className="text-center">Branch Name</th>
             <th className="text-center">Branch Email</th>
             <th className="text-center">Branch Mobile</th>
             <th className="text-center">Branch Address</th>
-            <th className="text-center">Registered Package</th>
-            <th className="text-center">Branch Created</th>
+            <th className="text-center">Company Email</th>
+            <th className="text-center">Created At</th>
             <th className="text-center">Action</th>
           </tr>
         </thead>
@@ -43,12 +51,8 @@ const BranchList = () => {
               <td className="text-center"> {item?.branchEmail} </td>
               <td className="text-center"> {item?.branchMobile} </td>
               <td className="text-center"> {item?.branchAddress} </td>
-              <td className="text-center">
-                {" "}
-                {item?.registeredPackage?.packageName}{" "}
-              </td>
+              <td className="text-center"> {item?.companyEmail} </td>
               <td className="text-center"> {timeFormat(item?.createdAt)} </td>
-
               <td className="text-center">
                 <div className="flex justify-center items-center">
                   <FaEdit />

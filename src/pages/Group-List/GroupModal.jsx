@@ -6,7 +6,6 @@ import { Modal } from "antd";
 import { useUpdateGroupMutation } from "../../redux/features/groupList/groupListApi";
 import { FaEdit } from "react-icons/fa";
 
-
 const GroupModal = ({ modalData }) => {
   const [open, setOpen] = useState(false);
   const { register, handleSubmit } = useForm();
@@ -14,7 +13,8 @@ const GroupModal = ({ modalData }) => {
     setOpen(true);
   };
 
-  const [updateGroup, { isLoading: groupUpdateLoading }] = useUpdateGroupMutation();
+  const [updateGroup, { isLoading: groupUpdateLoading }] =
+    useUpdateGroupMutation();
 
   const handleCancel = () => {
     setOpen(false);
@@ -37,7 +37,9 @@ const GroupModal = ({ modalData }) => {
 
   return (
     <div>
-      <p onClick={showModal}><FaEdit /></p>
+      <p onClick={showModal}>
+        <FaEdit />
+      </p>
       <Modal
         open={open}
         title="Quick Access"
@@ -46,10 +48,10 @@ const GroupModal = ({ modalData }) => {
       >
         <div>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-3 gap-5 items-center py-5 px-5">
+            <div className="grid grid-cols-2 gap-5 items-center py-5 px-5">
               <div className="flex flex-col">
                 <input
-                  className="py-2 px-2 my-1 rounded-sm employeeInput"
+                  className="py-2 px-2 my-1 border rounded employeeInput"
                   type="number"
                   id="name"
                   defaultValue={modalData.groupCode}
@@ -60,7 +62,7 @@ const GroupModal = ({ modalData }) => {
               </div>
               <div className="flex flex-col">
                 <input
-                  className="py-2 px-2 my-1 rounded-sm employeeInput"
+                  className="py-2 px-2 my-1 border rounded-sm employeeInput"
                   type="text"
                   id="name"
                   defaultValue={modalData.groupTitle}
@@ -69,16 +71,16 @@ const GroupModal = ({ modalData }) => {
                   required={true}
                 />
               </div>
+            </div>
 
-              <div className="text-left">
-                <input
-                  onClick={ groupUpdateLoading ? null : handleCancel}
-                  className="border border-green-500 py-2 px-5 rounded hover:bg-green-500 hover:text-white cursor-pointer"
-                  type="submit"
-                  value={groupUpdateLoading ? "Loading..." : "Submit"}
-                  disabled={groupUpdateLoading}
-                />
-              </div>
+            <div className="text-center">
+              <input
+                onClick={groupUpdateLoading ? null : handleCancel}
+                className="border border-green-500 transition-all duration-300 ease-in-out py-2 px-10 rounded hover:bg-green-500 hover:text-white cursor-pointer"
+                type="submit"
+                value={groupUpdateLoading ? "Loading..." : "Submit"}
+                disabled={groupUpdateLoading}
+              />
             </div>
           </form>
         </div>

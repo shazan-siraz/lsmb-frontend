@@ -1,17 +1,30 @@
 import { useForm } from "react-hook-form";
 import "react-toastify/dist/ReactToastify.css";
 import { useLoginMutation } from "../../redux/features/auth/authApi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../redux/features/auth/authSlice";
 import { verifyToken } from "../../utils/verifyToken/verifyToken";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import { clearToastMessage } from "../../redux/features/auth/toastSlice";
 
 const Login = () => {
   const [isError, setIsError] = useState(null);
   const { register, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const toastMessage = useSelector((state) => state.toast.message);
+
+
+  useEffect(() => {
+    if (toastMessage) {
+      toast.success(toastMessage);
+      dispatch(clearToastMessage()); // টোস্ট মেসেজটি ক্লিয়ার করুন
+    }
+
+  }, [toastMessage, dispatch]);
+
 
   const [login, { isLoading }] = useLoginMutation();
 
@@ -31,13 +44,16 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center h-[100vh] bg-[#f8f9fb]">
+      <ToastContainer></ToastContainer>
       <div className="max-w-[500px] w-[95%] bg-white p-5 mx-auto shadow-lg rounded-md">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <h1 className="text-[30px] text-center font-bold pb-8">
-              LS Micro Banking
+              Soft Bank BD
             </h1>
-            <p className="text-center text-red-600 font-semibold text-[20px]">{isError}</p>
+            <p className="text-center text-red-600 font-semibold text-[20px]">
+              {isError}
+            </p>
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="email">
                 Email*

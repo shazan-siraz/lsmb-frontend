@@ -8,18 +8,21 @@ const branchApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["branch"]
     }),
     getAllBranch: builder.query({
       query: (email) => ({
         url: `/branch/allBranch/${email}`,
         method: "GET",
       }),
+      providesTags: ["branch"]
     }),
     getSingleBranch: builder.query({
       query: (email) => ({
         url: `/branch/${email}`,
         method: "GET",
       }),
+      providesTags: ["branch"]
     }),
   }),
 });

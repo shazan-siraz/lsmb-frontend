@@ -20,7 +20,21 @@ const userApi = baseApi.injectEndpoints({
 
       invalidatesTags: ["company"],
     }),
+
+    blockedUserStatus: builder.mutation({
+      query: (data) => ({
+        url: "/user/blockedUserStatus",
+        method: "PATCH",
+        body: data,
+      }),
+
+      invalidatesTags: ["employee"],
+    }),
   }),
 });
 
-export const { useGetSingleUserQuery, useUpdateUserStatusMutation } = userApi;
+export const {
+  useGetSingleUserQuery,
+  useUpdateUserStatusMutation,
+  useBlockedUserStatusMutation,
+} = userApi;

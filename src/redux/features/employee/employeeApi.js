@@ -8,12 +8,14 @@ const employeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["employee"]
     }),
     getAllEmployee: builder.query({
       query: () => ({
         url: "/employee",
         method: "GET",
       }),
+      providesTags: ["employee"]
     }),
   }),
 });

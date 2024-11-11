@@ -33,7 +33,7 @@ const BranchProfile = () => {
             }`}
           >
             <NavLink
-              to={`branch-details/${email}`}
+              to="branch-details"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"

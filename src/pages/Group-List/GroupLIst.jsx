@@ -8,16 +8,22 @@ import GroupTable from "./GroupTable";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import Swal from "sweetalert2";
-
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 
 const GroupLIst = () => {
   const { register, handleSubmit, reset } = useForm();
   const { email } = useSelector(useCurrentUser);
 
+  const { data: singleBranchData, isLoading: getBranchQueryLoading} = useGetSingleBranchQuery(email);
+
   const [addGroup, { isLoading: groupCreatingLoading }] =
     useCreateGroupMutation();
 
   const { data: groupData, isLoading: groupGetLoading } = useGetAllGroupQuery();
+
+if(getBranchQueryLoading || groupGetLoading) {
+  return <p>Loading...</p>
+}
 
   const onSubmit = async (data) => {
     try {
@@ -25,6 +31,8 @@ const GroupLIst = () => {
         groupCode: data?.groupCode,
         groupTitle: data?.groupTitle,
         branchEmail: email,
+        companyEmail: singleBranchData?.data.companyEmail,
+        branch: singleBranchData?.data._id,
       };
 
       const res = await addGroup(groupData);

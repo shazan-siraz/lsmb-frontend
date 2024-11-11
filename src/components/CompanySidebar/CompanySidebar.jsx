@@ -45,7 +45,7 @@ const CompanySidebar = () => {
               <span className=" font-medium uppercase">Branch Create</span>
             </NavLink>
             <NavLink
-              to="maturity-dps"
+              to="branch-list"
               className={({ isActive }) =>
                 `dropDownListStyle ${
                   isActive ? "activeColor" : "text-gray-600"
@@ -53,7 +53,7 @@ const CompanySidebar = () => {
               }
             >
               <MdOutlineCircle className="iconListStyle" />
-              <span className="font-medium">MATURITY DPS</span>
+              <span className="font-medium uppercase">Branch List</span>
             </NavLink>
           </div>
         </div>
