@@ -26,6 +26,7 @@ import StaffSidebar from "../StaffSidebar/StaffSidebar";
 import RegisteredUserSidebar from "../RegisteredUserSidebar/RegisteredUserSidebar";
 import CompanySidebar from "../CompanySidebar/CompanySidebar";
 import BranchProfile from "../BranchProfile/BranchProfile";
+import BoothSidebar from "../BoothSidebar/BoothSidebar";
 
 const Sidebar = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -156,6 +157,9 @@ const Sidebar = () => {
 
               {/* FDR Dropdown Menu */}
               <FdrSidebar></FdrSidebar>
+
+              {/* Booth Dropdown Menu */}
+              <BoothSidebar></BoothSidebar>
 
               {/* Withdraw Dropdown Menu */}
               <WithdrawSidebar></WithdrawSidebar>

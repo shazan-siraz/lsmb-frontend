@@ -19,17 +19,25 @@ const loanApi = baseApi.injectEndpoints({
       providesTags: ["loan"],
     }),
 
+    getSingleLoan: builder.query({
+      query: (id) => ({
+        url: `/loan/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["loan"],
+    }),
+
     getPendingLoan: builder.query({
-      query: () => ({
-        url: "/loan/pending-loan",
+      query: (email) => ({
+        url: `/loan/pending-loan/${email}`,
         method: "GET",
       }),
       providesTags: ["loan"],
     }),
 
     getActiveLoan: builder.query({
-      query: () => ({
-        url: "/loan/Active-loan",
+      query: (email) => ({
+        url: `/loan/active-loan/${email}`,
         method: "GET",
       }),
       providesTags: ["loan"],
@@ -58,6 +66,7 @@ const loanApi = baseApi.injectEndpoints({
 export const {
   useCreateLoanMutation,
   useGetAllLoanQuery,
+  useGetSingleLoanQuery,
   useGetPendingLoanQuery,
   useGetActiveLoanQuery,
   useUpdateLoanMutation,

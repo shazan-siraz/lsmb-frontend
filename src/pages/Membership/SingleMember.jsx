@@ -9,10 +9,13 @@ const SingleMember = () => {
 
   const memberData = data?.data;
 
-  if(isLoading) {
-    return <p>Loading...</p>
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
-  
 
   return (
     <div>
@@ -242,15 +245,17 @@ const SingleMember = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>{memberData.nominee?.nomineeName}</td>
-              <td>{memberData.nominee?.nomineePhone}</td>
-              <td>{memberData.nominee?.nomineeNid}</td>
-              <td>{memberData.nominee?.nomineeRelation}</td>
-              <td>{memberData.nominee?.distributation}</td>
-              <td>UNCHANGED</td>
-            </tr>
+            {memberData?.nominee?.map((item, index) => (
+              <tr key={item._id}>
+                <td>{index + 1}</td>
+                <td>{item.nomineeName}</td>
+                <td>{item.nomineePhone}</td>
+                <td>{item.nomineeNid}</td>
+                <td>{item.nomineeRelation}</td>
+                <td>{item.distributation}</td>
+                <td>UNCHANGED</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

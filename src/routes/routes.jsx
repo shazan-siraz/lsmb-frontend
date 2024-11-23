@@ -60,6 +60,10 @@ import SingleArticle from "../pages/Article/SingleArticle";
 import RegisteredUserList from "../pages/Register/RegisteredUserList";
 import Profile from "../pages/Profile/Profile";
 import BranchDetails from "../pages/BranchCreate/BranchDetails";
+import FindSavingMember from "../pages/SavingCollection/FindSavingMember";
+import SavingTransaction from "../pages/SavingCollection/SavingTransaction";
+import FindLoanMember from "../pages/LoanTransaction/FindLoanMember";
+import LoanTransaction from "../pages/LoanTransaction/LoanTransaction";
 
 const router = createBrowserRouter([
   {
@@ -305,6 +309,22 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile></Profile>
+      },
+      {
+        path: "saving-transaction",
+        element: <FindSavingMember></FindSavingMember>
+      },
+      {
+        path: "saving-transaction/:id",
+        element: <SavingTransaction></SavingTransaction>
+      },
+      {
+        path: "loan-transaction",
+        element: <FindLoanMember></FindLoanMember>
+      },
+      {
+        path: "loan-transaction/:id",
+        element: <LoanTransaction></LoanTransaction>
       },
     ],
   },

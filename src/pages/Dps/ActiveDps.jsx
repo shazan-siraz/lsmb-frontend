@@ -6,7 +6,11 @@ const ActiveDps = () => {
   const { data: dpsData, isLoading: dpsDataQueryLoading } = useGetAllDpsQuery();
 
   if (dpsDataQueryLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
   return (

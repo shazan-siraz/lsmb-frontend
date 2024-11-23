@@ -7,11 +7,18 @@ const ActiveFdr = () => {
   const { data: fdrData, isLoading: fdrDataQueryLoading } = useGetAllFdrQuery();
 
   if (fdrDataQueryLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
+  console.log(fdrData.data.map(item => console.log(item.memberOfFdrApplying
+  )));
+
   return (
-    <div className="bg-[#EBECED]">
+    <div>
       <div>
         <div className="flex justify-between items-center px-5 pb-3 pt-5">
           <h1 className="text-[20px] font-semibold">Active FDR List</h1>
@@ -62,10 +69,10 @@ const ActiveFdr = () => {
                   <td>
                     <NavLink
                       target="_blank"
-                      to={`/dashboard/single-member/${item.memberOfApplying?._id}`}
+                      to={`/dashboard/single-member/${item?.memberOfFdrApplying?._id}`}
                       className="border border-lime-900 px-4 py-1 rounded-md hover:bg-slate-800 hover:text-white"
                     >
-                      <button>{item.memberOfFdrApplying?.memberName}</button>
+                      <button>{item?.memberOfFdrApplying?.memberName}</button>
                     </NavLink>
                   </td>
                   <td>{item.memberOfFdrApplying.memberId}</td>

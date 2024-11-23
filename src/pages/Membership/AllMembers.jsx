@@ -7,7 +7,11 @@ const AllMembers = () => {
   const { data, isLoading: membersDataLoading } = useGetAllMembershipQuery();
 
   if (membersDataLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
   return (
@@ -23,12 +27,10 @@ const AllMembers = () => {
         <table className="employeeTable">
           <thead>
             <tr className="uppercase font-semibold">
-              <th className="text-center">SL</th>
+              <th className="text-center">ID</th>
               <th className="text-center">Member Name</th>
-              <th className="text-center">Membership ID</th>
-              <th className="text-center">Phone</th>
+              <th className="text-center">Member Phone</th>
               <th className="text-center">Gender</th>
-              <th className="text-center">Relative</th>
               <th className="text-center">Group</th>
               <th className="text-center">Reference</th>
               <th className="text-center">Join Date</th>
@@ -37,15 +39,13 @@ const AllMembers = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.data?.map((item, index) => (
+            {data?.data?.map((item) => (
               <tr key={item._id}>
-                <td>{index + 1} </td>
-                <td>{item.memberName}</td>
                 <td>{item.memberId}</td>
+                <td>{item.memberName}</td>
                 <td>{item.phoneNo}</td>
                 <td>{item.gender}</td>
-                <td>{item.nominee.nomineeRelation}</td>
-                <td>{item.group.groupTitle}</td>
+                <td>{item.group?.groupTitle}</td>
                 <td>
                   {item?.referenceEmployee
                     ? item.referenceEmployee.employeeName

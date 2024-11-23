@@ -8,6 +8,7 @@ import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeAp
 import { useCreateFdrMutation } from "../../redux/features/fdr/fdrApi";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 
 const FdrCreate = () => {
   const { email } = useSelector(useCurrentUser);
@@ -167,15 +168,22 @@ const FdrCreate = () => {
     }
   };
 
+  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
+    useGetSingleBranchQuery(email);
   const { data: memberShipData, isLoading: membersDataLoading } =
     useGetAllMembershipQuery();
   const { data: employeeData, isLoading: employeeDataLoading } =
     useGetAllEmployeeQuery();
 
-  const [addFdr, {isLoading: fdrCreateLoading, error}] = useCreateFdrMutation();
+  const [addFdr, { isLoading: fdrCreateLoading, error }] =
+    useCreateFdrMutation();
 
-  if (membersDataLoading || employeeDataLoading) {
-    return <p>Loading...</p>;
+  if (membersDataLoading || employeeDataLoading || singleBranchQueryLoading) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
   const onSubmit = async (data) => {
@@ -183,6 +191,7 @@ const FdrCreate = () => {
       const fdrData = {
         memberOfFdrApplying: data.memberOfFdrApplying,
         branchEmail: email,
+        companyEmail: singleBranchData?.data?.companyEmail,
         FdrStart: data.FdrStart,
         FdrAcNo: data.FdrAcNo,
         FixedDepositAmount: parseInt(data.FixedDepositAmount),
@@ -234,9 +243,10 @@ const FdrCreate = () => {
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="memberOfFdrApplying"
                 {...register("memberOfFdrApplying")}
+                defaultValue=""
                 required={true}
               >
-                <option>Select FDR Member</option>
+                <option value="" disabled>Select FDR Member</option>
                 {memberShipData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.memberName}
@@ -297,9 +307,10 @@ const FdrCreate = () => {
                 id="durationOfYear"
                 {...register("durationOfYear")}
                 onChange={handleDurationOfYear}
+                defaultValue=""
                 required={true}
               >
-                <option>Select FDR Term</option>
+                <option value="" disabled>Select FDR Term</option>
                 <option value="1">1 Year</option>
                 <option value="2">2 Year</option>
                 <option value="3">3 Year</option>
@@ -322,9 +333,10 @@ const FdrCreate = () => {
                 id="revenueType"
                 {...register("revenueType")}
                 onChange={handleRevenueType}
+                defaultValue=""
                 required={true}
               >
-                <option>Select Revenue Type</option>
+                <option value="" disabled>Select Revenue Type</option>
                 <option value="Monthly">Monthly</option>
                 <option value="Yearly">Yearly</option>
                 <option value="Fixed">Fixed</option>
@@ -387,9 +399,10 @@ const FdrCreate = () => {
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceEmployee"
                 {...register("referenceEmployee")}
+                defaultValue=""
                 required={true}
               >
-                <option>Select Reference Employee</option>
+                <option value="" disabled>Select Reference Employee</option>
                 {employeeData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.employeeName}
@@ -406,9 +419,10 @@ const FdrCreate = () => {
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceMember"
                 {...register("referenceMember")}
+                defaultValue=""
                 required={true}
               >
-                <option>Select Reference Member</option>
+                <option value="" disabled>Select Reference Member</option>
                 {memberShipData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.memberName}

@@ -1,12 +1,16 @@
+import { useSelector } from "react-redux";
+import Loading from "../../components/Loading/Loading";
 import { useGetPendingLoanQuery } from "../../redux/features/loan/loanApi";
 import LoanList from "./LoanList";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const LoanRequest = () => {
+  const {email} = useSelector(useCurrentUser)
   const { data: loanQueryData, isLoading: loanQueryLoading } =
-    useGetPendingLoanQuery();
+    useGetPendingLoanQuery(email);
 
   if (loanQueryLoading) {
-    return <p>Loading...</p>;
+    return <Loading isLoading="true"></Loading>;
   }
 
   return (

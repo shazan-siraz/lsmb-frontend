@@ -1,9 +1,12 @@
+import { useSelector } from "react-redux";
 import { useGetActiveLoanQuery } from "../../redux/features/loan/loanApi";
 import ActiveLoanList from "./ActiveLoanList";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const ActiveLoan = () => {
+  const {email} = useSelector(useCurrentUser)
   const { data: loanQueryData, isLoading: loanQueryLoading } =
-    useGetActiveLoanQuery();
+    useGetActiveLoanQuery(email);
 
   if (loanQueryLoading) {
     return <p>Loading...</p>;

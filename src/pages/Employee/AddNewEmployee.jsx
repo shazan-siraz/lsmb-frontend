@@ -10,12 +10,21 @@ import { useCreateEmployeeMutation } from "../../redux/features/employee/employe
 import { FaMinus } from "react-icons/fa";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import { Divider } from "antd";
 
 const AddNewEmployee = () => {
   const [isError, setIsError] = useState(null);
   const [fileError, setFileError] = useState("");
   const [signatureError, setSignatureError] = useState("");
-  const [nidPassportError, setnipPassportError] = useState("");
+  const [employeeNidFirstPartError, setEmployeeNidFirstPartError] =
+    useState("");
+  const [employeeNidSeconedPartError, setEmployeeNidSeconedPartError] =
+    useState("");
+  const [jabindarNidFirstPartError, setJabindarNidFirstPartError] =
+    useState("");
+  const [jabindarNidSeconedPartError, setJabindarNidSeconedPartError] =
+    useState("");
+  const [jabindarSignatureError, setJabindarSignatureError] = useState("");
   const [attachments, setAttachments] = useState([{}]);
   const { email } = useSelector(useCurrentUser);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,18 +76,86 @@ const AddNewEmployee = () => {
   };
 
   // Nid/Passport size Validation
-  const validateNidPassportImageSize = (e) => {
+  const validateEmployeeNidFirstPart = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 100 * 1024) {
       // 80 KB = 80 * 1024 bytes
-      setnipPassportError("Image size more than 100kb");
+      setEmployeeNidFirstPartError("Image size more than 100kb");
+      setError("employeeNidFirstPart", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setEmployeeNidFirstPartError("");
+      clearErrors("signature");
+    }
+  };
+
+  // Nid/Passport size Validation
+  const validateEmployeeNidSeconedPart = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setEmployeeNidSeconedPartError("Image size more than 100kb");
+      setError("employeeNidSeconedPart", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setEmployeeNidSeconedPartError("");
+      clearErrors("signature");
+    }
+  };
+
+  // validateJabindarNidFirstPart size Validation
+  const validateJabindarNidFirstPart = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setJabindarNidFirstPartError("Image size more than 100kb");
       setError("nid_passport", {
         type: "manual",
         message: "Image size more than 100kb",
       });
       e.target.value = "";
     } else {
-      setnipPassportError("");
+      setJabindarNidFirstPartError("");
+      clearErrors("signature");
+    }
+  };
+
+  // validateJabindarSignature size Validation
+  const validateJabindarSignature = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setJabindarSignatureError("Image size more than 100kb");
+      setError("nid_passport", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setJabindarSignatureError("");
+      clearErrors("signature");
+    }
+  };
+
+  // validateJabindarNidFirstPart size Validation
+  const validateJabindarNidSeconedPart = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setJabindarNidSeconedPartError("Image size more than 100kb");
+      setError("nid_passport", {
+        type: "manual",
+        message: "Image size more than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setJabindarNidSeconedPartError("");
       clearErrors("signature");
     }
   };
@@ -100,7 +177,23 @@ const AddNewEmployee = () => {
     setIsLoading(true);
 
     try {
-      const uploadedImageUrl = await uploadImageToCloudinary(data.imageUrl[0]);
+      const [
+        profileImageUrl,
+        signatureImageUrl,
+        nidFirstPartImageUrl,
+        nidSeconedPartImageUrl,
+        jabindarSignatureImageUrl,
+        jabindarNidFirstPartImageUrl,
+        jabindarNidSeconedPartImageUrl,
+      ] = await Promise.all([
+        uploadImageToCloudinary(data.profileImage[0]),
+        uploadImageToCloudinary(data.signatureImage[0]),
+        uploadImageToCloudinary(data.nidFirstPart[0]),
+        uploadImageToCloudinary(data.nidSeconedPart[0]),
+        uploadImageToCloudinary(data.jabindarSignature[0]),
+        uploadImageToCloudinary(data.jabindarNidFirstPart[0]),
+        uploadImageToCloudinary(data.jabindarNidSeconedPart[0]),
+      ]);
 
       // Map through all image files and upload each to Cloudinary
       const uploadedImageUrls = await Promise.all(
@@ -140,8 +233,19 @@ const AddNewEmployee = () => {
           incomeTax: Number(data?.incomeTax),
           providentFund: Number(data?.providentFund),
           totalSalary: Number(data?.totalSalary),
-          profileImage: uploadedImageUrl,
+          profileImage: profileImageUrl,
+          signature: signatureImageUrl,
+          nidFirstPart: nidFirstPartImageUrl,
+          nidSeconedPart: nidSeconedPartImageUrl,
           attachments: uploadedImageUrls,
+          jabindar: {
+            jabindarName: data.jabindarName,
+            jabindarPhone: data.jabindarPhone,
+            jabindarNid: data.jabindarNid,
+            jabindarSignature: jabindarSignatureImageUrl,
+            jabindarNidFirstPart: jabindarNidFirstPartImageUrl,
+            jabindarNidSeconedPart: jabindarNidSeconedPartImageUrl,
+          },
         },
       };
 
@@ -569,8 +673,9 @@ const AddNewEmployee = () => {
                 <input
                   className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
                   type="file"
-                  id="imageUrl"
-                  {...register("imageUrl", { required: true })}
+                  required
+                  id="profileImage"
+                  {...register("profileImage")}
                   onChange={validateFileSize}
                 />
               </div>
@@ -589,29 +694,52 @@ const AddNewEmployee = () => {
                 <input
                   className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
                   type="file"
+                  required
                   id="signature"
-                  {...register("signatureImage", { required: true })}
+                  {...register("signatureImage")}
                   onChange={validateSignatureImageSize}
                 />
               </div>
             </div>
 
             <div className="flex flex-col">
-              {nidPassportError && (
+              {employeeNidFirstPartError && (
                 <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
-                  {nidPassportError}
+                  {employeeNidFirstPartError}
                 </p>
               )}
               <div className="flex flex-col">
-                <label className="font-bold" htmlFor="nid_passport">
-                  Nid/Passport*
+                <label className="font-bold" htmlFor="employeeNidFirstPart">
+                  Nid (1st Part)*
                 </label>
                 <input
                   className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
                   type="file"
-                  id="nid_passport"
-                  {...register("nid_passport", { required: true })}
-                  onChange={validateNidPassportImageSize}
+                  required
+                  id="employeeNidFirstPart"
+                  {...register("nidFirstPart")}
+                  onChange={validateEmployeeNidFirstPart}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              {employeeNidSeconedPartError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {employeeNidSeconedPartError}
+                </p>
+              )}
+              <div className="flex flex-col">
+                <label className="font-bold" htmlFor="employeeNidSeconedPart">
+                  Nid (2nd Part)*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                  type="file"
+                  required
+                  id="employeeNidSeconedPart"
+                  {...register("nidSeconedPart")}
+                  onChange={validateEmployeeNidSeconedPart}
                 />
               </div>
             </div>
@@ -628,7 +756,6 @@ const AddNewEmployee = () => {
                     id={`attachment-${index}`}
                     placeholder="Profile Image"
                     {...register(`attachment[${index}]`)}
-                    required={index === 0}
                   />
                 </div>
                 {index > 0 && (
@@ -644,6 +771,7 @@ const AddNewEmployee = () => {
                 )}
               </div>
             ))}
+
             <div>
               <button
                 type="button"
@@ -655,19 +783,127 @@ const AddNewEmployee = () => {
             </div>
           </div>
 
-          <hr className="py-2" />
+          <Divider className="uppercase">Employee Jabindar</Divider>
 
-          <div className="text-center pb-[30px]">
-            <input
-              className="transition-all duration-300 ease-in-out border border-blue-500 py-2 px-20 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+          <div>
+            <div className="grid grid-cols-4 gap-x-5">
+              <div className="flex flex-col">
+                <label className="font-semibold" htmlFor="jabindarName">
+                  Jabindar Name*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                  type="text"
+                  id="jabindarName"
+                  placeholder="Jabindar Name"
+                  {...register("jabindarName")}
+                  required={true}
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-semibold" htmlFor="jabindarPhone">
+                  Jabindar Phone*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                  type="number"
+                  id="jabindarPhone"
+                  placeholder="Jabindar Phone"
+                  {...register("jabindarPhone")}
+                  required={true}
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-semibold" htmlFor="jabindarNid">
+                  Jabindar NID*
+                </label>
+                <input
+                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                  type="text"
+                  id="jabindarNid"
+                  placeholder="Jabindar Nid"
+                  {...register("jabindarNid")}
+                  required={true}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                {jabindarSignatureError && (
+                  <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                    {jabindarSignatureError}
+                  </p>
+                )}
+                <div className="flex flex-col">
+                  <label className="font-bold" htmlFor="jabindarSignature">
+                    Jabindar Signature*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                    type="file"
+                    id="jabindarSignature"
+                    required
+                    {...register("jabindarSignature")}
+                    onChange={validateJabindarSignature}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                {jabindarNidFirstPartError && (
+                  <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                    {jabindarNidFirstPartError}
+                  </p>
+                )}
+                <div className="flex flex-col">
+                  <label className="font-bold" htmlFor="jabindarNidFirstPart">
+                    NID (1st Part)*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                    type="file"
+                    required
+                    id="jabindarNidFirstPart"
+                    {...register("jabindarNidFirstPart")}
+                    onChange={validateJabindarNidFirstPart}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                {jabindarNidSeconedPartError && (
+                  <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                    {jabindarNidSeconedPartError}
+                  </p>
+                )}
+                <div className="flex flex-col">
+                  <label className="font-bold" htmlFor="jabindarNidSeconedPart">
+                    NID (2nd Part)*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm employeeInput bg-white"
+                    type="file"
+                    required
+                    id="jabindarNidSeconedPart"
+                    {...register("jabindarNidSeconedPart")}
+                    onChange={validateJabindarNidSeconedPart}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center py-8">
+            <button
+              className="border border-blue-500 py-2 px-20 rounded hover:bg-blue-500 hover:text-white cursor-pointer transition-all duration-300 ease-in-out"
               type="submit"
-              value={
-                isLoading || createEmoloyeeLoading
-                  ? "Loading..."
-                  : "Create Employee"
-              }
               disabled={isLoading || createEmoloyeeLoading}
-            />
+            >
+              {isLoading || createEmoloyeeLoading ? (
+                <span className="loading loading-bars loading-md"></span>
+              ) : (
+                "Create Employee"
+              )}
+            </button>
           </div>
         </form>
       </div>

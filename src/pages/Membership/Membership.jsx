@@ -13,15 +13,30 @@ import { NavLink } from "react-router-dom";
 import { Divider } from "antd";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import { FaMinus } from "react-icons/fa";
 
 const Membership = () => {
   const { email } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
+  const [age, setAge] = useState("");
   const selectRef = useRef(null);
   const [selectedRefValue, setSelectedRefValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [attachments, setAttachments] = useState([{}]);
 
-  const [addMembership, { isLoading: membershipLoading , error}] =
+  const [nominees, setNominees] = useState([{ id: Date.now() }]);
+
+  const handleAddNominee = () => {
+    setNominees([...nominees, { id: Date.now() }]);
+  };
+
+  // Delete a nominee row
+  const handleDeleteNominee = (id) => {
+    setNominees(nominees.filter((nominee) => nominee.id !== id));
+  };
+
+  const [addMembership, { isLoading: membershipLoading, error }] =
     useCreateMembershipMutation();
 
   const { data: groupData, isLoading: groupQueryLoading } =
@@ -31,40 +46,91 @@ const Membership = () => {
   const { data: membershipData, isLoading: membersQueryLoading } =
     useGetAllMembershipQuery();
 
-  if (groupQueryLoading || employeeQueryLoading || membersQueryLoading) {
+  const { data: branchData, isLoading: branchQueryLoading } =
+    useGetSingleBranchQuery(email);
+
+  if (
+    groupQueryLoading ||
+    employeeQueryLoading ||
+    membersQueryLoading ||
+    branchQueryLoading
+  ) {
     return <p>Loading...</p>;
   }
+
+  const companyEmail = branchData?.data?.company?.companyEmail;
+  const fieldOfficerEmployee = employeeData?.data.filter(
+    (item) => item.userId.role === "fieldOfficer"
+  );
+
+  const handleDateChange = (event) => {
+    const birthDate = new Date(event.target.value);
+    const today = new Date();
+    let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    // Adjust age if birth month and day haven't occurred yet this year
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      calculatedAge--;
+    }
+
+    setAge(calculatedAge);
+    // setValue("age", calculatedAge); // Update the form field
+  };
+
+  // Function to add a new attachment input
+  const addAttachmentField = () => {
+    setAttachments([...attachments, {}]);
+  };
+
+  // Function to remove an attachment input
+  const removeAttachmentField = (index) => {
+    const updatedAttachments = attachments.filter((_, i) => i !== index);
+    setAttachments(updatedAttachments);
+  };
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
+      // Map through all image files and upload each to Cloudinary
+      const uploadedImageUrls = await Promise.all(
+        data.attachment.map(async (attachments) => {
+          const imageUrl = await uploadImageToCloudinary(attachments[0]);
+          return imageUrl;
+        })
+      );
+
       const [
         memberPhotoImageUrl,
         memberSignatureImageUrl,
-        memberPassportNidImageUrl,
-        memberChequeBookImageUrl,
+        nidFrontPartImageUrl,
+        nidBackPartImageUrl,
       ] = await Promise.all([
         uploadImageToCloudinary(data.memberPhoto[0]),
         uploadImageToCloudinary(data.signature[0]),
-        uploadImageToCloudinary(data.passport_nid[0]),
-        uploadImageToCloudinary(data.chequeBook[0]),
+        uploadImageToCloudinary(data.nidFrontPart[0]),
+        uploadImageToCloudinary(data.nidBackPart[0]),
       ]);
 
       setIsLoading(false);
 
       const membershipData = {
-        memberName: data.memberName,
-        memberId: data.memberId,
         branchEmail: email,
+        companyEmail: companyEmail,
+        branch: branchData?.data?._id,
+        memberName: data.memberName,
         group: data.groupName,
-        assignFieldOfficer: data.assignFieldOfficer,
+        assignFieldOfficer: data?.assignFieldOfficer,
         phoneNo: data.phoneNo,
         email: data.email,
         memberNid: data.memberNid,
         admissionFees: data.admissionFees,
         shareAmount: data.shareAmount,
         dateOfBirth: data.dateOfBirth,
-        age: data.age,
+        age: Number(data.age),
         gender: data.gender,
         fatherHusbandName: data.father_husbandName,
         profession: data.profession,
@@ -73,28 +139,24 @@ const Membership = () => {
         thana: data.thana,
         presentAddress: data.presentAddress,
         permanentAddress: data.permanentAddress,
-        status: data.status,
         accountBalance: 0,
         memberPhoto: memberPhotoImageUrl,
         signature: memberSignatureImageUrl,
-        passportOrNid: memberPassportNidImageUrl,
-        chequeBook: memberChequeBookImageUrl,
+        nidFrontPart: nidFrontPartImageUrl,
+        nidBackPart: nidBackPartImageUrl,
         referenceEmployee: data.referenceEmployee,
         referenceMember: data.referenceMember,
-        nominee: {
-          nomineeName: data.nominee.nomineeName,
-          nomineePhone: data.nominee.nomineeNid,
-          nomineeNid: data.nominee.nomineeNid,
-          nomineeRelation: data.nominee.nomineeRelation,
-          distributation: data.nominee.distributation,
-        },
+        attachments: uploadedImageUrls,
+        nominee: data.nominees,
       };
 
       const res = await addMembership(membershipData);
-      console.log(error);
+
+      console.log("res", res);
+      console.log("error", error);
 
       if (res?.data) {
-        toast.success("Branch Created Successfully");
+        toast.success("Member Created Successfully");
         reset();
       }
     } catch (err) {
@@ -135,30 +197,19 @@ const Membership = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="memberId">
-                Member ID*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="number"
-                id="memberId"
-                placeholder="Member ID"
-                {...register("memberId")}
-                required={true}
-              />
-            </div>
-
-            <div className="flex flex-col">
               <label className="font-semibold" htmlFor="groupName">
                 Group Name*
               </label>
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="groupName"
+                required
+                defaultValue=""
                 {...register("groupName")}
-                required={true}
               >
-                <option>Select Group Name</option>
+                <option value="" disabled>
+                  Select Group Name
+                </option>
                 {groupData?.data?.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item.groupTitle}
@@ -174,11 +225,14 @@ const Membership = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="assignFieldOfficer"
+                required
+                defaultValue=""
                 {...register("assignFieldOfficer")}
-                required={true}
               >
-                <option>Select Field Officer</option>
-                {employeeData?.data?.map((item) => (
+                <option value="" disabled>
+                  Select Field Officer
+                </option>
+                {fieldOfficerEmployee?.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.employeeName}
                   </option>
@@ -192,7 +246,7 @@ const Membership = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="number"
+                type="text"
                 id="phoneNo"
                 placeholder="Phone No"
                 {...register("phoneNo")}
@@ -267,6 +321,7 @@ const Membership = () => {
                 placeholder="Date Of Birth"
                 {...register("dateOfBirth")}
                 required={true}
+                onChange={handleDateChange}
               />
             </div>
 
@@ -279,6 +334,8 @@ const Membership = () => {
                 type="number"
                 id="age"
                 placeholder="Age"
+                value={age}
+                readOnly
                 {...register("age")}
                 required={true}
               />
@@ -302,13 +359,13 @@ const Membership = () => {
 
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="father_husbandName">
-                Father Husband Name*
+                Father/Husband Name*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 type="text"
                 id="father_husbandName"
-                placeholder="Father Husband Name"
+                placeholder="Father/Husband Name"
                 {...register("father_husbandName")}
                 required={true}
               />
@@ -406,22 +463,6 @@ const Membership = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="status">
-                Status*
-              </label>
-              <select
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                id="status"
-                {...register("status")}
-                required={true}
-              >
-                <option>Select Status</option>
-                <option value="enable">Enable</option>
-                <option value="disable">Disable</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col">
               <label className="font-semibold" htmlFor="memberPhoto">
                 Member Photo
               </label>
@@ -448,27 +489,27 @@ const Membership = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="passport_nid">
-                Passport/Nid
+              <label className="font-semibold" htmlFor="nidFrontPart">
+                Nid (Front Part)
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
                 type="file"
-                id="passport_nid"
-                {...register("passport_nid")}
+                id="nidFrontPart"
+                {...register("nidFrontPart")}
                 required={true}
               />
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="chequeBook">
-                Cheque Book
+              <label className="font-semibold" htmlFor="nidBackPart">
+                Nid (Back Part)
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
                 type="file"
-                id="chequeBook"
-                {...register("chequeBook")}
+                id="nidBackPart"
+                {...register("nidBackPart")}
                 required={true}
               />
             </div>
@@ -529,91 +570,165 @@ const Membership = () => {
                 </select>
               </div>
             )}
+
+            {attachments.map((_, index) => (
+              <div className="flex" key={index}>
+                <div>
+                  <label className="font-bold" htmlFor={`attachment-${index}`}>
+                    Attachment:
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm employeeInput"
+                    type="file"
+                    id={`attachment-${index}`}
+                    placeholder="Profile Image"
+                    {...register(`attachment[${index}]`)}
+                  />
+                </div>
+                {index > 0 && (
+                  <div className="flex justify-center items-center">
+                    <button
+                      type="button"
+                      className="ml-2 px-2 py-2 bg-red-500 text-white rounded"
+                      onClick={() => removeAttachmentField(index)}
+                    >
+                      <FaMinus></FaMinus>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <div className="flex items-center">
+              <button
+                type="button"
+                className=" px-4 py-2 bg-slate-400 hover:bg-slate-500 transition-all duration-300 ease-in-out text-white rounded-md"
+                onClick={addAttachmentField}
+              >
+                Add More Attachment
+              </button>
+            </div>
           </div>
 
           <Divider className="uppercase">Member Nominee</Divider>
 
           <div>
-            <div className="grid grid-cols-5 gap-5">
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="nomineeName">
-                  Nominee Name*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
-                  type="text"
-                  id="nomineeName"
-                  placeholder="Nominee Name"
-                  {...register("nominee.nomineeName")}
-                  required={true}
-                />
+            <button
+              type="button"
+              onClick={handleAddNominee}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Add Nominee
+            </button>
+
+            {nominees.map((nominee, index) => (
+              <div key={nominee.id} className="grid grid-cols-6 gap-5 my-4">
+                <div className="flex flex-col">
+                  <label
+                    className="font-semibold"
+                    htmlFor={`nomineeName-${index}`}
+                  >
+                    Nominee Name*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                    type="text"
+                    id={`nomineeName-${index}`}
+                    placeholder="Nominee Name"
+                    {...register(`nominees[${index}].nomineeName`)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    className="font-semibold"
+                    htmlFor={`nomineePhone-${index}`}
+                  >
+                    Nominee Phone*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                    type="number"
+                    id={`nomineePhone-${index}`}
+                    placeholder="Nominee Phone"
+                    {...register(`nominees[${index}].nomineePhone`)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    className="font-semibold"
+                    htmlFor={`nomineeNid-${index}`}
+                  >
+                    Nominee NID*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                    type="number"
+                    id={`nomineeNid-${index}`}
+                    placeholder="Nominee NID"
+                    {...register(`nominees[${index}].nomineeNid`)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    className="font-semibold"
+                    htmlFor={`nomineeRelation-${index}`}
+                  >
+                    Nominee Relation*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                    type="text"
+                    id={`nomineeRelation-${index}`}
+                    placeholder="Nominee Relation"
+                    {...register(`nominees[${index}].nomineeRelation`)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    className="font-semibold"
+                    htmlFor={`distributation-${index}`}
+                  >
+                    Distributation*
+                  </label>
+                  <input
+                    className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
+                    type="number"
+                    id={`distributation-${index}`}
+                    placeholder="Distributation"
+                    {...register(`nominees[${index}].distributation`)}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleDeleteNominee(nominee.id)}
+                  className="px-2 py-1 bg-red-500 text-white rounded h-10 self-end"
+                >
+                  Delete
+                </button>
               </div>
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="nomineePhone">
-                  Nominee Phone*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
-                  type="number"
-                  id="nomineePhone"
-                  placeholder="Nominee Phone"
-                  {...register("nominee.nomineePhone")}
-                  required={true}
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="nomineeNid">
-                  Nominee NID*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
-                  type="number"
-                  id="nomineeNid"
-                  placeholder="Nominee Nid"
-                  {...register("nominee.nomineeNid")}
-                  required={true}
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="nomineeRelation">
-                  Nominee Relation*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
-                  type="text"
-                  id="nomineeRelation"
-                  placeholder="Nominee Relation"
-                  {...register("nominee.nomineeRelation")}
-                  required={true}
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="font-semibold" htmlFor="distributation">
-                  Distributation*
-                </label>
-                <input
-                  className="py-2 px-2 my-1 rounded-sm membershipInput bg-white"
-                  type="number"
-                  id="distributation"
-                  placeholder="Distributation"
-                  {...register("nominee.distributation")}
-                  required={true}
-                />
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="border-b border-slate-300 my-10"></div>
 
           <div className="text-center pb-10">
-            <input
-              className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+            <button
+              className="border border-blue-500 py-2 px-5 rounded
+            hover:bg-blue-500 hover:text-white cursor-pointer"
               type="submit"
-              value={
-                membershipLoading || isLoading ? "Loading..." : "Create Member"
-              }
-              disabled={membershipLoading || isLoading}
-            />
+            >
+              {isLoading || membershipLoading ? (
+                <span className="loading loading-bars loading-md"></span>
+              ) : (
+                "Create Member"
+              )}
+            </button>
             <ToastContainer></ToastContainer>
           </div>
         </form>

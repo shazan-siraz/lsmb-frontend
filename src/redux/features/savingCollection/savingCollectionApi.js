@@ -1,17 +1,17 @@
 import { baseApi } from "../../api/baseApi";
 
-const savingTransactionApi = baseApi.injectEndpoints({
+const savingCollectionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createSavingTransaction: builder.mutation({
+    createSavingCollection: builder.mutation({
       query: (data) => ({
         url: "/savingTransaction/create-savingTransaction",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["savingTransaction"],
+      invalidatesTags: ["membership"],
     }),
 
-    getAllSavingTransaction: builder.query({
+    getAllSavingCollection: builder.query({
       query: () => ({
         url: "/savingTransaction",
         method: "GET",
@@ -21,4 +21,4 @@ const savingTransactionApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useCreateSavingTransactionMutation, useGetAllSavingTransactionQuery } = savingTransactionApi;
+export const { useCreateSavingCollectionMutation, useGetAllSavingCollectionQuery } = savingCollectionApi;

@@ -8,6 +8,7 @@ import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeAp
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useCreateDpsMutation } from "../../redux/features/dps/dpsApi";
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 
 const DpsCreate = () => {
   const { email } = useSelector(useCurrentUser);
@@ -158,7 +159,6 @@ const DpsCreate = () => {
 
   const handleInterestPercentChange = (event) => {
     const value = event.target.value;
-   
 
     if (durationOfYear === "1" && installmentType === "Monthly") {
       setTotalAmount(
@@ -302,15 +302,22 @@ const DpsCreate = () => {
     }
   };
 
+  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
+    useGetSingleBranchQuery(email);
   const { data: memberShipData, isLoading: membersDataLoading } =
     useGetAllMembershipQuery();
   const { data: employeeData, isLoading: employeeDataLoading } =
     useGetAllEmployeeQuery();
 
-  const [createDPS, {isLoading: dpsCreateLoading, error}] = useCreateDpsMutation();
+  const [createDPS, { isLoading: dpsCreateLoading, error }] =
+    useCreateDpsMutation();
 
-  if (membersDataLoading || employeeDataLoading) {
-    return <p>Loading...</p>;
+  if (singleBranchQueryLoading || membersDataLoading || employeeDataLoading) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
   const onSubmit = async (data) => {
@@ -318,6 +325,7 @@ const DpsCreate = () => {
       const dpsData = {
         memberOfApplying: data.memberOfDpsApplying,
         branchEmail: email,
+        companyEmail: singleBranchData?.data?.companyEmail,
         dpsStart: data.dpsStart,
         dpsAcNo: data.dpsAcNo,
         startingBalance: Number(data.startingBalance),
@@ -328,7 +336,6 @@ const DpsCreate = () => {
         referenceEmployee: data.referenceEmployee,
         referenceMember: data.referenceMember,
       };
-
 
       const res = await createDPS(dpsData);
 
@@ -370,8 +377,9 @@ const DpsCreate = () => {
                 id="memberOfDpsApplying"
                 {...register("memberOfDpsApplying")}
                 required={true}
+                defaultValue=""
               >
-                <option>Select DPS Member</option>
+                <option value="" disabled>Select DPS Member</option>
                 {memberShipData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.memberName}
@@ -433,8 +441,9 @@ const DpsCreate = () => {
                 {...register("durationOfYear")}
                 onChange={handleDurationOfYear}
                 required={true}
+                defaultValue=""
               >
-                <option>Select DPS Term</option>
+                <option value="" disabled>Select DPS Term</option>
                 <option value="1">1 Year</option>
                 <option value="2">2 Year</option>
                 <option value="3">3 Year</option>
@@ -457,9 +466,10 @@ const DpsCreate = () => {
                 id="installmentType"
                 {...register("installmentType")}
                 onChange={handleInstallmentType}
+                defaultValue=""
                 required={true}
               >
-                <option>Select Installment Type</option>
+                <option value="" disabled>Select Installment Type</option>
                 <option value="Daily">Daily</option>
                 <option value="Weeakly">Weeakly</option>
                 <option value="Monthly">Monthly</option>
@@ -499,15 +509,16 @@ const DpsCreate = () => {
 
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="referenceEmployee">
-                Reference Employee*
+                Reference Employee
               </label>
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceEmployee"
                 {...register("referenceEmployee")}
+                defaultValue=""
                 required={true}
               >
-                <option>Select Reference Employee</option>
+                <option value="" disabled>Select Reference Employee</option>
                 {employeeData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.employeeName}
@@ -518,15 +529,16 @@ const DpsCreate = () => {
 
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="referenceMember">
-                Reference Member*
+                Reference Member
               </label>
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceMember"
                 {...register("referenceMember")}
+                defaultValue=""
                 required={true}
               >
-                <option>Select Reference Member</option>
+                <option value="" disabled>Select Reference Member</option>
                 {memberShipData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.memberName}
