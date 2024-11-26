@@ -4,7 +4,7 @@ import { HiUserGroup } from "react-icons/hi2";
 
 const DashboardHome = () => {
   return (
-    <div className="py-8 px-10">
+    <div className="py-8 px-10 bg-slate-100">
       <BalanceInfo></BalanceInfo>
 
       <div className="flex justify-center gap-5 mt-5">

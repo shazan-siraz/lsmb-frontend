@@ -21,6 +21,7 @@ const LoanList = ({ item, index }) => {
       toast.success(
         `${item.memberOfApplying?.groupName} Loan is Active Successfully`
       );
+      window.location.reload()
     }
   };
 

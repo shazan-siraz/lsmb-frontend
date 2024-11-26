@@ -8,7 +8,7 @@ const savingCollectionApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["membership"],
+      invalidatesTags: ["savingTransaction", "membership"],
     }),
 
     getAllSavingCollection: builder.query({
@@ -18,7 +18,28 @@ const savingCollectionApi = baseApi.injectEndpoints({
       }),
       providesTags: ["savingTransaction"],
     }),
+
+    getTotalSavingtxnAmount: builder.query({
+      query: (email) => ({
+        url: `/savingTransaction/getTotalSavingtxnAmount/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["savingTransaction"],
+    }),
+
+    todaySavingCollection: builder.query({
+      query: (email) => ({
+        url: `savingTransaction/todaySavingTxn/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["savingTransaction"],
+    }),
   }),
 });
 
-export const { useCreateSavingCollectionMutation, useGetAllSavingCollectionQuery } = savingCollectionApi;
+export const {
+  useCreateSavingCollectionMutation,
+  useGetAllSavingCollectionQuery,
+  useTodaySavingCollectionQuery,
+  useGetTotalSavingtxnAmountQuery
+} = savingCollectionApi;

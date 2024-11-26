@@ -13,7 +13,15 @@ const membershipApi = baseApi.injectEndpoints({
 
     getAllMembership: builder.query({
       query: (email) => ({
-        url: `/membership/${email}`,
+        url: `/membership/getAllMember/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["membership"],
+    }),
+
+    getAllSavingMembership: builder.query({
+      query: (email) => ({
+        url: `/membership/getAllSavingMember/${email}`,
         method: "GET",
       }),
       providesTags: ["membership"],
@@ -28,13 +36,14 @@ const membershipApi = baseApi.injectEndpoints({
       providesTags: ["membership"],
     }),
 
-    findMembership: builder.query({
-      query: () => ({
-        url: `/membership/findMember`,
+    searchMember: builder.query({
+      query: ({ query, email }) => ({
+        url: `/membership/searchMember?query=${query}&email=${email}`,
         method: "GET",
       }),
       invalidatesTags: ["membership"],
     }),
+
   }),
 });
 
@@ -42,5 +51,6 @@ export const {
   useCreateMembershipMutation,
   useGetAllMembershipQuery,
   useGetSingleMembershipQuery,
-  useFindMembershipQuery,
+  useGetAllSavingMembershipQuery,
+  useSearchMemberQuery,
 } = membershipApi;

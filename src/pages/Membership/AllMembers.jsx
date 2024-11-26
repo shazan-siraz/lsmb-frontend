@@ -2,9 +2,12 @@ import { NavLink } from "react-router-dom";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { FaEdit } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { useCurrentUser } from "../../redux/features/auth/authSlice";
 
 const AllMembers = () => {
-  const { data, isLoading: membersDataLoading } = useGetAllMembershipQuery();
+  const {email} = useSelector(useCurrentUser)
+  const { data, isLoading: membersDataLoading } = useGetAllMembershipQuery(email);
 
   if (membersDataLoading) {
     return (

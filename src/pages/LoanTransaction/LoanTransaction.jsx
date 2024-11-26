@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetSingleLoanQuery } from "../../redux/features/loan/loanApi";
 import { FaIdCardClip } from "react-icons/fa6";
 import { MdOutlinePhoneIphone } from "react-icons/md";
@@ -10,12 +10,17 @@ import {
   useTotalLoanCollectionQuery,
 } from "../../redux/features/loanCollection/loanCollectionApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
+import { useDispatch } from "react-redux";
+import { setToastMessage } from "../../redux/features/auth/toastSlice";
+import generateUniqueTxnId from "../../utils/createTransactionId/generateTransactionId";
 
 const LoanTransaction = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const { register, handleSubmit, reset } = useForm();
+  const navigate = useNavigate();
 
   const { data: loanData, isLoading: LoanDataQueryLoading } =
     useGetSingleLoanQuery(id);
@@ -53,6 +58,7 @@ const LoanTransaction = () => {
     const loanTransactionData = {
       loanId: _id,
       memberId: loanData?.data?.memberOfApplying?._id,
+      transactionId: generateUniqueTxnId(),
       memberEmail: loanData?.data?.memberOfApplying?.email,
       branchEmail: branchEmail,
       companyEmail: companyEmail,
@@ -63,16 +69,16 @@ const LoanTransaction = () => {
     };
 
     const res = await createLoanCollection(loanTransactionData);
-    console.log(res);
 
-    if (res?.data) {
-      toast.success(`Loan Transaction Successfully`);
+    if (res?.data?.success === true) {
+      dispatch(setToastMessage("Loan Collection Successfully!"));
       reset();
+      navigate("/dashboard/loan-transaction");
     }
   };
 
   return (
-    <div>
+    <div className="bg-slate-100 min-h-screen">
       <h1 className="text-center font-bold text-[35px] py-2 uppercase">
         Loan Transaction
       </h1>

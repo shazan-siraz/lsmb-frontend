@@ -7,7 +7,7 @@ import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { MdOutlineCircle } from "react-icons/md";
 
 const BranchProfile = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { role } = useSelector(useCurrentUser);
   const [isBranchDropdownOpen, setBranchDropdownOpen] = useState(false);
 
   const branchDropdown = () => setBranchDropdownOpen(!isBranchDropdownOpen);

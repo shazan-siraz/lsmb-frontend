@@ -1,18 +1,22 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetSingleMembershipQuery } from "../../redux/features/membership/membershipApi";
 import { FaIdCardClip } from "react-icons/fa6";
 import { MdOutlinePhoneIphone } from "react-icons/md";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { FaDatabase } from "react-icons/fa";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useForm } from "react-hook-form";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import generateUniqueTxnId from "../../utils/createTransactionId/generateTransactionId";
 import { useCreateSavingCollectionMutation } from "../../redux/features/savingCollection/savingCollectionApi";
+import { useDispatch } from "react-redux";
+import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
 const SavingTransaction = () => {
   const { id } = useParams();
   const { register, handleSubmit, reset } = useForm();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { data: singleMemberData, isLoading: singleMemberQueryLoading } =
     useGetSingleMembershipQuery(id);
@@ -38,14 +42,16 @@ const SavingTransaction = () => {
 
     const res = await createSavingCollection(SavingCollectionData);
 
-    if (res?.data) {
-      toast.success(`Saving Collection Successfully`);
+
+    if (res?.data?.success === true) {
+      dispatch(setToastMessage("Saving Collection Successfully!"));
       reset();
+      navigate("/dashboard/saving-transaction");
     }
   };
 
   return (
-    <div>
+    <div className="bg-slate-100 min-h-screen">
       <h1 className="text-center font-bold text-[35px] py-2 uppercase">
         Savings Transaction
       </h1>

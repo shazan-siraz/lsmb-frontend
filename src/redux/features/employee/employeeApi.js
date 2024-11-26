@@ -8,17 +8,27 @@ const employeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["employee"]
+      invalidatesTags: ["employee"],
     }),
     getAllEmployee: builder.query({
       query: () => ({
         url: "/employee",
         method: "GET",
       }),
-      providesTags: ["employee"]
+      providesTags: ["employee"],
+    }),
+    getSingleEmployee: builder.query({
+      query: (email) => ({
+        url: `/employee/getSingleEmployee/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["employee"],
     }),
   }),
 });
 
-export const { useGetAllEmployeeQuery, useCreateEmployeeMutation } =
-  employeeApi;
+export const {
+  useGetAllEmployeeQuery,
+  useCreateEmployeeMutation,
+  useGetSingleEmployeeQuery,
+} = employeeApi;

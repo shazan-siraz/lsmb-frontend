@@ -2,7 +2,10 @@ import { NavLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useRef, useState } from "react";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
-import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
+import {
+  useGetAllEmployeeQuery,
+  useGetSingleEmployeeQuery,
+} from "../../redux/features/employee/employeeApi";
 import { Divider } from "antd";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import { useCreateLoanMutation } from "../../redux/features/loan/loanApi";
@@ -12,9 +15,11 @@ import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { FaMinus } from "react-icons/fa";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
+import { useBranchWallet } from "../../hooks/useBranchWallet";
 
 const CreateLoan = () => {
-  const { email } = useSelector(useCurrentUser);
+  const { email, role } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
   const selectRef = useRef(null);
   const guarantorRef = useRef(null);
@@ -26,6 +31,22 @@ const CreateLoan = () => {
   const [attachments, setAttachments] = useState([{}]);
   const [nominees, setNominees] = useState([{ id: Date.now() }]);
   const [installmentNumber, setInstallmentNumber] = useState();
+  const { branchWallet } = useBranchWallet();
+
+  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
+    useGetSingleBranchQuery(email);
+  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
+    useGetSingleEmployeeQuery(email);
+
+  // Conditionally use the data based on the role
+  let data;
+  if (role === "branch") {
+    data = singleBranchData;
+  } else if (role === "manager") {
+    data = singleEmployeeData;
+  }
+
+  const branchEmail = data?.data?.branchEmail;
 
   const handleAddNominee = () => {
     setNominees([...nominees, { id: Date.now() }]);
@@ -39,12 +60,17 @@ const CreateLoan = () => {
   const { data: branchData, isLoading: branchQueryLoading } =
     useGetSingleBranchQuery(email);
   const { data: memberShipData, isLoading: membershipQueryLoading } =
-    useGetAllMembershipQuery();
+    useGetAllMembershipQuery(branchEmail);
   const { data: employeeData } = useGetAllEmployeeQuery();
   const [createLoan] = useCreateLoanMutation();
 
-  if (branchQueryLoading || membershipQueryLoading) {
-    return <p>Loading...</p>;
+  if (
+    branchQueryLoading ||
+    membershipQueryLoading ||
+    singleBranchQueryLoading ||
+    singleEmployeeLoading
+  ) {
+    return <LoadingComponent></LoadingComponent>;
   }
 
   const companyEmail = branchData?.data?.company?.companyEmail;
@@ -71,50 +97,66 @@ const CreateLoan = () => {
   };
 
   const onSubmit = async (data) => {
-    setIsLoading(true);
-
     try {
-      // Map through all image files and upload each to Cloudinary
-      const attachmentImageUrls = await Promise.all(
-        data.attachment.map(async (attachments) => {
-          const imageUrl = await uploadImageToCloudinary(attachments[0]);
-          return imageUrl;
-        })
-      );
+      setIsLoading(true);
 
-      const loanData = {
-        memberOfApplying: data.memberOfApplying,
-        branchEmail: email,
-        companyEmail: companyEmail,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        loanNo: data.loanNo,
-        loanAmount: data.loanAmount,
-        percentageOfInterest: data.percentageOfInterest,
-        processFees: Number(data.processFees),
-        insurance: data.insurance,
-        installmentMode: {
-          numberOfInstallment: data.numberOfInstallment,
-          installType: data.installType,
-          totalReceivable: data.totalReceivable,
-        },
-        installmentAmount: data.installmentAmount,
-        attachment: attachmentImageUrls,
-        loanType: data.loanType,
-        guarantorEmployee: data.guarantorEmployee,
-        gurantorMember: data.guarantorMember,
-        loanGuarantor: data.loanGuarantor,
-        status: "Pending",
-      };
+      if (branchWallet < Number(data?.loanAmount)) {
+        toast.error("Insufficient Balance!");
+        setIsLoading(false);
+      } else {
+        const singleMemberData = memberShipData?.data?.find(
+          (item) => item._id === data?.memberOfApplying
+        );
 
-      const res = await createLoan(loanData);
+        const memberName = singleMemberData.memberName;
+        const memberPhone = singleMemberData.phoneNo;
 
-      if (res?.data?.data) {
-        toast.success("Loan is Created Successfully");
-        reset();
+        // Map through all image files and upload each to Cloudinary
+        const attachmentImageUrls = await Promise.all(
+          data.attachment.map(async (attachments) => {
+            const imageUrl = await uploadImageToCloudinary(attachments[0]);
+            return imageUrl;
+          })
+        );
+
+        const loanData = {
+          memberOfApplying: data.memberOfApplying,
+          memberName: memberName,
+          memberPhone: memberPhone,
+          branchEmail: email,
+          companyEmail: companyEmail,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          loanNo: data.loanNo,
+          loanAmount: data.loanAmount,
+          percentageOfInterest: data.percentageOfInterest,
+          processFees: Number(data.processFees),
+          insurance: data.insurance,
+          installmentMode: {
+            numberOfInstallment: data.numberOfInstallment,
+            installType: data.installType,
+            totalReceivable: data.totalReceivable,
+          },
+          installmentAmount: data.installmentAmount,
+          attachment: attachmentImageUrls,
+          loanType: data.loanType,
+          guarantorEmployee: data.guarantorEmployee,
+          gurantorMember: data.guarantorMember,
+          loanGuarantor: data.loanGuarantor,
+          status: "Pending",
+        };
+
+        const res = await createLoan(loanData);
+        
+        console.log(res);
+
+        if (res?.data?.data) {
+          toast.success("Loan is Created Successfully");
+          reset();
+        }
+
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     } catch (err) {
       console.log(err);
       toast.success(err.message);
@@ -122,7 +164,7 @@ const CreateLoan = () => {
   };
 
   return (
-    <div className="bg-[#EBECED]">
+    <div className="bg-slate-100 min-h-screen">
       <div className="flex justify-between px-5 pt-2">
         <h1 className="uppercase">Loan Disbursement</h1>
         <NavLink to="/dashboard/all-members">
@@ -601,12 +643,17 @@ const CreateLoan = () => {
           </div>
 
           <div className="text-center py-5">
-            <input
-              className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
+            <button
+              className="border border-blue-500 py-2 px-5 rounded
+            hover:bg-blue-500 hover:text-white cursor-pointer"
               type="submit"
-              value={isLoading ? "Loading..." : "Submit"}
-              disabled={isLoading}
-            />
+            >
+              {isLoading ? (
+                <span className="loading loading-bars loading-md"></span>
+              ) : (
+                "Submit"
+              )}
+            </button>
           </div>
           <ToastContainer />
         </form>

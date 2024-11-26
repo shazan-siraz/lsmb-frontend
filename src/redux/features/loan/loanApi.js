@@ -49,7 +49,7 @@ const loanApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["loan"],
+      invalidatesTags: ["loan", "savingTransaction"],
     }),
 
     getOverdueLoan: builder.query({
@@ -57,9 +57,24 @@ const loanApi = baseApi.injectEndpoints({
         url: "/loan/overdue-loan",
         method: "GET",
       }),
-      invalidatesTags: ["loan"],
+      providesTags: ["loan"],
     }),
 
+    getTotalLoanAmountWithoutPorcessFees: builder.query({
+      query: (email) => ({
+        url: `/loan/getTotalLoanAmountWithoutPorcessFees/${email}`,
+        method: "GET",
+      }),
+      invalidatesTags: ["savingTransaction"],
+    }),
+
+    searchLoan: builder.query({
+      query: ({ query, email }) => ({
+        url: `/loan/searchLoan?query=${query}&email=${email}`,
+        method: "GET",
+      }),
+      providesTags: ["loan"],
+    }),
   }),
 });
 
@@ -70,5 +85,7 @@ export const {
   useGetPendingLoanQuery,
   useGetActiveLoanQuery,
   useUpdateLoanMutation,
-  useGetOverdueLoanQuery
+  useGetOverdueLoanQuery,
+  useGetTotalLoanAmountWithoutPorcessFeesQuery,
+  useSearchLoanQuery,
 } = loanApi;
