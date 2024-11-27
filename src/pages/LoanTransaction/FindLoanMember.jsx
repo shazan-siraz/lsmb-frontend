@@ -82,8 +82,12 @@ const FindLoanMember = () => {
             Loan Transaction
           </h1>
 
-          <form>
-            <div className="flex justify-center items-center gap-5 pb-8">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <div className="flex justify-center items-center gap-2 px-5 pb-8">
               <input
                 className="py-2 px-2 mx-4 rounded my-1 w-full border membershipInput"
                 type="text"
@@ -92,6 +96,12 @@ const FindLoanMember = () => {
                 placeholder="Search by Name, PhoneNo, or ID"
                 required={true}
               />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              >
+                Search
+              </button>
             </div>
           </form>
         </div>
@@ -114,7 +124,7 @@ const FindLoanMember = () => {
               <tr key={item?._id}>
                 <td>{item?.loanNo}</td>
                 <td>
-                  <img src={item?.memberOfApplying?.memberPhoto} alt="" />
+                  <img className="w-[50px]" src={item?.memberOfApplying?.memberPhoto} alt="" />
                 </td>
                 <td>{item?.memberName}</td>
                 <td>{item?.memberPhone}</td>

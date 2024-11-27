@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux";
-
 import { useCurrentUser } from "../redux/features/auth/authSlice";
 import { useGetSingleBranchQuery } from "../redux/features/branch/branchApi";
 import { useGetSingleEmployeeQuery } from "../redux/features/employee/employeeApi";
@@ -28,8 +27,10 @@ export const useBranchWallet = () => {
   const { data: totalSavingTxnAmount, isLoading: totalSavingTxnAmountLoading } =
     useGetTotalSavingtxnAmountQuery(branchEmail);
 
-  const { data: getTotalLoamAmountWithoutProcessFees } =
-    useGetTotalLoanAmountWithoutPorcessFeesQuery(branchEmail);
+  const {
+    data: getTotalLoamAmountWithoutProcessFees,
+    isLoading: getTotalLoamAmountWithoutProcessFeesLoading,
+  } = useGetTotalLoanAmountWithoutPorcessFeesQuery(branchEmail);
 
   const {
     data: totalLoanCollectionAmountData,
@@ -40,7 +41,8 @@ export const useBranchWallet = () => {
     singleBranchQueryLoading ||
     singleEmployeeLoading ||
     totalSavingTxnAmountLoading ||
-    totalLoanCollectionAmountLoading;
+    totalLoanCollectionAmountLoading ||
+    getTotalLoamAmountWithoutProcessFeesLoading;
 
   const branchWallet =
     totalSavingTxnAmount?.data +

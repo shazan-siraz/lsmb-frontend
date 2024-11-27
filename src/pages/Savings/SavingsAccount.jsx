@@ -24,10 +24,14 @@ const SavingsAccount = () => {
 
   const branchEmail = data?.data?.branchEmail;
 
-  const { data: savingMemberData, isLoading: savingMemeberQueryLoading } =
+  const { data: savingMemberData, isLoading: savingMemberQueryLoading } =
     useGetAllSavingMembershipQuery(branchEmail);
 
-  if (savingMemeberQueryLoading) {
+  if (
+    singleBranchQueryLoading ||
+    singleEmployeeLoading ||
+    savingMemberQueryLoading
+  ) {
     return <LoadingComponent></LoadingComponent>;
   }
 

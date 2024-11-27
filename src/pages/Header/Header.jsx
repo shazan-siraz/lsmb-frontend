@@ -1,7 +1,7 @@
 import "./Header.css";
 import { useDispatch } from "react-redux";
 import { logOut } from "../../redux/features/auth/authSlice";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
@@ -16,6 +16,12 @@ const Header = () => {
   const profileBoxRef = useRef(null); // Create a ref for the profile box
   const buttonRef = useRef(null); // Create a ref for the button
   const dispatch = useDispatch();
+
+  const location = useLocation(); // বর্তমান URL এর জন্য
+
+  const isActive = (path) => location.pathname === path;
+
+  console.log(isActive);
 
   const handleLogOut = () => {
     dispatch(logOut());
@@ -54,15 +60,28 @@ const Header = () => {
     <div>
       <div className="bg-[#092e3a] text-center py-2 px-10 text-white w-full top-0 fixed left-0 flex justify-between">
         <div className="flex gap-2 md:ml-[250px]">
-          <p className="header-btn transition-all duration-300 ease-in-out">
-            Transaction
-          </p>
-          <p className="header-btn transition-all duration-300 ease-in-out">
-            Savings TXN
-          </p>
-          <p className="header-btn transition-all duration-300 ease-in-out">
-            Loan TXN
-          </p>
+          <NavLink to="/dashboard/saving-transaction">
+            <p
+              className={`header-btn transition-all duration-300 ease-in-out ${
+                isActive("/dashboard/saving-transaction")
+                  ? "bg-white text-black"
+                  : ""
+              }`}
+            >
+              Savings TXN
+            </p>
+          </NavLink>
+          <NavLink to="/dashboard/loan-transaction">
+            <p
+              className={`header-btn transition-all duration-300 ease-in-out ${
+                isActive("/dashboard/loan-transaction")
+                  ? "bg-white text-black"
+                  : ""
+              }`}
+            >
+              Loan TXN
+            </p>
+          </NavLink>
           <p className="header-btn transition-all duration-300 ease-in-out">
             DPS TXN
           </p>

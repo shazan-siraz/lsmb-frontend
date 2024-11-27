@@ -16,7 +16,6 @@ const FindSavingMember = () => {
   const { email, role } = useSelector(useCurrentUser);
   const dispatch = useDispatch();
   const toastMessage = useSelector((state) => state.toast.message);
-
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -53,10 +52,11 @@ const FindSavingMember = () => {
 
   const branchEmail = data?.data?.branchEmail;
 
-  const { data: searchMemberData } = useSearchMemberQuery({
-    query: debouncedQuery || undefined,
-    email: branchEmail,
-  });
+  const { data: searchMemberData, isLoading: searchMemeberLoading } =
+    useSearchMemberQuery({
+      query: debouncedQuery || undefined,
+      email: branchEmail,
+    });
 
   const { data: toadySavingTxnData, isLoading: todaySavingTxnLoading } =
     useTodaySavingCollectionQuery(email);
@@ -64,10 +64,16 @@ const FindSavingMember = () => {
   if (
     singleEmployeeLoading ||
     singleBranchQueryLoading ||
-    todaySavingTxnLoading
+    todaySavingTxnLoading ||
+    searchMemeberLoading
   ) {
     return <LoadingComponent></LoadingComponent>;
   }
+
+  // সার্চ বাটনের মাধ্যমে সার্চ
+  const handleSearch = () => {
+    setDebouncedQuery(searchQuery);
+  };
 
   const handleSavingTxn = async (id) => {
     navigate(`/dashboard/saving-transaction/${id}`);
@@ -82,8 +88,13 @@ const FindSavingMember = () => {
             Saving Transaction
           </h1>
 
-          <form>
-            <div className="flex justify-center items-center gap-5 pb-8">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); // ফর্ম রিফ্রেশ বন্ধ করুন
+              handleSearch();
+            }}
+          >
+            <div className="flex justify-center items-center gap-2 px-5 pb-8">
               <input
                 className="py-2 px-2 mx-4 rounded my-1 w-full border membershipInput"
                 type="text"
@@ -92,6 +103,16 @@ const FindSavingMember = () => {
                 placeholder="Search by Name, PhoneNo, or ID"
                 required={true}
               />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              >
+                {searchMemeberLoading ? (
+                  <span className="loading loading-bars loading-md"></span>
+                ) : (
+                  "Search"
+                )}
+              </button>
             </div>
           </form>
         </div>
@@ -114,7 +135,7 @@ const FindSavingMember = () => {
               <tr key={item?._id}>
                 <td>{item?.memberId}</td>
                 <td>
-                  <img className="w-[70px]" src={item?.memberPhoto} alt="" />
+                  <img className="w-[50px]" src={item?.memberPhoto} alt="" />
                 </td>
                 <td>{item?.memberName}</td>
                 <td>{item?.phoneNo}</td>
@@ -134,10 +155,10 @@ const FindSavingMember = () => {
         </table>
       </div>
 
-
-
       <div className="mb-[30px]">
-        <h1 className="text-center text-[25px] font-semibold mt-8 mb-2 pb-1 bg-slate-500 text-white">Today Saving Transaction</h1>
+        <h1 className="text-center text-[25px] font-semibold mt-8 mb-2 pb-1 bg-slate-500 text-white">
+          Today Saving Transaction
+        </h1>
         <table className="w-[95%] mx-auto mb-[60px]">
           <thead>
             <tr>
