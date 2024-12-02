@@ -2,7 +2,10 @@ import { useForm } from "react-hook-form";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import "./Membership.css";
 import { useGetAllGroupQuery } from "../../redux/features/groupList/groupListApi";
-import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
+import {
+  useGetAllEmployeeQuery,
+  useGetSingleEmployeeQuery,
+} from "../../redux/features/employee/employeeApi";
 import { useRef, useState } from "react";
 import {
   useCreateMembershipMutation,
@@ -17,13 +20,28 @@ import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import { FaMinus } from "react-icons/fa";
 
 const Membership = () => {
-  const { email } = useSelector(useCurrentUser);
+  const { email, role } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
   const [age, setAge] = useState("");
   const selectRef = useRef(null);
   const [selectedRefValue, setSelectedRefValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [attachments, setAttachments] = useState([{}]);
+
+  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
+    useGetSingleBranchQuery(email);
+  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
+    useGetSingleEmployeeQuery(email);
+
+  // Conditionally use the data based on the role
+  let data;
+  if (role === "branch") {
+    data = singleBranchData;
+  } else if (role === "manager") {
+    data = singleEmployeeData;
+  }
+
+  const branchEmail = data?.data?.branchEmail;
 
   const [nominees, setNominees] = useState([{ id: Date.now() }]);
 
@@ -44,7 +62,7 @@ const Membership = () => {
   const { data: employeeData, isLoading: employeeQueryLoading } =
     useGetAllEmployeeQuery();
   const { data: membershipData, isLoading: membersQueryLoading } =
-    useGetAllMembershipQuery();
+    useGetAllMembershipQuery(branchEmail);
 
   const { data: branchData, isLoading: branchQueryLoading } =
     useGetSingleBranchQuery(email);
@@ -53,7 +71,9 @@ const Membership = () => {
     groupQueryLoading ||
     employeeQueryLoading ||
     membersQueryLoading ||
-    branchQueryLoading
+    branchQueryLoading ||
+    singleBranchQueryLoading ||
+    singleEmployeeLoading
   ) {
     return <p>Loading...</p>;
   }
@@ -117,7 +137,7 @@ const Membership = () => {
 
       setIsLoading(false);
 
-      const membershipData = {
+      const createMembershipData = {
         branchEmail: email,
         companyEmail: companyEmail,
         branch: branchData?.data?._id,
@@ -127,8 +147,8 @@ const Membership = () => {
         phoneNo: data.phoneNo,
         email: data.email,
         memberNid: data.memberNid,
-        admissionFees: data.admissionFees,
-        shareAmount: data.shareAmount,
+        admissionFees: Number(data.admissionFees),
+        accountBalance: Number(data?.shareAmount) || 0,
         dateOfBirth: data.dateOfBirth,
         age: Number(data.age),
         gender: data.gender,
@@ -139,7 +159,6 @@ const Membership = () => {
         thana: data.thana,
         presentAddress: data.presentAddress,
         permanentAddress: data.permanentAddress,
-        accountBalance: 0,
         memberPhoto: memberPhotoImageUrl,
         signature: memberSignatureImageUrl,
         nidFrontPart: nidFrontPartImageUrl,
@@ -150,7 +169,7 @@ const Membership = () => {
         nominee: data.nominees,
       };
 
-      const res = await addMembership(membershipData);
+      const res = await addMembership(createMembershipData);
 
       console.log("res", res);
       console.log("error", error);
@@ -256,7 +275,7 @@ const Membership = () => {
 
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="email">
-                Email*
+                Email
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
@@ -264,7 +283,6 @@ const Membership = () => {
                 id="email"
                 placeholder="Email"
                 {...register("email")}
-                required={true}
               />
             </div>
 
@@ -302,7 +320,7 @@ const Membership = () => {
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="text"
+                type="number"
                 id="shareAmount"
                 placeholder="Share Amount"
                 {...register("shareAmount")}

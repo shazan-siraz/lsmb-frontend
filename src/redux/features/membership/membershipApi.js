@@ -32,7 +32,14 @@ const membershipApi = baseApi.injectEndpoints({
         url: `/membership/single-membership/${id}`,
         method: "GET",
       }),
-      // invalidatesTags: ["membership"],
+      providesTags: ["membership"],
+    }),
+
+    getTotalShareAmountAndProcessFees: builder.query({
+      query: (email) => ({
+        url: `/membership/getTotalShareAmountAndProcessFees/${email}`,
+        method: "GET",
+      }),
       providesTags: ["membership"],
     }),
 
@@ -43,7 +50,6 @@ const membershipApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["membership"],
     }),
-
   }),
 });
 
@@ -52,5 +58,6 @@ export const {
   useGetAllMembershipQuery,
   useGetSingleMembershipQuery,
   useGetAllSavingMembershipQuery,
+  useGetTotalShareAmountAndProcessFeesQuery,
   useSearchMemberQuery,
 } = membershipApi;

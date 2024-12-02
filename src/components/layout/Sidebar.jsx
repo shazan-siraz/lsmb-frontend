@@ -27,6 +27,7 @@ import RegisteredUserSidebar from "../RegisteredUserSidebar/RegisteredUserSideba
 import CompanySidebar from "../CompanySidebar/CompanySidebar";
 import BranchProfile from "../BranchProfile/BranchProfile";
 import BoothSidebar from "../BoothSidebar/BoothSidebar";
+import PackageSidebar from "../PackageSidebar/PackageSidebar";
 
 const Sidebar = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -138,7 +139,10 @@ const Sidebar = () => {
               <SoftwareUsersSidebar></SoftwareUsersSidebar>
 
               {/* Conditionally Render Register Package */}
-              <RegisterPackage></RegisterPackage>
+              {/* <RegisterPackage></RegisterPackage> */}
+
+              {/* Conditionally Render Package Create */}
+              <PackageSidebar></PackageSidebar>
 
               {/* Conditionally Render article */}
               <AdArticleSidebar></AdArticleSidebar>

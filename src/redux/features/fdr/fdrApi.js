@@ -15,7 +15,14 @@ const fdrApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getSingleFdr: builder.query({
+      query: (id) => ({
+        url: `/fdr/getSingleFdr/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useCreateFdrMutation, useGetAllFdrQuery } = fdrApi;
+export const { useCreateFdrMutation, useGetAllFdrQuery, useGetSingleFdrQuery } =
+  fdrApi;

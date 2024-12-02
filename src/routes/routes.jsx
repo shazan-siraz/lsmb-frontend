@@ -64,6 +64,8 @@ import FindSavingMember from "../pages/SavingCollection/FindSavingMember";
 import SavingTransaction from "../pages/SavingCollection/SavingTransaction";
 import FindLoanMember from "../pages/LoanTransaction/FindLoanMember";
 import LoanTransaction from "../pages/LoanTransaction/LoanTransaction";
+import PackageCreate from "../pages/Package/PackageCreate";
+import Packages from "../pages/Package/Packages";
 
 const router = createBrowserRouter([
   {
@@ -125,6 +127,14 @@ const router = createBrowserRouter([
       {
         path: "registerPackage-list",
         element: <PackageList></PackageList>,
+      },
+      {
+        path: "package-create",
+        element: <PackageCreate></PackageCreate>,
+      },
+      {
+        path: "packages",
+        element: <Packages></Packages>,
       },
       {
         path: "branch-create",

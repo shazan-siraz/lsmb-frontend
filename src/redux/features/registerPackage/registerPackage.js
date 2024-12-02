@@ -8,18 +8,21 @@ const registerPackageApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["registerPackage"]
     }),
     getAllRegisterPackage: builder.query({
       query: () => ({
         url: "/registerPackage",
         method: "GET",
       }),
+      providesTags: ["registerPackage"]
     }),
     deleteRegisterPackage: builder.mutation({
       query: (id) => ({
         url: `/registerPackage/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["registerPackage"]
     }),
   }),
 });

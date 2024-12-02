@@ -5,6 +5,8 @@ import { useGetSingleEmployeeQuery } from "../redux/features/employee/employeeAp
 import { useGetTotalSavingtxnAmountQuery } from "../redux/features/savingCollection/savingCollectionApi";
 import { useGetTotalLoanAmountWithoutPorcessFeesQuery } from "../redux/features/loan/loanApi";
 import { useGetTotalLoanCollectionAmountQuery } from "../redux/features/loanCollection/loanCollectionApi";
+import { useGetTotalShareAmountAndProcessFeesQuery } from "../redux/features/membership/membershipApi";
+import { useGetTotalSavingWithdrawQuery } from "../redux/features/savingWithdraw/savingWithdraw";
 
 export const useBranchWallet = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -37,17 +39,30 @@ export const useBranchWallet = () => {
     isLoading: totalLoanCollectionAmountLoading,
   } = useGetTotalLoanCollectionAmountQuery(branchEmail);
 
+  const {
+    data: TotalShareAmountAndadmissionFees,
+    isLoading: TotalShareAmountAndadmissionFeesLoading,
+  } = useGetTotalShareAmountAndProcessFeesQuery(branchEmail);
+
+  const { data: totalSavingWithdraw, isLoading: totalSavingWithdrawLoading } =
+    useGetTotalSavingWithdrawQuery(branchEmail);
+
+
   const isLoading =
     singleBranchQueryLoading ||
     singleEmployeeLoading ||
     totalSavingTxnAmountLoading ||
     totalLoanCollectionAmountLoading ||
-    getTotalLoamAmountWithoutProcessFeesLoading;
+    getTotalLoamAmountWithoutProcessFeesLoading ||
+    TotalShareAmountAndadmissionFeesLoading ||
+    totalSavingWithdrawLoading;
 
   const branchWallet =
     totalSavingTxnAmount?.data +
-    totalLoanCollectionAmountData?.data -
-    getTotalLoamAmountWithoutProcessFees?.data;
+    totalLoanCollectionAmountData?.data +
+    (TotalShareAmountAndadmissionFees?.data -
+      getTotalLoamAmountWithoutProcessFees?.data -
+      totalSavingWithdraw?.data);
 
   return { branchWallet, isLoading };
 };

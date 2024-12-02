@@ -4,19 +4,38 @@ import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
-import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
+import {
+  useGetAllEmployeeQuery,
+  useGetSingleEmployeeQuery,
+} from "../../redux/features/employee/employeeApi";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useCreateDpsMutation } from "../../redux/features/dps/dpsApi";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 
 const DpsCreate = () => {
-  const { email } = useSelector(useCurrentUser);
+  const { email, role } = useSelector(useCurrentUser);
   const { register, handleSubmit, reset } = useForm();
   const [isStartingBalance, setIsStartingBalance] = useState("");
   const [durationOfYear, setDurationOfYear] = useState("");
   const [installmentType, setInstallmentType] = useState("");
   const [totalAmount, setTotalAmount] = useState();
+
+  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
+    useGetSingleBranchQuery(email);
+  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
+    useGetSingleEmployeeQuery(email);
+
+  // Conditionally use the data based on the role
+  let data;
+  if (role === "branch") {
+    data = singleBranchData;
+  } else if (role === "manager") {
+    data = singleEmployeeData;
+  }
+
+  const branchEmail = data?.data?.branchEmail;
 
   const handleStartingBalance = (event) => {
     const value = event.target.value;
@@ -302,29 +321,27 @@ const DpsCreate = () => {
     }
   };
 
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
   const { data: memberShipData, isLoading: membersDataLoading } =
-    useGetAllMembershipQuery();
+    useGetAllMembershipQuery(branchEmail);
   const { data: employeeData, isLoading: employeeDataLoading } =
     useGetAllEmployeeQuery();
 
-  const [createDPS, { isLoading: dpsCreateLoading, error }] =
-    useCreateDpsMutation();
+  const [createDPS, { isLoading: dpsCreateLoading }] = useCreateDpsMutation();
 
-  if (singleBranchQueryLoading || membersDataLoading || employeeDataLoading) {
-    return (
-      <div className="h-screen w-full flex justify-center items-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
+  if (
+    singleBranchQueryLoading ||
+    membersDataLoading ||
+    employeeDataLoading ||
+    singleEmployeeLoading
+  ) {
+    return <LoadingComponent></LoadingComponent>;
   }
 
   const onSubmit = async (data) => {
     try {
       const dpsData = {
         memberOfApplying: data.memberOfDpsApplying,
-        branchEmail: email,
+        branchEmail: branchEmail,
         companyEmail: singleBranchData?.data?.companyEmail,
         dpsStart: data.dpsStart,
         dpsAcNo: data.dpsAcNo,
@@ -335,16 +352,17 @@ const DpsCreate = () => {
         returnAmount: totalAmount,
         referenceEmployee: data.referenceEmployee,
         referenceMember: data.referenceMember,
+        status: "Active",
       };
 
-      const res = await createDPS(dpsData);
+      const res = await createDPS(dpsData).unwrap();
 
       if (res?.data) {
         toast.success(`DPS created Successfully`);
         reset();
       }
     } catch (err) {
-      console.log(error);
+      toast.error(err.data.message)
     }
   };
 
@@ -379,7 +397,9 @@ const DpsCreate = () => {
                 required={true}
                 defaultValue=""
               >
-                <option value="" disabled>Select DPS Member</option>
+                <option value="" disabled>
+                  Select DPS Member
+                </option>
                 {memberShipData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.memberName}
@@ -443,7 +463,9 @@ const DpsCreate = () => {
                 required={true}
                 defaultValue=""
               >
-                <option value="" disabled>Select DPS Term</option>
+                <option value="" disabled>
+                  Select DPS Term
+                </option>
                 <option value="1">1 Year</option>
                 <option value="2">2 Year</option>
                 <option value="3">3 Year</option>
@@ -469,7 +491,9 @@ const DpsCreate = () => {
                 defaultValue=""
                 required={true}
               >
-                <option value="" disabled>Select Installment Type</option>
+                <option value="" disabled>
+                  Select Installment Type
+                </option>
                 <option value="Daily">Daily</option>
                 <option value="Weeakly">Weeakly</option>
                 <option value="Monthly">Monthly</option>
@@ -518,7 +542,9 @@ const DpsCreate = () => {
                 defaultValue=""
                 required={true}
               >
-                <option value="" disabled>Select Reference Employee</option>
+                <option value="" disabled>
+                  Select Reference Employee
+                </option>
                 {employeeData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.employeeName}
@@ -538,7 +564,9 @@ const DpsCreate = () => {
                 defaultValue=""
                 required={true}
               >
-                <option value="" disabled>Select Reference Member</option>
+                <option value="" disabled>
+                  Select Reference Member
+                </option>
                 {memberShipData?.data.map((item) => (
                   <option key={item._id} value={item?._id}>
                     {item?.memberName}
@@ -550,9 +578,9 @@ const DpsCreate = () => {
 
           <div className="border-b border-slate-300 my-5"></div>
 
-          <div className="text-center py-10 max-w-[500px] mx-auto">
+          <div className="text-center py-10 max-w-[300px] mx-auto">
             <input
-              className="w-[100%] border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white font-semibold cursor-pointer transition-all duration-300 ease-in-out"
+              className="uppercase w-[100%] border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white font-semibold cursor-pointer transition-all duration-300 ease-in-out"
               type="submit"
               value={dpsCreateLoading ? "Loading..." : "Create DPS"}
               disabled={dpsCreateLoading}

@@ -15,7 +15,15 @@ const dpsApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    getSingleDps: builder.query({
+      query: (id) => ({
+        url: `/dps/getSingleDps/${id}`,
+        method: "GET"
+      })
+    })
+
   }),
 });
 
-export const { useCreateDpsMutation, useGetAllDpsQuery } = dpsApi;
+export const { useCreateDpsMutation, useGetAllDpsQuery, useGetSingleDpsQuery } = dpsApi;

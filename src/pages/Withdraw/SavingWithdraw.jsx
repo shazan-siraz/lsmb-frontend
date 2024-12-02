@@ -1,32 +1,40 @@
 import { useForm } from "react-hook-form";
-import { FaDatabase, FaIdCardAlt, FaUser } from "react-icons/fa";
+import { FaDatabase, FaIdCardAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetSingleMembershipQuery } from "../../redux/features/membership/membershipApi";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import { ToastContainer, toast } from "react-toastify";
 import { useRef, useState } from "react";
-import { useCreateSavingWithdrawMutation } from "../../redux/features/savingWithdraw/savingWithdraw";
+import {
+  useCreateSavingWithdrawMutation,
+  useGetOneMemberAllSavingWithdrawQuery,
+} from "../../redux/features/savingWithdraw/savingWithdraw";
 import Swal from "sweetalert2";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
+import { useDispatch } from "react-redux";
+import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
 const SavingWithdraw = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const withdrawAmountRef = useRef();
   const [withdrawAmountState, setWithdrawAmountState] = useState("");
+  const [serviceCharge, setServiceCharge] = useState(0);
 
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
 
-  const {
-    data: singleMemberData,
-    isLoading: singleMemberDataQueryLoading,
-    refetch,
-  } = useGetSingleMembershipQuery(id);
+  const { data: singleMemberData, isLoading: singleMemberDataQueryLoading } =
+    useGetSingleMembershipQuery(id);
 
   const [addSavingWithdraw, { isLoading: withdrawLoading }] =
     useCreateSavingWithdrawMutation();
 
+  const { data: totalSavingsWithdraw } =
+    useGetOneMemberAllSavingWithdrawQuery(id);
+
   if (singleMemberDataQueryLoading) {
-    return <p>Loading...</p>;
+    return <LoadingComponent></LoadingComponent>;
   }
 
   const handleWithdrawAmountChange = () => {
@@ -38,12 +46,15 @@ const SavingWithdraw = () => {
     try {
       const savingWithdrawData = {
         memberId: singleMemberData?.data._id,
+        branchEmail: singleMemberData?.data?.branchEmail,
+        companyEmail: singleMemberData?.data?.companyEmail,
         dateOfWithdraw: data.dateOfWithdraw,
         mrSlipNo: data.mrSlipNo,
         withdrawAmount: withdrawAmountState,
-        serviceCharge: data.serviceCharge,
+        serviceCharge: data.serviceCharge || 0,
         totalPayableAmount: withdrawAmountState,
         withdrawTransactionInfo: data.withdrawTransactionInfo,
+        status: "Active",
       };
 
       const result = await Swal.fire({
@@ -57,12 +68,19 @@ const SavingWithdraw = () => {
       });
 
       if (result.isConfirmed) {
-        const res = await addSavingWithdraw(savingWithdrawData);
+        if (withdrawAmountState > singleMemberData?.data?.accountBalance) {
+          toast.error("Insufficient Balance");
+        } else {
+          const res = await addSavingWithdraw(savingWithdrawData);
 
-        if (res?.data) {
-          toast.success(`${withdrawAmountState} Amount withdraw successfully`);
-          refetch();
-          navigate("/dashboard/withdraw");
+          if (res?.data) {
+            dispatch(
+              setToastMessage(
+                `${withdrawAmountState} Amount withdraw successfully`
+              )
+            );
+            navigate("/dashboard/withdraw");
+          }
         }
       }
     } catch (err) {
@@ -71,7 +89,7 @@ const SavingWithdraw = () => {
   };
 
   return (
-    <div>
+    <div className="bg-slate-100 min-h-screen">
       <div className="flex justify-evenly items-center py-5">
         <h1 className="uppercase font-bold text-[35px]">Savings Withdraw</h1>
       </div>
@@ -80,7 +98,18 @@ const SavingWithdraw = () => {
 
       <div className="flex justify-around items-center  py-4">
         <div className="flex items-center gap-2 text-[20px] font-semibold">
-          <FaUser />
+          <img
+            className="w-[80px] h-[40px]"
+            src={singleMemberData?.data?.signature}
+            alt=""
+          />
+        </div>
+        <div className="flex items-center gap-2 text-[20px] font-semibold">
+          <img
+            className="w-[50px]"
+            src={singleMemberData?.data?.memberPhoto}
+            alt=""
+          />
           <p className="text-[20px]">{singleMemberData?.data.memberName}</p>
         </div>
         <div className="flex items-center gap-2 text-[20px] font-semibold">
@@ -89,7 +118,9 @@ const SavingWithdraw = () => {
         </div>
         <div className="flex items-center gap-2 text-[20px] font-semibold">
           <FaDatabase />
-          <p>{singleMemberData?.data.accountBalance}</p>
+          <p>
+            {singleMemberData?.data.accountBalance - totalSavingsWithdraw?.data}
+          </p>
         </div>
       </div>
 
@@ -152,7 +183,7 @@ const SavingWithdraw = () => {
                 id="serviceCharge"
                 placeholder="Service Charge"
                 {...register("serviceCharge")}
-                required={true}
+                onChange={(e) => setServiceCharge(e.target.value)}
               />
             </div>
 
@@ -167,7 +198,7 @@ const SavingWithdraw = () => {
                 placeholder="Total Payable Amount"
                 {...register("totalPayableAmount")}
                 required={true}
-                value={withdrawAmountState}
+                value={withdrawAmountState - serviceCharge}
                 readOnly
               />
             </div>
@@ -185,7 +216,6 @@ const SavingWithdraw = () => {
                 id="withdrawTransactionInfo"
                 placeholder="Enter Transaction Note"
                 {...register("withdrawTransactionInfo")}
-                required={true}
               />
             </div>
           </div>

@@ -1,11 +1,11 @@
 import { FaCheck } from "react-icons/fa";
 import "./UserPriceList.css";
-import { useGetAllRegisterPackageQuery } from "../../../redux/features/registerPackage/registerPackage";
 import { NavLink } from "react-router-dom";
+import { useGetAllPackageQuery } from "../../../redux/features/package/packageApi";
 
 const UserPriceList = () => {
   const { data: packageData, isLoading: packageDataLoading } =
-    useGetAllRegisterPackageQuery();
+    useGetAllPackageQuery();
 
   if (packageDataLoading) {
     return <p>Loading...</p>;

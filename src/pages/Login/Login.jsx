@@ -16,15 +16,12 @@ const Login = () => {
   const navigate = useNavigate();
   const toastMessage = useSelector((state) => state.toast.message);
 
-
   useEffect(() => {
     if (toastMessage) {
       toast.success(toastMessage);
       dispatch(clearToastMessage()); // টোস্ট মেসেজটি ক্লিয়ার করুন
     }
-
   }, [toastMessage, dispatch]);
-
 
   const [login, { isLoading }] = useLoginMutation();
 
@@ -83,12 +80,13 @@ const Login = () => {
             </div>
 
             <div className="text-center py-10">
-              <input
-                className="font-semibold transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer"
-                type="submit"
-                value={isLoading ? "Loading..." : "LOG IN"}
-                disabled={isLoading}
-              />
+              <button className="font-semibold transition-all duration-300 ease-in-out border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointer">
+                {isLoading ? (
+                  <span className="loading loading-bars loading-md"></span>
+                ) : (
+                  "LOG IN"
+                )}
+              </button>
             </div>
           </div>
         </form>

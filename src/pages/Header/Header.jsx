@@ -21,8 +21,6 @@ const Header = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  console.log(isActive);
-
   const handleLogOut = () => {
     dispatch(logOut());
   };
