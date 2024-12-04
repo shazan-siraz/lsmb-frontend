@@ -35,7 +35,7 @@ const SuperAdminProfile = () => {
             {name?.firstName} {name?.lastName}
           </p>
           <p className="text-[20px] font-semibold py-2 border-b-2">{superAdminEmail}</p>
-          <p className="text-[20px] font-semibold py-2 border-b-2">Role: {user.role}</p>
+          <p className="text-[20px] font-semibold py-2 border-b-2">Role: {user?.role}</p>
         </div>
 
         <div className="border-r-2"></div>

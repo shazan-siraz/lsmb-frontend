@@ -56,7 +56,7 @@ if(getBranchQueryLoading || groupGetLoading) {
   }
 
   return (
-    <div>
+    <div className="bg-slate-100 min-h-screen">
       <div className="px-5 py-2">
         <h1 className="text-2xl font-bold">Group List</h1>
       </div>

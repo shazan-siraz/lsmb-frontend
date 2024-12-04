@@ -2,12 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import MainLayout from "../components/layout/MainLayout";
 import DashboardHome from "../pages/DashboardHome/DashboardHome";
-import RegisterPackage from "../pages/RegisterPackage/RegisterPackage";
+// import RegisterPackage from "../pages/RegisterPackage/RegisterPackage";
 import CreateAdmin from "../pages/CreateAdmin/CreateAdmin";
 import CreateSuperAdmin from "../pages/CreateSuperAdmin/CreateSuperAdmin";
 import SuperAdminList from "../pages/CreateSuperAdmin/SuperAdminList";
 import AdminList from "../pages/CreateAdmin/AdminList";
-import PackageList from "../pages/RegisterPackage/PackageList";
+// import PackageList from "../pages/RegisterPackage/PackageList";
 import BranchCreate from "../pages/BranchCreate/BranchCreate";
 import BranchList from "../pages/BranchCreate/BranchList";
 import Login from "../pages/Login/Login";
@@ -120,14 +120,14 @@ const router = createBrowserRouter([
         path: "admin-list",
         element: <AdminList></AdminList>,
       },
-      {
-        path: "registerPackage-create",
-        element: <RegisterPackage></RegisterPackage>,
-      },
-      {
-        path: "registerPackage-list",
-        element: <PackageList></PackageList>,
-      },
+      // {
+      //   path: "registerPackage-create",
+      //   element: <RegisterPackage></RegisterPackage>,
+      // },
+      // {
+      //   path: "registerPackage-list",
+      //   element: <PackageList></PackageList>,
+      // },
       {
         path: "package-create",
         element: <PackageCreate></PackageCreate>,

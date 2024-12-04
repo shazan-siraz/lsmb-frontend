@@ -3,7 +3,7 @@ import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { toast, ToastContainer } from "react-toastify";
 import { useGetAllCompanyQuery } from "../../redux/features/company/company";
 import { useUpdateUserStatusMutation } from "../../redux/features/user/user";
-import Loading from "../../components/Loading/Loading"; // Your high-quality loading component
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 
 const RegisteredUserList = () => {
   const { data: companyData, isLoading: companyDataLoading } =
@@ -12,20 +12,22 @@ const RegisteredUserList = () => {
   const [loadingRow, setLoadingRow] = useState(null); // Track the loading row
 
   if (companyDataLoading) {
-    return <Loading isLoading={true} message="Loading companies..." />;
+    return <LoadingComponent></LoadingComponent>
   }
 
   const handleStatus = async (email, rowId) => {
+
     setLoadingRow(rowId); // Set the loading row ID
     try {
       const res = await updateCompanyStatus({ email });
+
       if (res?.data) {
         toast.success("Status Updated!");
       } else {
-        toast.error("Failed to update status");
+        toast.error("Failed to update status!");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("An error occurred!");
     } finally {
       setLoadingRow(null); // Reset the loading row ID
     }

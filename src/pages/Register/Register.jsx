@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
 import LogoSoftbankBD from "../../../src/assets/icons/LogoSoftbankBD.png";
-import { useGetAllRegisterPackageQuery } from "../../redux/features/registerPackage/registerPackage";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import { useCreateCompanyMutation } from "../../redux/features/company/company";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
+import { useGetAllPackageQuery } from "../../redux/features/package/packageApi";
 
 
 const Register = () => {
@@ -17,8 +17,8 @@ const Register = () => {
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
 
-  const { data: registerPackageData, isLoading: registerPackageLoading } =
-    useGetAllRegisterPackageQuery();
+  const { data: packageData, isLoading: packageLoading } =
+    useGetAllPackageQuery();
 
   const [
     createCompany,
@@ -173,9 +173,9 @@ const Register = () => {
                     Please select a package
                   </option>
 
-                  {registerPackageLoading
+                  {packageLoading
                     ? "Loading..."
-                    : registerPackageData?.data?.map((item) => (
+                    : packageData?.data?.map((item) => (
                         <option key={item._id} value={item._id}>
                           [ {item.packageName} - Monthly {item.packagePrice} BDT
                           - {item.memberLimit} Member ]

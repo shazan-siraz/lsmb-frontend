@@ -18,7 +18,7 @@ const userApi = baseApi.injectEndpoints({
         body: data,
       }),
 
-      invalidatesTags: ["company"],
+      invalidatesTags: ["company", "user"],
     }),
 
     blockedUserStatus: builder.mutation({
@@ -28,7 +28,7 @@ const userApi = baseApi.injectEndpoints({
         body: data,
       }),
 
-      invalidatesTags: ["employee"],
+      invalidatesTags: ["employee", "user"],
     }),
   }),
 });

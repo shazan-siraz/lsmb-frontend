@@ -1,18 +1,19 @@
 import { useForm } from "react-hook-form";
 import "./AddNewEmployee.css";
-
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import Swal from "sweetalert2";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import { useCreateEmployeeMutation } from "../../redux/features/employee/employeeApi";
 import { FaMinus } from "react-icons/fa";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import { Divider } from "antd";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
+import { toast, ToastContainer } from "react-toastify";
 
 const AddNewEmployee = () => {
+  const { branchEmail, isLoading: branchQueryLoading } = useGetBranchEmail();
   const [isError, setIsError] = useState(null);
   const [fileError, setFileError] = useState("");
   const [signatureError, setSignatureError] = useState("");
@@ -26,11 +27,10 @@ const AddNewEmployee = () => {
     useState("");
   const [jabindarSignatureError, setJabindarSignatureError] = useState("");
   const [attachments, setAttachments] = useState([{}]);
-  const { email } = useSelector(useCurrentUser);
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, reset, setError, clearErrors } = useForm();
 
-  const { data: branchData } = useGetSingleBranchQuery(email);
+  const { data: branchData } = useGetSingleBranchQuery(branchEmail);
 
   const [addEmployee, { error, isLoading: createEmoloyeeLoading }] =
     useCreateEmployeeMutation();
@@ -40,6 +40,10 @@ const AddNewEmployee = () => {
       setIsError(error?.data?.message);
     }
   }, [error]); // Runs only when the error changes
+
+  if (branchQueryLoading) {
+    return <LoadingComponent></LoadingComponent>;
+  }
 
   // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
   const validateFileSize = (e) => {
@@ -208,7 +212,7 @@ const AddNewEmployee = () => {
         employee: {
           employeeEmail: data?.employeeEmail,
           branch: branchData?.data._id,
-          branchEmail: email,
+          branchEmail: branchEmail,
           companyEmail: companyEmail,
           employeeName: data?.employeeName,
           joiningDate: data?.joiningDate,
@@ -250,7 +254,7 @@ const AddNewEmployee = () => {
       };
 
       setIsLoading(false);
-
+      toast.error("Employee Limit is Full!")
       setIsError(error?.data?.message);
       const res = await addEmployee(employeeData);
 
@@ -264,6 +268,7 @@ const AddNewEmployee = () => {
         });
         reset();
         setIsError("");
+        
       }
     } catch (err) {
       console.log(err);
@@ -271,7 +276,8 @@ const AddNewEmployee = () => {
   };
 
   return (
-    <div>
+    <div className="bg-slate-100">
+      <ToastContainer></ToastContainer>
       <h1 className="px-5 py-2 text-2xl font-bold">Make A New Employee </h1>
       <div className="py-3">
         <div className="border-b-2"></div>

@@ -51,7 +51,7 @@ const BranchCreate = () => {
     }
   };
 
-  if (singleUserData?.data.status === "pending") {
+  if (singleUserData?.data?.status === "pending") {
     return <CompanyApprovedMessage></CompanyApprovedMessage>;
   }
 
