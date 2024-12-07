@@ -6,12 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
 import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useCreateFdrMutation } from "../../redux/features/fdr/fdrApi";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const FdrCreate = () => {
-  const { email } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
   const [inputDepositValue, setInputDepositValue] = useState("");
   const [interestPercent, setInterestPercent] = useState("");
@@ -169,11 +168,11 @@ const FdrCreate = () => {
   };
 
   const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
+    useGetSingleBranchQuery(branchEmail);
   const { data: memberShipData, isLoading: membersDataLoading } =
-    useGetAllMembershipQuery();
+    useGetAllMembershipQuery(branchEmail);
   const { data: employeeData, isLoading: employeeDataLoading } =
-    useGetAllEmployeeQuery();
+    useGetAllEmployeeQuery(branchEmail);
 
   const [addFdr, { isLoading: fdrCreateLoading, error }] =
     useCreateFdrMutation();
@@ -190,7 +189,7 @@ const FdrCreate = () => {
     try {
       const fdrData = {
         memberOfFdrApplying: data.memberOfFdrApplying,
-        branchEmail: email,
+        branchEmail: branchEmail,
         companyEmail: singleBranchData?.data?.companyEmail,
         FdrStart: data.FdrStart,
         FdrAcNo: data.FdrAcNo,

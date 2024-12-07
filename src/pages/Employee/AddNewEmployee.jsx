@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import "./AddNewEmployee.css";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import Swal from "sweetalert2";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCreateEmployeeMutation } from "../../redux/features/employee/employeeApi";
 import { FaMinus } from "react-icons/fa";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
@@ -14,7 +14,6 @@ import { toast, ToastContainer } from "react-toastify";
 
 const AddNewEmployee = () => {
   const { branchEmail, isLoading: branchQueryLoading } = useGetBranchEmail();
-  const [isError, setIsError] = useState(null);
   const [fileError, setFileError] = useState("");
   const [signatureError, setSignatureError] = useState("");
   const [employeeNidFirstPartError, setEmployeeNidFirstPartError] =
@@ -32,14 +31,8 @@ const AddNewEmployee = () => {
 
   const { data: branchData } = useGetSingleBranchQuery(branchEmail);
 
-  const [addEmployee, { error, isLoading: createEmoloyeeLoading }] =
+  const [addEmployee, { isLoading: createEmoloyeeLoading }] =
     useCreateEmployeeMutation();
-
-  useEffect(() => {
-    if (error) {
-      setIsError(error?.data?.message);
-    }
-  }, [error]); // Runs only when the error changes
 
   if (branchQueryLoading) {
     return <LoadingComponent></LoadingComponent>;
@@ -254,8 +247,6 @@ const AddNewEmployee = () => {
       };
 
       setIsLoading(false);
-      toast.error("Employee Limit is Full!")
-      setIsError(error?.data?.message);
       const res = await addEmployee(employeeData);
 
       if (res?.data) {
@@ -267,8 +258,10 @@ const AddNewEmployee = () => {
           timer: 1500,
         });
         reset();
-        setIsError("");
-        
+      }
+
+      if (res?.error) {
+        toast.error(res?.error?.data?.message);
       }
     } catch (err) {
       console.log(err);
@@ -285,9 +278,6 @@ const AddNewEmployee = () => {
 
       <div className="px-10 ">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <p className="text-center text-red-600 font-semibold text-[20px]">
-            {isError}
-          </p>
           <div className="grid grid-cols-4 gap-3 gap-x-5 items-center">
             <div className="flex flex-col">
               <label className="font-bold" htmlFor="employeeEmail">

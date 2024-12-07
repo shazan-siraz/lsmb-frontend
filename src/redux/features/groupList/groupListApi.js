@@ -8,7 +8,7 @@ const groupListApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ['group'],
+      invalidatesTags: ["group"],
     }),
     updateGroup: builder.mutation({
       query: (data) => ({
@@ -16,17 +16,20 @@ const groupListApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ['group'],
+      invalidatesTags: ["group"],
     }),
     getAllGroup: builder.query({
-      query: () => ({
-        url: "/groups",
+      query: (email) => ({
+        url: `/groups/${email}`,
         method: "GET",
       }),
-      providesTags: ['group'],
+      providesTags: ["group"],
     }),
   }),
 });
 
-export const { useCreateGroupMutation, useGetAllGroupQuery, useUpdateGroupMutation } = groupListApi;
-
+export const {
+  useCreateGroupMutation,
+  useGetAllGroupQuery,
+  useUpdateGroupMutation,
+} = groupListApi;

@@ -4,38 +4,19 @@ import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
-import {
-  useGetAllEmployeeQuery,
-  useGetSingleEmployeeQuery,
-} from "../../redux/features/employee/employeeApi";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useCreateDpsMutation } from "../../redux/features/dps/dpsApi";
-import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 
 const DpsCreate = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
   const [isStartingBalance, setIsStartingBalance] = useState("");
   const [durationOfYear, setDurationOfYear] = useState("");
   const [installmentType, setInstallmentType] = useState("");
   const [totalAmount, setTotalAmount] = useState();
-
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
 
   const handleStartingBalance = (event) => {
     const value = event.target.value;
@@ -324,16 +305,13 @@ const DpsCreate = () => {
   const { data: memberShipData, isLoading: membersDataLoading } =
     useGetAllMembershipQuery(branchEmail);
   const { data: employeeData, isLoading: employeeDataLoading } =
-    useGetAllEmployeeQuery();
+    useGetAllEmployeeQuery(branchEmail);
+  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
+    useGetSingleBranchQuery(branchEmail);
 
   const [createDPS, { isLoading: dpsCreateLoading }] = useCreateDpsMutation();
 
-  if (
-    singleBranchQueryLoading ||
-    membersDataLoading ||
-    employeeDataLoading ||
-    singleEmployeeLoading
-  ) {
+  if (membersDataLoading || employeeDataLoading || singleBranchQueryLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -362,7 +340,7 @@ const DpsCreate = () => {
         reset();
       }
     } catch (err) {
-      toast.error(err.data.message)
+      toast.error(err.data.message);
     }
   };
 

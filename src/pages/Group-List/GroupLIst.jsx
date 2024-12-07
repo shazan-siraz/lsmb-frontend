@@ -5,32 +5,33 @@ import {
 } from "../../redux/features/groupList/groupListApi";
 import "./GroupList.css";
 import GroupTable from "./GroupTable";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import Swal from "sweetalert2";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 
 const GroupLIst = () => {
   const { register, handleSubmit, reset } = useForm();
-  const { email } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetSingleBranchQuery();
 
-  const { data: singleBranchData, isLoading: getBranchQueryLoading} = useGetSingleBranchQuery(email);
+  const { data: singleBranchData, isLoading: getBranchQueryLoading } =
+    useGetSingleBranchQuery(branchEmail);
 
   const [addGroup, { isLoading: groupCreatingLoading }] =
     useCreateGroupMutation();
 
-  const { data: groupData, isLoading: groupGetLoading } = useGetAllGroupQuery();
+  const { data: groupData, isLoading: groupGetLoading } =
+    useGetAllGroupQuery(branchEmail);
 
-if(getBranchQueryLoading || groupGetLoading) {
-  return <p>Loading...</p>
-}
+  if (getBranchQueryLoading || groupGetLoading) {
+    return <LoadingComponent></LoadingComponent>;
+  }
 
   const onSubmit = async (data) => {
     try {
       const groupData = {
         groupCode: data?.groupCode,
         groupTitle: data?.groupTitle,
-        branchEmail: email,
+        branchEmail: branchEmail,
         companyEmail: singleBranchData?.data.companyEmail,
         branch: singleBranchData?.data._id,
       };
@@ -50,10 +51,6 @@ if(getBranchQueryLoading || groupGetLoading) {
       console.log(err);
     }
   };
-
-  if (groupGetLoading) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <div className="bg-slate-100 min-h-screen">

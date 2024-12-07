@@ -2,19 +2,16 @@ import { NavLink } from "react-router-dom";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { FaEdit } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 
 const AllMembers = () => {
-  const {email} = useSelector(useCurrentUser)
-  const { data, isLoading: membersDataLoading } = useGetAllMembershipQuery(email);
+  const { branchEmail } = useGetBranchEmail();
+  const { data, isLoading: membersDataLoading } =
+    useGetAllMembershipQuery(branchEmail);
 
   if (membersDataLoading) {
-    return (
-      <div className="h-screen w-full flex justify-center items-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
+    return <LoadingComponent></LoadingComponent>;
   }
 
   return (
@@ -22,7 +19,9 @@ const AllMembers = () => {
       <div className="px-5 pt-5 flex justify-between">
         <h1>Member List: {data?.data.length}</h1>
         <NavLink to="/dashboard/membership-create">
-          <button>Add New Member</button>
+          <button className="border-2 hover:bg-slate-500 font-semibold hover:text-white transition-all duration-300 ease-in-out px-3 py-1 rounded">
+            Add New Member
+          </button>
         </NavLink>
       </div>
 

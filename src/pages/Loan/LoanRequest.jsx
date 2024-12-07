@@ -3,9 +3,10 @@ import Loading from "../../components/Loading/Loading";
 import { useGetPendingLoanQuery } from "../../redux/features/loan/loanApi";
 import LoanList from "./LoanList";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import { NavLink } from "react-router-dom";
 
 const LoanRequest = () => {
-  const {email} = useSelector(useCurrentUser)
+  const { email } = useSelector(useCurrentUser);
   const { data: loanQueryData, isLoading: loanQueryLoading } =
     useGetPendingLoanQuery(email);
 
@@ -16,8 +17,14 @@ const LoanRequest = () => {
   return (
     <div>
       <div>
-        <div className="px-5 py-2 font-semibold text-[20px]">
+        <div className="flex justify-between px-5 py-2 font-semibold text-[20px]">
           <h1>Pending Loan List</h1>
+          <NavLink
+            to="/dashboard/loan-create"
+            className="border-2 rounded hover:bg-slate-500 hover:text-white transition-all duration-300 ease-in-out px-3"
+          >
+            <p>Loan Create</p>
+          </NavLink>
         </div>
         <div className="border-b my-2"></div>
 

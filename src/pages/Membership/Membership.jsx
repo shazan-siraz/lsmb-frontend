@@ -2,10 +2,7 @@ import { useForm } from "react-hook-form";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import "./Membership.css";
 import { useGetAllGroupQuery } from "../../redux/features/groupList/groupListApi";
-import {
-  useGetAllEmployeeQuery,
-  useGetSingleEmployeeQuery,
-} from "../../redux/features/employee/employeeApi";
+import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useRef, useState } from "react";
 import {
   useCreateMembershipMutation,
@@ -14,34 +11,19 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import { Divider } from "antd";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import { FaMinus } from "react-icons/fa";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const Membership = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
   const [age, setAge] = useState("");
   const selectRef = useRef(null);
   const [selectedRefValue, setSelectedRefValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [attachments, setAttachments] = useState([{}]);
-
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
 
   const [nominees, setNominees] = useState([{ id: Date.now() }]);
 
@@ -54,28 +36,26 @@ const Membership = () => {
     setNominees(nominees.filter((nominee) => nominee.id !== id));
   };
 
-  const [addMembership, { isLoading: membershipLoading, error }] =
+  const [addMembership, { isLoading: membershipLoading }] =
     useCreateMembershipMutation();
 
   const { data: groupData, isLoading: groupQueryLoading } =
-    useGetAllGroupQuery();
+    useGetAllGroupQuery(branchEmail);
   const { data: employeeData, isLoading: employeeQueryLoading } =
-    useGetAllEmployeeQuery();
+    useGetAllEmployeeQuery(branchEmail);
   const { data: membershipData, isLoading: membersQueryLoading } =
     useGetAllMembershipQuery(branchEmail);
 
   const { data: branchData, isLoading: branchQueryLoading } =
-    useGetSingleBranchQuery(email);
+    useGetSingleBranchQuery(branchEmail);
 
   if (
     groupQueryLoading ||
     employeeQueryLoading ||
     membersQueryLoading ||
-    branchQueryLoading ||
-    singleBranchQueryLoading ||
-    singleEmployeeLoading
+    branchQueryLoading
   ) {
-    return <p>Loading...</p>;
+    return <LoadingComponent></LoadingComponent>;
   }
 
   const companyEmail = branchData?.data?.company?.companyEmail;
@@ -98,7 +78,6 @@ const Membership = () => {
     }
 
     setAge(calculatedAge);
-    // setValue("age", calculatedAge); // Update the form field
   };
 
   // Function to add a new attachment input
@@ -138,7 +117,7 @@ const Membership = () => {
       setIsLoading(false);
 
       const createMembershipData = {
-        branchEmail: email,
+        branchEmail: branchEmail,
         companyEmail: companyEmail,
         branch: branchData?.data?._id,
         memberName: data.memberName,
@@ -171,12 +150,13 @@ const Membership = () => {
 
       const res = await addMembership(createMembershipData);
 
-      console.log("res", res);
-      console.log("error", error);
-
       if (res?.data) {
         toast.success("Member Created Successfully");
         reset();
+      }
+
+      if (res?.error) {
+        toast.error(res?.error?.data?.message);
       }
     } catch (err) {
       console.log(err);
@@ -193,7 +173,9 @@ const Membership = () => {
       <div className="flex justify-between px-5 pt-2">
         <h1>Make A New Membership</h1>
         <NavLink to="/dashboard/all-members">
-          <button>Add New Member</button>
+          <button className="border border-slate-500 px-3 py-1 rounded font-semibold hover:text-white hover:bg-slate-500 transition-all duration-300 ease-in-out">
+            Add New Member
+          </button>
         </NavLink>
       </div>
       <div className="border-b border-slate-300 my-3"></div>

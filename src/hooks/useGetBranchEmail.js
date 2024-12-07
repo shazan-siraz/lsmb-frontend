@@ -15,7 +15,11 @@ export const useGetBranchEmail = () => {
   let data;
   if (role === "branch") {
     data = singleBranchData;
-  } else if (role === "manager") {
+  } else if (
+    role === "manager" ||
+    role === "accountant" ||
+    role === "fieldOfficer"
+  ) {
     data = singleEmployeeData;
   }
 

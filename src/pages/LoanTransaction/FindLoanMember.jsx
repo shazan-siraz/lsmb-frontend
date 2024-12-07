@@ -3,17 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import debounce from "lodash/debounce";
-import { useGetSingleEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
-import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import { toast, ToastContainer } from "react-toastify";
 import { clearToastMessage } from "../../redux/features/auth/toastSlice";
 import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
 import { useSearchLoanQuery } from "../../redux/features/loan/loanApi";
 import { useTodayLoanCollectionQuery } from "../../redux/features/loanCollection/loanCollectionApi";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const FindLoanMember = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { email } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const dispatch = useDispatch();
   const toastMessage = useSelector((state) => state.toast.message);
 
@@ -38,21 +38,6 @@ const FindLoanMember = () => {
     };
   }, [searchQuery]);
 
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
-
   const { data: searchLoanData } = useSearchLoanQuery({
     query: debouncedQuery || undefined,
     email: branchEmail,
@@ -61,11 +46,7 @@ const FindLoanMember = () => {
   const { data: todayLoanTxnData, isLoading: todayLoanTxnLoading } =
     useTodayLoanCollectionQuery(email);
 
-  if (
-    singleEmployeeLoading ||
-    singleBranchQueryLoading ||
-    todayLoanTxnLoading
-  ) {
+  if (todayLoanTxnLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -124,7 +105,11 @@ const FindLoanMember = () => {
               <tr key={item?._id}>
                 <td>{item?.loanNo}</td>
                 <td>
-                  <img className="w-[50px]" src={item?.memberOfApplying?.memberPhoto} alt="" />
+                  <img
+                    className="w-[50px]"
+                    src={item?.memberOfApplying?.memberPhoto}
+                    alt=""
+                  />
                 </td>
                 <td>{item?.memberName}</td>
                 <td>{item?.memberPhone}</td>

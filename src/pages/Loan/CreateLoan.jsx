@@ -2,10 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useRef, useState } from "react";
 import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
-import {
-  useGetAllEmployeeQuery,
-  useGetSingleEmployeeQuery,
-} from "../../redux/features/employee/employeeApi";
+import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { Divider } from "antd";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
 import { useCreateLoanMutation } from "../../redux/features/loan/loanApi";
@@ -17,9 +14,11 @@ import { FaMinus } from "react-icons/fa";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useBranchWallet } from "../../hooks/useBranchWallet";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const CreateLoan = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { email } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
   const selectRef = useRef(null);
   const guarantorRef = useRef(null);
@@ -32,21 +31,6 @@ const CreateLoan = () => {
   const [nominees, setNominees] = useState([{ id: Date.now() }]);
   const [installmentNumber, setInstallmentNumber] = useState();
   const { branchWallet } = useBranchWallet();
-
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
 
   const handleAddNominee = () => {
     setNominees([...nominees, { id: Date.now() }]);
@@ -64,12 +48,7 @@ const CreateLoan = () => {
   const { data: employeeData } = useGetAllEmployeeQuery();
   const [createLoan] = useCreateLoanMutation();
 
-  if (
-    branchQueryLoading ||
-    membershipQueryLoading ||
-    singleBranchQueryLoading ||
-    singleEmployeeLoading
-  ) {
+  if (branchQueryLoading || membershipQueryLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -147,7 +126,7 @@ const CreateLoan = () => {
         };
 
         const res = await createLoan(loanData);
-        
+
         console.log(res);
 
         if (res?.data?.data) {

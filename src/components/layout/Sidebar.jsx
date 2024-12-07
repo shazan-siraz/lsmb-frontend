@@ -5,7 +5,6 @@ import { AiOutlineBars } from "react-icons/ai";
 import { IoIosSpeedometer } from "react-icons/io";
 import ModalComponents from "../../pages/Modal/ModalComponents";
 import "./Sidebar.css";
-import RegisterPackage from "../RegisterPackageSidebar/RegisterPackage";
 import CreateAdminSidebar from "../CreateAdminSidebar/CreateAdminSidebar";
 import { useSelector } from "react-redux";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
@@ -28,16 +27,19 @@ import CompanySidebar from "../CompanySidebar/CompanySidebar";
 import BranchProfile from "../BranchProfile/BranchProfile";
 import BoothSidebar from "../BoothSidebar/BoothSidebar";
 import PackageSidebar from "../PackageSidebar/PackageSidebar";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import FieldOfficerSidebar from "../FieldOfficerSidebar/FieldOfficerSidebar";
 
 const Sidebar = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { role } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const [isActive, setActive] = useState(false);
 
   const sidebarRef = useRef(null);
   const location = useLocation();
   const handleToggle = () => setActive(!isActive);
 
-  const { data: branchData } = useGetSingleBranchQuery(email);
+  const { data: branchData } = useGetSingleBranchQuery(branchEmail);
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -180,6 +182,9 @@ const Sidebar = () => {
                   <ModalComponents></ModalComponents>,
                 </div>
               )}
+
+              {/* Conditionaly Render field Officer sidebar */}
+              <FieldOfficerSidebar></FieldOfficerSidebar>
             </nav>
           </div>
         </div>

@@ -2,18 +2,16 @@ import { useSearchMemberQuery } from "../../redux/features/membership/membership
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import debounce from "lodash/debounce";
-import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
-import { useGetSingleEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useDispatch, useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGetSingleDpsQuery } from "../../redux/features/dps/dpsApi";
 import { useGetSingleFdrQuery } from "../../redux/features/fdr/fdrApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { toast, ToastContainer } from "react-toastify";
 import { clearToastMessage } from "../../redux/features/auth/toastSlice";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const Withdraw = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { branchEmail, isLoading } = useGetBranchEmail();
   const dispatch = useDispatch();
   const [routeErr, setRouteErr] = useState("");
   const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -22,7 +20,6 @@ const Withdraw = () => {
   const [accountType, setAccountType] = useState("savings");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-
   const navigate = useNavigate();
 
   const toastMessage = useSelector((state) => state.toast.message);
@@ -44,21 +41,6 @@ const Withdraw = () => {
     };
   }, [searchQuery]);
 
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
-
   const { data: searchMemberData } = useSearchMemberQuery({
     query: debouncedQuery || undefined,
     email: branchEmail,
@@ -72,7 +54,7 @@ const Withdraw = () => {
     skip: !membership,
   });
 
-  if (singleBranchQueryLoading || singleEmployeeLoading) {
+  if (isLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -113,8 +95,6 @@ const Withdraw = () => {
       );
     }
   };
-
-  console.log(routeErr);
 
   return (
     <div className="pt-[50px] bg-slate-100 min-h-screen">

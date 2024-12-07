@@ -1,37 +1,15 @@
-import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGetAllSavingMembershipQuery } from "../../redux/features/membership/membershipApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
-import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
-import { useGetSingleEmployeeQuery } from "../../redux/features/employee/employeeApi";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const SavingsAccount = () => {
-  const { email, role } = useSelector(useCurrentUser);
-
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
+  const { branchEmail, isLoading } = useGetBranchEmail();
 
   const { data: savingMemberData, isLoading: savingMemberQueryLoading } =
     useGetAllSavingMembershipQuery(branchEmail);
 
-  if (
-    singleBranchQueryLoading ||
-    singleEmployeeLoading ||
-    savingMemberQueryLoading
-  ) {
+  if (isLoading || savingMemberQueryLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 

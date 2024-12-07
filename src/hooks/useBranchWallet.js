@@ -2,11 +2,9 @@ import { useSelector } from "react-redux";
 import { useCurrentUser } from "../redux/features/auth/authSlice";
 import { useGetSingleBranchQuery } from "../redux/features/branch/branchApi";
 import { useGetSingleEmployeeQuery } from "../redux/features/employee/employeeApi";
-import { useGetTotalSavingtxnAmountQuery } from "../redux/features/savingCollection/savingCollectionApi";
 import { useGetTotalLoanAmountWithoutPorcessFeesQuery } from "../redux/features/loan/loanApi";
 import { useGetTotalLoanCollectionAmountQuery } from "../redux/features/loanCollection/loanCollectionApi";
-import { useGetTotalShareAmountAndProcessFeesQuery } from "../redux/features/membership/membershipApi";
-import { useGetTotalSavingWithdrawQuery } from "../redux/features/savingWithdraw/savingWithdraw";
+import { useGetTotalMemberAccountBalaceAndProcessFeesQuery } from "../redux/features/membership/membershipApi";
 
 export const useBranchWallet = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -20,14 +18,18 @@ export const useBranchWallet = () => {
   let data;
   if (role === "branch") {
     data = singleBranchData;
-  } else if (role === "manager") {
+  } else if (
+    role === "manager" ||
+    role === "accountant" ||
+    role === "fieldOfficer"
+  ) {
     data = singleEmployeeData;
   }
 
   const branchEmail = data?.data?.branchEmail;
 
-  const { data: totalSavingTxnAmount, isLoading: totalSavingTxnAmountLoading } =
-    useGetTotalSavingtxnAmountQuery(branchEmail);
+  // const { data: totalSavingTxnAmount, isLoading: totalSavingTxnAmountLoading } =
+  //   useGetTotalSavingtxnAmountQuery(branchEmail);
 
   const {
     data: getTotalLoamAmountWithoutProcessFees,
@@ -40,29 +42,24 @@ export const useBranchWallet = () => {
   } = useGetTotalLoanCollectionAmountQuery(branchEmail);
 
   const {
-    data: TotalShareAmountAndadmissionFees,
-    isLoading: TotalShareAmountAndadmissionFeesLoading,
-  } = useGetTotalShareAmountAndProcessFeesQuery(branchEmail);
+    data: TotalMemberAccountBalaceAndProcessFees,
+    isLoading: TotalMemberAccountBalaceAndProcessFeesLoading,
+  } = useGetTotalMemberAccountBalaceAndProcessFeesQuery(branchEmail);
 
-  const { data: totalSavingWithdraw, isLoading: totalSavingWithdrawLoading } =
-    useGetTotalSavingWithdrawQuery(branchEmail);
-
+  // const { data: totalSavingWithdraw, isLoading: totalSavingWithdrawLoading } =
+  //   useGetTotalSavingWithdrawQuery(branchEmail);
 
   const isLoading =
     singleBranchQueryLoading ||
     singleEmployeeLoading ||
-    totalSavingTxnAmountLoading ||
     totalLoanCollectionAmountLoading ||
     getTotalLoamAmountWithoutProcessFeesLoading ||
-    TotalShareAmountAndadmissionFeesLoading ||
-    totalSavingWithdrawLoading;
+    TotalMemberAccountBalaceAndProcessFeesLoading;
 
   const branchWallet =
-    totalSavingTxnAmount?.data +
     totalLoanCollectionAmountData?.data +
-    (TotalShareAmountAndadmissionFees?.data -
-      getTotalLoamAmountWithoutProcessFees?.data -
-      totalSavingWithdraw?.data);
+    TotalMemberAccountBalaceAndProcessFees?.data -
+    getTotalLoamAmountWithoutProcessFees?.data;
 
   return { branchWallet, isLoading };
 };

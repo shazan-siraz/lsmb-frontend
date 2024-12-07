@@ -1,13 +1,12 @@
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../../redux/features/auth/authSlice";
 import { useGetSingleBranchQuery } from "../../../redux/features/branch/branchApi";
 import defaultProfileImg from "../../../assets/icons/userProfile.png";
+import { useGetBranchEmail } from "../../../hooks/useGetBranchEmail";
 
 const BranchProfilePage = () => {
-  const { email } = useSelector(useCurrentUser);
+  const {branchEmail: branchMail} = useGetBranchEmail();
 
   const { data: branchData, isLoading: branchQueryLoading } =
-    useGetSingleBranchQuery(email);
+    useGetSingleBranchQuery(branchMail);
 
   if (branchQueryLoading) {
     return <p>Loading...</p>;
