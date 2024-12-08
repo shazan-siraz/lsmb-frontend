@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { MdOutlineCircle } from "react-icons/md";
-import { RiArticleFill } from "react-icons/ri";
 import { FaPersonBooth } from "react-icons/fa";
 
 const BoothSidebar = () => {
@@ -64,7 +63,24 @@ const BoothSidebar = () => {
               <span className="font-medium uppercase">Loan Collection</span>
             </NavLink>
           </div>
-          
+
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              savingDropdown ? "max-h-screen" : "max-h-0"
+            }`}
+          >
+            <NavLink
+              to="/dashboard/dps-collection"
+              className={({ isActive }) =>
+                `dropDownListStyle ${
+                  isActive ? "activeColor" : "text-gray-600"
+                }`
+              }
+            >
+              <MdOutlineCircle className="iconListStyle" />
+              <span className="font-medium uppercase">DPS Collection</span>
+            </NavLink>
+          </div>
         </div>
       )}
     </div>

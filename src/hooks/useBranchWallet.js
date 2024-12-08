@@ -5,6 +5,7 @@ import { useGetSingleEmployeeQuery } from "../redux/features/employee/employeeAp
 import { useGetTotalLoanAmountWithoutPorcessFeesQuery } from "../redux/features/loan/loanApi";
 import { useGetTotalLoanCollectionAmountQuery } from "../redux/features/loanCollection/loanCollectionApi";
 import { useGetTotalMemberAccountBalaceAndProcessFeesQuery } from "../redux/features/membership/membershipApi";
+import { useGetTotalDpsAmountQuery } from "../redux/features/dps/dpsApi";
 
 export const useBranchWallet = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -32,8 +33,8 @@ export const useBranchWallet = () => {
   //   useGetTotalSavingtxnAmountQuery(branchEmail);
 
   const {
-    data: getTotalLoamAmountWithoutProcessFees,
-    isLoading: getTotalLoamAmountWithoutProcessFeesLoading,
+    data: getTotalLoanAmountWithoutProcessFees,
+    isLoading: getTotalLoanAmountWithoutProcessFeesLoading,
   } = useGetTotalLoanAmountWithoutPorcessFeesQuery(branchEmail);
 
   const {
@@ -46,6 +47,9 @@ export const useBranchWallet = () => {
     isLoading: TotalMemberAccountBalaceAndProcessFeesLoading,
   } = useGetTotalMemberAccountBalaceAndProcessFeesQuery(branchEmail);
 
+  const { data: totalDpsAmount, isLoading: totalDpsAmountQueryLoading } =
+    useGetTotalDpsAmountQuery(branchEmail);
+
   // const { data: totalSavingWithdraw, isLoading: totalSavingWithdrawLoading } =
   //   useGetTotalSavingWithdrawQuery(branchEmail);
 
@@ -53,13 +57,19 @@ export const useBranchWallet = () => {
     singleBranchQueryLoading ||
     singleEmployeeLoading ||
     totalLoanCollectionAmountLoading ||
-    getTotalLoamAmountWithoutProcessFeesLoading ||
-    TotalMemberAccountBalaceAndProcessFeesLoading;
+    getTotalLoanAmountWithoutProcessFeesLoading ||
+    TotalMemberAccountBalaceAndProcessFeesLoading ||
+    totalDpsAmountQueryLoading;
 
-  const branchWallet =
+  const addedBranchWallet =
+    TotalMemberAccountBalaceAndProcessFees?.data +
     totalLoanCollectionAmountData?.data +
-    TotalMemberAccountBalaceAndProcessFees?.data -
-    getTotalLoamAmountWithoutProcessFees?.data;
+    totalDpsAmount?.data;
+
+  const subtractBranchWallet = getTotalLoanAmountWithoutProcessFees?.data;
+
+  const branchWallet = addedBranchWallet - subtractBranchWallet;
+ 
 
   return { branchWallet, isLoading };
 };

@@ -1,14 +1,19 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import debounce from "lodash/debounce";
 import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
+import {
+  useGetAllMembershipQuery,
+  useSearchMemberQuery,
+} from "../../redux/features/membership/membershipApi";
 import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { useCreateDpsMutation } from "../../redux/features/dps/dpsApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
+import generateDpsAccountNo from "../../utils/generateDpsAcNo/generateDpsAcNo";
 
 const DpsCreate = () => {
   const { branchEmail } = useGetBranchEmail();
@@ -17,6 +22,11 @@ const DpsCreate = () => {
   const [durationOfYear, setDurationOfYear] = useState("");
   const [installmentType, setInstallmentType] = useState("");
   const [totalAmount, setTotalAmount] = useState();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [memberPhoneNo, setMemberPhoneNo] = useState();
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [membership, setIsMembership] = useState();
 
   const handleStartingBalance = (event) => {
     const value = event.target.value;
@@ -309,6 +319,36 @@ const DpsCreate = () => {
   const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
     useGetSingleBranchQuery(branchEmail);
 
+  useEffect(() => {
+    const handler = debounce(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500); // 500ms debounce
+    handler();
+    return () => {
+      handler.cancel();
+    };
+  }, [searchQuery]);
+
+  const { data: searchMemberData } = useSearchMemberQuery({
+    query: debouncedQuery || undefined,
+    email: branchEmail,
+  });
+
+  const handleInputChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    // যদি ইনপুট ফিল্ড খালি না থাকে, তাহলে ড্রপডাউন দেখান
+    setDropdownVisible(query.length > 0);
+  };
+
+  const handleSelect = (id, memberName, memberPhoneNo) => {
+    setSearchQuery(memberName); // নির্বাচিত নাম ইনপুটে সেট করা হবে
+    setMemberPhoneNo(memberPhoneNo)
+    setDropdownVisible(false); // ড্রপডাউন বন্ধ করা হবে
+    setIsMembership(id);
+  };
+
   const [createDPS, { isLoading: dpsCreateLoading }] = useCreateDpsMutation();
 
   if (membersDataLoading || employeeDataLoading || singleBranchQueryLoading) {
@@ -318,7 +358,9 @@ const DpsCreate = () => {
   const onSubmit = async (data) => {
     try {
       const dpsData = {
-        memberOfApplying: data.memberOfDpsApplying,
+        memberOfApplying: membership,
+        memberName: searchQuery,
+        memberPhoneNo: memberPhoneNo,
         branchEmail: branchEmail,
         companyEmail: singleBranchData?.data?.companyEmail,
         dpsStart: data.dpsStart,
@@ -339,6 +381,7 @@ const DpsCreate = () => {
         toast.success(`DPS created Successfully`);
         reset();
       }
+     
     } catch (err) {
       toast.error(err.data.message);
     }
@@ -354,8 +397,10 @@ const DpsCreate = () => {
     <div className="bg-[#EBECED] h-screen">
       <div className="flex justify-between px-5 pt-2">
         <h1 className="font-semibold text-[20px]">Make A New DPS</h1>
-        <NavLink to="/dashboard/all-members">
-          <button>Add New Member</button>
+        <NavLink to="/dashboard/active-dps">
+          <button className="border-2 border-slate-300 px-3 py-1 rounded hover:bg-slate-500 hover:text-white font-semibold transition-all duration-300 ease-in-out">
+            Active DPS List
+          </button>
         </NavLink>
       </div>
 
@@ -364,26 +409,36 @@ const DpsCreate = () => {
       <div className="px-5">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-3 gap-5">
-            <div className="flex flex-col">
+            <div className="flex flex-col ">
               <label className="font-semibold" htmlFor="memberOfDpsApplying">
                 Member Of DPS Applying*
               </label>
-              <select
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                id="memberOfDpsApplying"
-                {...register("memberOfDpsApplying")}
-                required={true}
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select DPS Member
-                </option>
-                {memberShipData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item?.memberName}
-                  </option>
-                ))}
-              </select>
+              <div className="relative w-full">
+                {/* ইনপুট ফিল্ড */}
+                <input
+                  type="text"
+                  className="py-2 px-2 my-1 rounded-sm membershipInput border w-full"
+                  placeholder="Type Member Name Or Phone No"
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onFocus={() => setDropdownVisible(searchQuery.length > 0)} // ইনপুটে ফোকাস করলে ড্রপডাউন দেখাবে
+                />
+
+                {/* ড্রপডাউন মেনু */}
+                {isDropdownVisible && searchMemberData?.data?.length > 0 && (
+                  <ul className="absolute z-10 bg-white border w-full rounded-sm max-h-40 overflow-y-auto">
+                    {searchMemberData?.data?.map((item) => (
+                      <li
+                        key={item._id}
+                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleSelect(item._id, item.memberName, item.phoneNo)}
+                      >
+                        {item.memberName} - {item.phoneNo}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col">
@@ -408,6 +463,7 @@ const DpsCreate = () => {
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 type="text"
                 id="DpsAcNo"
+                value={generateDpsAccountNo()}
                 placeholder="DPS A/C No"
                 {...register("dpsAcNo")}
                 required={true}

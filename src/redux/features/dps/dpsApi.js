@@ -8,22 +8,56 @@ const dpsApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["dps"],
     }),
     getAllDps: builder.query({
       query: () => ({
         url: "/dps",
         method: "GET",
       }),
+      providesTags: ["dps"],
+    }),
+
+    getTotalDpsAmount: builder.query({
+      query: (email) => ({
+        url: `/dps/getTotalDpsAmount/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["dps"],
     }),
 
     getSingleDps: builder.query({
       query: (id) => ({
         url: `/dps/getSingleDps/${id}`,
-        method: "GET"
-      })
-    })
+        method: "GET",
+      }),
+      providesTags: ["dps"],
+    }),
+
+    getSingleDpsById: builder.query({
+      query: (id) => ({
+        url: `/dps/getSingleDpsById/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["dps"],
+    }),
+
+    searchDpsAccount: builder.query({
+      query: ({ query, email }) => ({
+        url: `/dps/searchDpsAccount?query=${query}&email=${email}`,
+        method: "GET",
+      }),
+      providesTags: ["dps"],
+    }),
 
   }),
 });
 
-export const { useCreateDpsMutation, useGetAllDpsQuery, useGetSingleDpsQuery } = dpsApi;
+export const {
+  useCreateDpsMutation,
+  useGetAllDpsQuery,
+  useGetTotalDpsAmountQuery,
+  useGetSingleDpsQuery,
+  useGetSingleDpsByIdQuery,
+  useSearchDpsAccountQuery
+} = dpsApi;
