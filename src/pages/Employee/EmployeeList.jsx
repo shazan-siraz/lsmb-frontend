@@ -4,9 +4,11 @@ import "./EmployeeList.css";
 import { useState } from "react";
 import { useBlockedUserStatusMutation } from "../../redux/features/user/user";
 import { toast, ToastContainer } from "react-toastify";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const EmployeeList = () => {
-  const { data, isLoading } = useGetAllEmployeeQuery(undefined);
+  const { branchEmail } = useGetBranchEmail();
+  const { data, isLoading } = useGetAllEmployeeQuery(branchEmail);
   const [loadingRow, setLoadingRow] = useState(null); // Track the loading row
 
   const [blockUserStatus] = useBlockedUserStatusMutation();

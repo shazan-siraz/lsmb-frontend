@@ -72,10 +72,13 @@ const Withdraw = () => {
   };
 
   const handleSelect = (id, memberName) => {
-    setSearchQuery(memberName); // নির্বাচিত নাম ইনপুটে সেট করা হবে
+
+    setSearchQuery(memberName ); // নির্বাচিত নাম ইনপুটে সেট করা হবে
     setDropdownVisible(false); // ড্রপডাউন বন্ধ করা হবে
     setIsMembership(id);
   };
+
+
 
   const handleNavigateWithdraw = () => {
     if (accountType === "dps") {
@@ -124,7 +127,7 @@ const Withdraw = () => {
                     <li
                       key={item._id}
                       className="py-2 px-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelect(item._id, item.memberName)}
+                      onClick={() => handleSelect(item._id, item.memberName, item.phoneNo)}
                     >
                       {item.memberName} - {item.phoneNo}
                     </li>

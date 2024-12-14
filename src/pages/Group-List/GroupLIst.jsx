@@ -8,10 +8,11 @@ import GroupTable from "./GroupTable";
 import Swal from "sweetalert2";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const GroupLIst = () => {
+  const {branchEmail} = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
-  const { branchEmail } = useGetSingleBranchQuery();
 
   const { data: singleBranchData, isLoading: getBranchQueryLoading } =
     useGetSingleBranchQuery(branchEmail);
@@ -22,7 +23,7 @@ const GroupLIst = () => {
   const { data: groupData, isLoading: groupGetLoading } =
     useGetAllGroupQuery(branchEmail);
 
-  if (getBranchQueryLoading || groupGetLoading) {
+  if (getBranchQueryLoading || groupGetLoading ) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -37,6 +38,7 @@ const GroupLIst = () => {
       };
 
       const res = await addGroup(groupData);
+
       if (res?.data) {
         Swal.fire({
           position: "top-end",

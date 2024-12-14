@@ -1,18 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import debounce from "lodash/debounce";
-import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { toast, ToastContainer } from "react-toastify";
 import { clearToastMessage } from "../../redux/features/auth/toastSlice";
 import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
-import { useTodayLoanCollectionQuery } from "../../redux/features/loanCollection/loanCollectionApi";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 import { useSearchDpsAccountQuery } from "../../redux/features/dps/dpsApi";
+import { useTodayDpsCollectionQuery } from "../../redux/features/dpsCollection/dpsCollectionApi";
 
 const FindDpsAccount = () => {
-  const { email } = useSelector(useCurrentUser);
   const { branchEmail } = useGetBranchEmail();
   const dispatch = useDispatch();
   const toastMessage = useSelector((state) => state.toast.message);
@@ -42,23 +39,15 @@ const FindDpsAccount = () => {
     query: debouncedQuery || undefined,
     email: branchEmail,
   });
-
-  const { data: todayLoanTxnData, isLoading: todayLoanTxnLoading } =
-    useTodayLoanCollectionQuery(email);
-
-  if (todayLoanTxnLoading) {
-    return <LoadingComponent></LoadingComponent>;
-  }
+  const { data: todayDpsCollectionData, isLoading: todayDpsCollectionLoading } =
+    useTodayDpsCollectionQuery(branchEmail);
 
   const handleDpsTxn = async (id) => {
     navigate(`/dashboard/dps-collection/${id}`);
   };
 
-
-  
-
   return (
-    <div className="bg-slate-100">
+    <div className="bg-slate-100 min-h-screen">
       <div className="rounded pt-[30px]">
         <ToastContainer></ToastContainer>
         <div className="max-w-[600px] w-full mx-auto bg-white rounded border-t-[5px] border-slate-500">
@@ -104,30 +93,38 @@ const FindDpsAccount = () => {
             </tr>
           </thead>
           <tbody>
-            {searchDpsData?.data?.map((item) => (
-              <tr key={item?._id}>
-                <td>{item?.dpsAcNo}</td>
-                <td>
-                  <img
-                    className="w-[50px]"
-                    src={item?.memberOfApplying?.memberPhoto}
-                    alt=""
-                  />
-                </td>
-                <td>{item?.memberName}</td>
-                <td>{item?.memberPhoneNo}</td>
-                <td>{item?.memberOfApplying?.fatherHusbandName}</td>
-                <td>{item?.memberOfApplying?.presentAddress}</td>
-                <td className="text-center">
-                  <button
-                    onClick={() => handleDpsTxn(item?._id)}
-                    className="bg-slate-600 px-3 py-2 rounded text-white font-semibold"
-                  >
-                    DPS Transaction
-                  </button>
+            {searchDpsData?.data?.length > 0 ? (
+              searchDpsData.data.map((item) => (
+                <tr key={item?._id}>
+                  <td>{item?.dpsAcNo}</td>
+                  <td>
+                    <img
+                      className="w-[50px]"
+                      src={item?.memberOfApplying?.memberPhoto}
+                      alt="Member"
+                    />
+                  </td>
+                  <td>{item?.memberName}</td>
+                  <td>{item?.memberPhoneNo}</td>
+                  <td>{item?.memberOfApplying?.fatherHusbandName}</td>
+                  <td>{item?.memberOfApplying?.presentAddress}</td>
+                  <td className="text-center">
+                    <button
+                      onClick={() => handleDpsTxn(item?._id)}
+                      className="bg-slate-600 px-3 py-2 rounded text-white font-semibold"
+                    >
+                      DPS Transaction
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="text-center">
+                  No Data Found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -143,23 +140,29 @@ const FindDpsAccount = () => {
               <td>Member</td>
               <td>Member Phone</td>
               <td>Time</td>
+              <td>DPA A/C No</td>
               <td>Txn Type</td>
               <td>Txn Note</td>
               <td>Amount</td>
+              <td>Penalty</td>
             </tr>
           </thead>
           <tbody>
-            {todayLoanTxnData?.data?.map((item) => (
-              <tr key={item?._id}>
-                <td>{item?.transactionId}</td>
-                <td>{item?.memberId?.memberName}</td>
-                <td>{item?.memberId?.phoneNo}</td>
-                <td>{isoDateToTime(item?.createdAt)}</td>
-                <td>Loan Txn</td>
-                <td>{item?.transactionNote}</td>
-                <td>{item?.installmentAmount}</td>
-              </tr>
-            ))}
+            {todayDpsCollectionLoading
+              ? ""
+              : todayDpsCollectionData?.data?.map((item) => (
+                  <tr key={item?._id}>
+                    <td>{item?._id}</td>
+                    <td>{item?.memberOfApplying?.memberName}</td>
+                    <td>{item?.memberOfApplying?.phoneNo}</td>
+                    <td>{isoDateToTime(item?.createdAt)}</td>
+                    <td>{item?.dpsAcNo}</td>
+                    <td>DPS Txn</td>
+                    <td>{item?.transactionNote}</td>
+                    <td>{item?.dpsCollectionAmount}</td>
+                    <td>{item?.penaltyAmount}</td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>

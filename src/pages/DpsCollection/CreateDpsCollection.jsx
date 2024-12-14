@@ -1,32 +1,59 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetSingleDpsByIdQuery } from "../../redux/features/dps/dpsApi";
 import { FaIdCard } from "react-icons/fa";
 import { MdPhoneAndroid } from "react-icons/md";
 import { ToastContainer } from "react-toastify";
 import { useForm } from "react-hook-form";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
+import {
+  useCreateDpsCollectionMutation,
+  useGetTotalDpsBalaceByOneDpsAcQuery,
+} from "../../redux/features/dpsCollection/dpsCollectionApi";
+import { useDispatch } from "react-redux";
+import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
 const CreateDpsCollection = () => {
   const { id } = useParams();
   const { register, handleSubmit, reset } = useForm();
-
-  console.log(id);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { data: singleDpsData } = useGetSingleDpsByIdQuery(id);
-
-  console.log(singleDpsData?.data?.dpsAcNo);
+  const [createDpsCollection, { isLoading: dpsCollectionMutationLoading }] =
+    useCreateDpsCollectionMutation();
+  const { data: totalDpsBalance } = useGetTotalDpsBalaceByOneDpsAcQuery(
+    singleDpsData?.data?.dpsAcNo,
+    {
+      skip: !singleDpsData?.data?.dpsAcNo,
+    }
+  );
 
   const onSubmit = async (data) => {
+    try {
+      const dpsCollectionData = {
+        memberOfApplying: singleDpsData?.data?.memberOfApplying?._id,
+        memberName: singleDpsData?.data?.memberName,
+        memberPhoneNo: singleDpsData?.data?.memberPhoneNo,
+        branchEmail: singleDpsData?.data?.branchEmail,
+        companyEmail: singleDpsData?.data?.companyEmail,
+        dpsId: singleDpsData?.data?._id,
+        dateOfCollection: data.dateOfCollection,
+        dpsAcNo: singleDpsData?.data?.dpsAcNo,
+        dpsCollectionAmount: Number(data.dpsCollectionAmount),
+        penaltyAmount: Number(data.penaltyAmount),
+        transactionNote: data.transactionNote,
+      };
 
+      const res = await createDpsCollection(dpsCollectionData);
 
-
-    // const res = await createLoanCollection(loanTransactionData);
-
-    // if (res?.data?.success === true) {
-    //   dispatch(setToastMessage("Loan Collection Successfully!"));
-    //   reset();
-    //   navigate("/dashboard/loan-transaction");
-    // }
+      if (res?.data?.success === true) {
+        dispatch(setToastMessage("DPS Collection Successfully!"));
+        reset();
+        navigate("/dashboard/dps-collection");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -46,7 +73,9 @@ const CreateDpsCollection = () => {
               src={singleDpsData?.data?.memberOfApplying?.memberPhoto}
               alt=""
             />
-            <h3 className="font-semibold text-[25px]">{singleDpsData?.data?.memberName}</h3>
+            <h3 className="font-semibold text-[25px]">
+              {singleDpsData?.data?.memberName}
+            </h3>
           </div>
         </div>
 
@@ -71,13 +100,15 @@ const CreateDpsCollection = () => {
             DPS Balance
           </p>
           <p className="border px-5 py-2 text-center text-[18px] font-semibold">
-            0
+            {totalDpsBalance?.data}
           </p>
         </div>
         <div className="grid grid-cols-2 bg-white">
-          <p className="border px-5 py-2 text-[18px] font-semibold">Monthly</p>
+          <p className="border px-5 py-2 text-[18px] font-semibold">
+            {singleDpsData?.data?.installmentType}
+          </p>
           <p className="border px-5 py-2 text-center text-[18px] font-semibold">
-            0
+            {singleDpsData?.data?.startingBalance}
           </p>
         </div>
         <div className="grid grid-cols-2 bg-white">
@@ -97,52 +128,48 @@ const CreateDpsCollection = () => {
       </div>
       <hr />
 
-
       <div className="mt-8">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-3 gap-4 px-8">
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="date">
+              <label className="font-semibold" htmlFor="dateOfCollection">
                 Date*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 type="text"
-                id="date"
-                {...register("date")}
+                id="dateOfCollection"
+                {...register("dateOfCollection")}
                 required={true}
                 value={todayDateFormated()}
               />
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="selectDpsAcNo">
-                Select DPS A/C No*
+              <label className="font-semibold" htmlFor="dpsAcNo">
+                DPS A/C No*
               </label>
-              <select
+              <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
-                id="selectDpsAcNo"
-                required
-                defaultValue=""
-                {...register("selectDpsAcNo")}
-              >
-                <option value="" disabled>
-                  Select DPS A/C No
-                </option>
-                <option>12345</option>
-              </select>
+                type="text"
+                id="dpsAcNo"
+                {...register("dpsAcNo")}
+                required={true}
+                value={singleDpsData?.data?.dpsAcNo || ""}
+                readOnly
+              />
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="depositAmount">
+              <label className="font-semibold" htmlFor="dpsCollectionAmount">
                 Amount*
               </label>
               <input
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 placeholder="Enter Deposit Amount"
                 type="number"
-                id="depositAmount"
-                {...register("depositAmount")}
+                id="dpsCollectionAmount"
+                {...register("dpsCollectionAmount")}
               />
             </div>
 
@@ -179,20 +206,18 @@ const CreateDpsCollection = () => {
             <button
               className="border border-blue-500 py-2 px-20 rounded hover:bg-blue-500 hover:text-white cursor-pointer transition-all duration-300 ease-in-out"
               type="submit"
-            // disabled={createLoanCollectionLoading}
+              disabled={dpsCollectionMutationLoading}
             >
-              {/* {createLoanCollectionLoading ? (
+              {dpsCollectionMutationLoading ? (
                 <span className="loading loading-bars loading-md"></span>
               ) : (
                 "Submit"
-              )} */}
+              )}
             </button>
           </div>
           <ToastContainer></ToastContainer>
         </form>
       </div>
-
-
     </div>
   );
 };

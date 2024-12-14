@@ -66,7 +66,7 @@ const Header = () => {
                   : ""
               }`}
             >
-              Savings TXN
+              Savings Collection
             </p>
           </NavLink>
           <NavLink to="/dashboard/loan-transaction">
@@ -77,15 +77,32 @@ const Header = () => {
                   : ""
               }`}
             >
-              Loan TXN
+              Loan Collection
             </p>
           </NavLink>
-          <p className="header-btn transition-all duration-300 ease-in-out">
-            DPS TXN
-          </p>
-          <p className="header-btn transition-all duration-300 ease-in-out">
-            Today TXN
-          </p>
+          <NavLink to="/dashboard/dps-collection">
+            <p
+              className={`header-btn transition-all duration-300 ease-in-out ${
+                isActive("/dashboard/dps-collection")
+                  ? "bg-white text-black"
+                  : ""
+              }`}
+            >
+              DPS Collection
+            </p>
+          </NavLink>
+          <NavLink to="/dashboard/today-collection">
+            <p
+              className={`header-btn transition-all duration-300 ease-in-out ${
+                isActive("/dashboard/today-collection")
+                  ? "bg-white text-black"
+                  : ""
+              }`}
+            >
+              Today Transaction
+            </p>
+          </NavLink>
+          
         </div>
 
         <div

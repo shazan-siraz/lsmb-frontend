@@ -1,9 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import debounce from "lodash/debounce";
-import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { toast, ToastContainer } from "react-toastify";
 import { clearToastMessage } from "../../redux/features/auth/toastSlice";
 import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
@@ -12,7 +10,6 @@ import { useTodayLoanCollectionQuery } from "../../redux/features/loanCollection
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const FindLoanMember = () => {
-  const { email } = useSelector(useCurrentUser);
   const { branchEmail } = useGetBranchEmail();
   const dispatch = useDispatch();
   const toastMessage = useSelector((state) => state.toast.message);
@@ -43,19 +40,15 @@ const FindLoanMember = () => {
     email: branchEmail,
   });
 
-  const { data: todayLoanTxnData, isLoading: todayLoanTxnLoading } =
-    useTodayLoanCollectionQuery(email);
-
-  if (todayLoanTxnLoading) {
-    return <LoadingComponent></LoadingComponent>;
-  }
+  const { data: todayLoanTxnData } =
+    useTodayLoanCollectionQuery(branchEmail);
 
   const handleLoanTxn = async (id) => {
     navigate(`/dashboard/loan-transaction/${id}`);
   };
 
   return (
-    <div className="bg-slate-100">
+    <div className="bg-slate-100 min-h-screen">
       <div className="rounded pt-[30px]">
         <ToastContainer></ToastContainer>
         <div className="max-w-[600px] w-full mx-auto bg-white rounded border-t-[5px] border-slate-500">

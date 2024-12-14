@@ -9,7 +9,6 @@ import {
   useLastLoanCollectionQuery,
   useTotalLoanCollectionQuery,
 } from "../../redux/features/loanCollection/loanCollectionApi";
-import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { ToastContainer } from "react-toastify";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { useDispatch } from "react-redux";
@@ -22,27 +21,17 @@ const LoanTransaction = () => {
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
 
-  const { data: loanData, isLoading: LoanDataQueryLoading } =
+  const { data: loanData  } =
     useGetSingleLoanQuery(id);
 
   const {
-    data: totalLoanCollectionData,
-    isLoading: totalLoanCollectionLoading,
-  } = useTotalLoanCollectionQuery(loanData?.data?.memberOfApplying?.email);
+    data: totalLoanCollectionData  } = useTotalLoanCollectionQuery(loanData?.data?.memberOfApplying?.email);
 
-  const { data: lastLoanCollectionData, isLoading: lastLoanCollectionLoading } =
+  const { data: lastLoanCollectionData } =
     useLastLoanCollectionQuery(loanData?.data?.memberOfApplying?.email);
 
   const [createLoanCollection, { isLoading: createLoanCollectionLoading }] =
     useCreateLoanCollectionMutation();
-
-  if (
-    LoanDataQueryLoading ||
-    totalLoanCollectionLoading ||
-    lastLoanCollectionLoading
-  ) {
-    return <LoadingComponent></LoadingComponent>;
-  }
 
   const {
     _id,

@@ -1,19 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import { useSearchMemberQuery } from "../../redux/features/membership/membershipApi";
 import debounce from "lodash/debounce";
-import { useGetSingleEmployeeQuery } from "../../redux/features/employee/employeeApi";
-import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
-import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import { toast, ToastContainer } from "react-toastify";
 import { clearToastMessage } from "../../redux/features/auth/toastSlice";
 import { useTodaySavingCollectionQuery } from "../../redux/features/savingCollection/savingCollectionApi";
 import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+
 
 const FindSavingMember = () => {
-  const { email, role } = useSelector(useCurrentUser);
+  const { branchEmail } = useGetBranchEmail();
   const dispatch = useDispatch();
   const toastMessage = useSelector((state) => state.toast.message);
   const navigate = useNavigate();
@@ -37,38 +35,13 @@ const FindSavingMember = () => {
     };
   }, [searchQuery]);
 
-  const { data: singleBranchData, isLoading: singleBranchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: singleEmployeeData, isLoading: singleEmployeeLoading } =
-    useGetSingleEmployeeQuery(email);
-
-  // Conditionally use the data based on the role
-  let data;
-  if (role === "branch") {
-    data = singleBranchData;
-  } else if (role === "manager") {
-    data = singleEmployeeData;
-  }
-
-  const branchEmail = data?.data?.branchEmail;
-
   const { data: searchMemberData, isLoading: searchMemeberLoading } =
     useSearchMemberQuery({
       query: debouncedQuery || undefined,
       email: branchEmail,
     });
 
-  const { data: toadySavingTxnData, isLoading: todaySavingTxnLoading } =
-    useTodaySavingCollectionQuery(email);
-
-  if (
-    singleEmployeeLoading ||
-    singleBranchQueryLoading ||
-    todaySavingTxnLoading ||
-    searchMemeberLoading
-  ) {
-    return <LoadingComponent></LoadingComponent>;
-  }
+  const { data: toadySavingTxnData } = useTodaySavingCollectionQuery(branchEmail);
 
   // সার্চ বাটনের মাধ্যমে সার্চ
   const handleSearch = () => {

@@ -81,6 +81,24 @@ const BoothSidebar = () => {
               <span className="font-medium uppercase">DPS Collection</span>
             </NavLink>
           </div>
+
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              savingDropdown ? "max-h-screen" : "max-h-0"
+            }`}
+          >
+            <NavLink
+              to="/dashboard/today-collection"
+              className={({ isActive }) =>
+                `dropDownListStyle ${
+                  isActive ? "activeColor" : "text-gray-600"
+                }`
+              }
+            >
+              <MdOutlineCircle className="iconListStyle" />
+              <span className="font-medium uppercase">Today Transction</span>
+            </NavLink>
+          </div>
         </div>
       )}
     </div>

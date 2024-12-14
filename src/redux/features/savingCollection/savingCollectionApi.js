@@ -34,6 +34,24 @@ const savingCollectionApi = baseApi.injectEndpoints({
       }),
       providesTags: ["savingTransaction"],
     }),
+
+    updateSavingTransaction: builder.mutation({
+      query: (data) => ({
+        url: "savingTransaction/updateSavingTransaction",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["savingTransaction"],
+    }),
+
+    deleteSavingTransaction: builder.mutation({
+      query: (data) => ({
+        url: "savingTransaction/deleteSavingTransaction",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["savingTransaction"],
+    }),
   }),
 });
 
@@ -41,5 +59,7 @@ export const {
   useCreateSavingCollectionMutation,
   useGetAllSavingCollectionQuery,
   useTodaySavingCollectionQuery,
-  useGetTotalSavingtxnAmountQuery
+  useGetTotalSavingtxnAmountQuery,
+  useUpdateSavingTransactionMutation,
+  useDeleteSavingTransactionMutation,
 } = savingCollectionApi;

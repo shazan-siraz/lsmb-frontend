@@ -8,19 +8,11 @@ const dpsApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["dps"],
+      invalidatesTags: ["dps", "dpsCollection"],
     }),
     getAllDps: builder.query({
       query: () => ({
         url: "/dps",
-        method: "GET",
-      }),
-      providesTags: ["dps"],
-    }),
-
-    getTotalDpsAmount: builder.query({
-      query: (email) => ({
-        url: `/dps/getTotalDpsAmount/${email}`,
         method: "GET",
       }),
       providesTags: ["dps"],
@@ -56,7 +48,6 @@ const dpsApi = baseApi.injectEndpoints({
 export const {
   useCreateDpsMutation,
   useGetAllDpsQuery,
-  useGetTotalDpsAmountQuery,
   useGetSingleDpsQuery,
   useGetSingleDpsByIdQuery,
   useSearchDpsAccountQuery

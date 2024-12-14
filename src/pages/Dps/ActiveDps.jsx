@@ -19,10 +19,11 @@ const ActiveDps = () => {
         <div className="flex justify-between items-center px-5 py-2">
           <h1>Active DPS List</h1>
           <button>
-            <NavLink to="/dashboard/dps-create">
-              <button className="border-2 border-slate-300 px-3 py-1 rounded hover:bg-slate-500 hover:text-white font-semibold transition-all duration-300 ease-in-out">
-                Add New DPS
-              </button>
+            <NavLink
+              to="/dashboard/dps-create"
+              className="border-2 border-slate-300 px-3 py-1 rounded hover:bg-slate-500 hover:text-white font-semibold transition-all duration-300 ease-in-out"
+            >
+              Add New DPS
             </NavLink>
           </button>
         </div>

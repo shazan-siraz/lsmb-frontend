@@ -344,14 +344,14 @@ const DpsCreate = () => {
 
   const handleSelect = (id, memberName, memberPhoneNo) => {
     setSearchQuery(memberName); // নির্বাচিত নাম ইনপুটে সেট করা হবে
-    setMemberPhoneNo(memberPhoneNo)
+    setMemberPhoneNo(memberPhoneNo);
     setDropdownVisible(false); // ড্রপডাউন বন্ধ করা হবে
     setIsMembership(id);
   };
 
   const [createDPS, { isLoading: dpsCreateLoading }] = useCreateDpsMutation();
 
-  if (membersDataLoading || employeeDataLoading || singleBranchQueryLoading) {
+  if (singleBranchQueryLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -381,7 +381,6 @@ const DpsCreate = () => {
         toast.success(`DPS created Successfully`);
         reset();
       }
-     
     } catch (err) {
       toast.error(err.data.message);
     }
@@ -397,10 +396,11 @@ const DpsCreate = () => {
     <div className="bg-[#EBECED] h-screen">
       <div className="flex justify-between px-5 pt-2">
         <h1 className="font-semibold text-[20px]">Make A New DPS</h1>
-        <NavLink to="/dashboard/active-dps">
-          <button className="border-2 border-slate-300 px-3 py-1 rounded hover:bg-slate-500 hover:text-white font-semibold transition-all duration-300 ease-in-out">
-            Active DPS List
-          </button>
+        <NavLink
+          to="/dashboard/active-dps"
+          className="border-2 border-slate-300 px-3 py-1 rounded hover:bg-slate-500 hover:text-white font-semibold transition-all duration-300 ease-in-out"
+        >
+          Active DPS List
         </NavLink>
       </div>
 
@@ -431,7 +431,9 @@ const DpsCreate = () => {
                       <li
                         key={item._id}
                         className="py-2 px-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleSelect(item._id, item.memberName, item.phoneNo)}
+                        onClick={() =>
+                          handleSelect(item._id, item.memberName, item.phoneNo)
+                        }
                       >
                         {item.memberName} - {item.phoneNo}
                       </li>
@@ -579,11 +581,18 @@ const DpsCreate = () => {
                 <option value="" disabled>
                   Select Reference Employee
                 </option>
-                {employeeData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item?.employeeName}
+
+                {employeeDataLoading ? (
+                  <option value="" disabled>
+                    Loading...
                   </option>
-                ))}
+                ) : (
+                  employeeData?.data.map((item) => (
+                    <option key={item._id} value={item?._id}>
+                      {item?.employeeName}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
@@ -601,11 +610,17 @@ const DpsCreate = () => {
                 <option value="" disabled>
                   Select Reference Member
                 </option>
-                {memberShipData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item?.memberName}
+                {membersDataLoading ? (
+                  <option value="" disabled>
+                    Loading...
                   </option>
-                ))}
+                ) : (
+                  memberShipData?.data.map((item) => (
+                    <option key={item._id} value={item?._id}>
+                      {item?.memberName}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
           </div>

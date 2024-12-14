@@ -119,8 +119,8 @@ const CreateLoan = () => {
           installmentAmount: data.installmentAmount,
           attachment: attachmentImageUrls,
           loanType: data.loanType,
-          guarantorEmployee: data.guarantorEmployee,
-          gurantorMember: data.guarantorMember,
+          guarantorEmployee: data.guarantorEmployee || null,
+          gurantorMember: data.guarantorMember || null,
           loanGuarantor: data.loanGuarantor,
           status: "Pending",
         };
@@ -477,7 +477,6 @@ const CreateLoan = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="guarantorType"
-                defaultValue=""
                 required
                 ref={guarantorRef} // Attach ref to the select element
                 onChange={handleGuarantorChange} // Handle the change event

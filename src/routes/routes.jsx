@@ -66,6 +66,8 @@ import PackageCreate from "../pages/Package/PackageCreate";
 import Packages from "../pages/Package/Packages";
 import FindDpsAccount from "../pages/DpsCollection/FindDpsAccount";
 import DpsCollection from "../pages/DpsCollection/CreateDpsCollection";
+import UpdateMember from "../pages/Membership/UpdateMember";
+import TodayTransaction from "../pages/TodayTransaction/TodayTransaction";
 
 const router = createBrowserRouter([
   {
@@ -171,6 +173,10 @@ const router = createBrowserRouter([
       {
         path: "membership-create",
         element: <Membership></Membership>,
+      },
+      {
+        path: "updateMembership/:id",
+        element: <UpdateMember></UpdateMember>,
       },
       {
         path: "dps-create",
@@ -335,6 +341,10 @@ const router = createBrowserRouter([
       {
         path: "dps-collection/:id",
         element: <DpsCollection></DpsCollection>
+      },
+      {
+        path: "today-collection",
+        element: <TodayTransaction></TodayTransaction>
       },
     ],
   },

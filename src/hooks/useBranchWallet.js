@@ -5,7 +5,9 @@ import { useGetSingleEmployeeQuery } from "../redux/features/employee/employeeAp
 import { useGetTotalLoanAmountWithoutPorcessFeesQuery } from "../redux/features/loan/loanApi";
 import { useGetTotalLoanCollectionAmountQuery } from "../redux/features/loanCollection/loanCollectionApi";
 import { useGetTotalMemberAccountBalaceAndProcessFeesQuery } from "../redux/features/membership/membershipApi";
-import { useGetTotalDpsAmountQuery } from "../redux/features/dps/dpsApi";
+import { useGetTotalDpsCollectionBalaceQuery } from "../redux/features/dpsCollection/dpsCollectionApi";
+import { useGetTotalSavingWithdrawQuery } from "../redux/features/savingWithdraw/savingWithdraw";
+import { useGetTotalSavingtxnAmountQuery } from "../redux/features/savingCollection/savingCollectionApi";
 
 export const useBranchWallet = () => {
   const { email, role } = useSelector(useCurrentUser);
@@ -29,8 +31,8 @@ export const useBranchWallet = () => {
 
   const branchEmail = data?.data?.branchEmail;
 
-  // const { data: totalSavingTxnAmount, isLoading: totalSavingTxnAmountLoading } =
-  //   useGetTotalSavingtxnAmountQuery(branchEmail);
+  const { data: totalSavingTxnAmount, isLoading: totalSavingTxnAmountLoading } =
+    useGetTotalSavingtxnAmountQuery(branchEmail);
 
   const {
     data: getTotalLoanAmountWithoutProcessFees,
@@ -47,29 +49,30 @@ export const useBranchWallet = () => {
     isLoading: TotalMemberAccountBalaceAndProcessFeesLoading,
   } = useGetTotalMemberAccountBalaceAndProcessFeesQuery(branchEmail);
 
-  const { data: totalDpsAmount, isLoading: totalDpsAmountQueryLoading } =
-    useGetTotalDpsAmountQuery(branchEmail);
+  const { data: totalDpsCollectionBalanceData } =
+    useGetTotalDpsCollectionBalaceQuery(branchEmail);
 
-  // const { data: totalSavingWithdraw, isLoading: totalSavingWithdrawLoading } =
-  //   useGetTotalSavingWithdrawQuery(branchEmail);
+  const { data: totalSavingWithdraw } =
+    useGetTotalSavingWithdrawQuery(branchEmail);
 
   const isLoading =
     singleBranchQueryLoading ||
     singleEmployeeLoading ||
+    totalSavingTxnAmountLoading ||
     totalLoanCollectionAmountLoading ||
     getTotalLoanAmountWithoutProcessFeesLoading ||
-    TotalMemberAccountBalaceAndProcessFeesLoading ||
-    totalDpsAmountQueryLoading;
+    TotalMemberAccountBalaceAndProcessFeesLoading;
 
   const addedBranchWallet =
     TotalMemberAccountBalaceAndProcessFees?.data +
+    totalSavingTxnAmount?.data +
     totalLoanCollectionAmountData?.data +
-    totalDpsAmount?.data;
+    totalDpsCollectionBalanceData?.data;
 
-  const subtractBranchWallet = getTotalLoanAmountWithoutProcessFees?.data;
+  const subtractBranchWallet =
+    getTotalLoanAmountWithoutProcessFees?.data + totalSavingWithdraw?.data;
 
   const branchWallet = addedBranchWallet - subtractBranchWallet;
- 
 
   return { branchWallet, isLoading };
 };

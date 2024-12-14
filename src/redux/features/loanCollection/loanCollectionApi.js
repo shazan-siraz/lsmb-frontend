@@ -11,6 +11,24 @@ const loanCollectionApi = baseApi.injectEndpoints({
       invalidatesTags: ["loanCollection"],
     }),
 
+    deleteLoanCollection: builder.mutation({
+      query: (data) => ({
+        url: "/loanCollection/deleteLoanCollection",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["loanCollection"],
+    }),
+
+    updateLoanCollection: builder.mutation({
+      query: (data) => ({
+        url: "/loanCollection/update-loanCollection",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["loanCollection"],
+    }),
+
     totalLoanCollection: builder.query({
       query: (email) => ({
         url: `/loanCollection/totalLoanCollection/${email}`,
@@ -51,4 +69,6 @@ export const {
   useLastLoanCollectionQuery,
   useTodayLoanCollectionQuery,
   useGetTotalLoanCollectionAmountQuery,
+  useUpdateLoanCollectionMutation,
+  useDeleteLoanCollectionMutation,
 } = loanCollectionApi;
