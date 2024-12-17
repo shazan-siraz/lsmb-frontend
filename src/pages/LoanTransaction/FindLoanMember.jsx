@@ -40,6 +40,8 @@ const FindLoanMember = () => {
     email: branchEmail,
   });
 
+  console.log(searchLoanData);
+
   const { data: todayLoanTxnData } =
     useTodayLoanCollectionQuery(branchEmail);
 
@@ -85,6 +87,7 @@ const FindLoanMember = () => {
           <thead>
             <tr>
               <td>Loan No</td>
+              <td>Member Id</td>
               <td>Photo</td>
               <td>Name</td>
               <td>Phone No</td>
@@ -97,6 +100,7 @@ const FindLoanMember = () => {
             {searchLoanData?.data?.map((item) => (
               <tr key={item?._id}>
                 <td>{item?.loanNo}</td>
+                <td>{item?.memberId}</td>
                 <td>
                   <img
                     className="w-[50px]"

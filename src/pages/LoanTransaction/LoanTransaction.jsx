@@ -103,7 +103,7 @@ const LoanTransaction = () => {
         <hr />
       </div>
 
-      <div className="grid grid-cols-4 gap-4 px-8 py-5">
+      <div className="grid grid-cols-3 lg:grid-cols-4 gap-4 px-8 py-5">
         <div>
           <div className="grid grid-cols-2">
             <h2 className="border bg-white text-[18px] font-semibold px-4 py-1 uppercase">
@@ -176,7 +176,7 @@ const LoanTransaction = () => {
 
       <div className="mt-8">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-4 gap-4 px-8">
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 px-8 items-center">
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="date">
                 Date*

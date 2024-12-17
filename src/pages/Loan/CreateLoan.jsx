@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -20,12 +20,8 @@ import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useBranchWallet } from "../../hooks/useBranchWallet";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
-import incrementLoanNumber from "../../utils/incrementLoanNumber/incrementLoanNumber";
-import { useDispatch } from "react-redux";
-import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
 const CreateLoan = () => {
-  const dispatch = useDispatch();
   const { branchEmail } = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
   const selectRef = useRef(null);
@@ -46,8 +42,6 @@ const CreateLoan = () => {
   const [memberId, setMemberId] = useState();
   const [memberPhone, setMemberPhone] = useState();
   const [memberName, setMemberName] = useState();
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = debounce(() => {
@@ -175,7 +169,7 @@ const CreateLoan = () => {
       const res = await createLoan(loanData);
 
       if (res?.data?.data) {
-        dispatch(setToastMessage("Loan is Created Successfully"));
+        toast.success("Loan Created Successfully.")
         reset();
       }
 
@@ -190,7 +184,7 @@ const CreateLoan = () => {
     <div className="bg-slate-100 min-h-screen">
       <div className="flex justify-between px-5 pt-2">
         <h1 className="uppercase">Loan Disbursement</h1>
-        <NavLink to="/dashboard/loan-request">
+        <NavLink to="/dashboard/loan-request" className="border-2 px-3 rounded">
           <button>Pending Loan List</button>
         </NavLink>
       </div>
