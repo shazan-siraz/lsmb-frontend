@@ -1,15 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { useGetAllSavingMembershipQuery } from "../../redux/features/membership/membershipApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import { useGetUniqueMemberSavingsQuery } from "../../redux/features/savingCollection/savingCollectionApi";
 
 const SavingsAccount = () => {
   const { branchEmail, isLoading } = useGetBranchEmail();
 
-  const { data: savingMemberData, isLoading: savingMemberQueryLoading } =
-    useGetAllSavingMembershipQuery(branchEmail);
+  const { data: savingsMember } = useGetUniqueMemberSavingsQuery(branchEmail);
 
-  if (isLoading || savingMemberQueryLoading) {
+  if (isLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -27,7 +26,7 @@ const SavingsAccount = () => {
 
       <div>
         <table className="w-[95%] mx-auto">
-          <thead>
+          <thead className="bg-slate-500 text-white font-semibold">
             <tr>
               <td>SL</td>
               <td>Name</td>
@@ -39,15 +38,15 @@ const SavingsAccount = () => {
             </tr>
           </thead>
           <tbody>
-            {savingMemberData?.data.map((item, index) => (
+            {savingsMember?.data.map((item, index) => (
               <tr key={item._id}>
                 <td>{index + 1}</td>
-                <td>{item?.memberName}</td>
-                <td>{item?.memberId}</td>
-                <td>{item?.phoneNo}</td>
-                <td>{item?.gender}</td>
-                <td>{item?.profession}</td>
-                <td>{item?.accountBalance}</td>
+                <td>{item.memberId?.memberId}</td>
+                <td>{item.memberId?.memberName}</td>
+                <td>{item.memberId?.phoneNo}</td>
+                <td>{item.memberId?.gender}</td>
+                <td>{item.memberId?.presentAddress}</td>
+                <td>{item?.netBalance}</td>
               </tr>
             ))}
           </tbody>

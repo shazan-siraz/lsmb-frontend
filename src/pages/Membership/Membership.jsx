@@ -18,12 +18,102 @@ import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const Membership = () => {
   const { branchEmail } = useGetBranchEmail();
-  const { register, handleSubmit, reset } = useForm();
-  const [age, setAge] = useState("");
+  const { register, handleSubmit, reset, setError, clearErrors } = useForm();
+  const [age, setAge] = useState();
   const selectRef = useRef(null);
   const [selectedRefValue, setSelectedRefValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [attachments, setAttachments] = useState([{}]);
+  const [memberPhotoError, setMemberPhotoError] = useState("");
+  const [signaturePhotoError, setSignaturePhotoError] = useState("");
+  const [nidFirstPhotoError, setNidFirstPhotoError] = useState("");
+  const [nidSeconedPhotoError, setNidSeconedPhotoError] = useState("");
+  const [attachmentsPhotoError, setAttachmentsPhotoError] = useState("");
+
+  // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
+  const validateMemberPhotoSize = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setMemberPhotoError("Image larger than 100kb");
+      setError("imageUrl", {
+        type: "manual",
+        message: "Image larger than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setMemberPhotoError("");
+      clearErrors("imageUrl");
+    }
+  };
+
+  // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
+  const handleSignature = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setSignaturePhotoError("Image larger than 100kb");
+      setError("imageUrl", {
+        type: "manual",
+        message: "Image larger than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setSignaturePhotoError("");
+      clearErrors("imageUrl");
+    }
+  };
+
+  // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
+  const handleNidFirstPart = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setNidFirstPhotoError("Image larger than 100kb");
+      setError("imageUrl", {
+        type: "manual",
+        message: "Image larger than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setNidFirstPhotoError("");
+      clearErrors("imageUrl");
+    }
+  };
+
+  // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
+  const handleNidSeconedPart = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setNidSeconedPhotoError("Image larger than 100kb");
+      setError("imageUrl", {
+        type: "manual",
+        message: "Image larger than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setNidSeconedPhotoError("");
+      clearErrors("imageUrl");
+    }
+  };
+
+  // ইমেজ সাইজ ভ্যালিডেশন ফাংশন
+  const handleAttachment = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 100 * 1024) {
+      // 80 KB = 80 * 1024 bytes
+      setAttachmentsPhotoError("Image larger than 100kb");
+      setError("imageUrl", {
+        type: "manual",
+        message: "Image larger than 100kb",
+      });
+      e.target.value = "";
+    } else {
+      setAttachmentsPhotoError("");
+      clearErrors("imageUrl");
+    }
+  };
 
   const [nominees, setNominees] = useState([{ id: Date.now() }]);
 
@@ -49,12 +139,7 @@ const Membership = () => {
   const { data: branchData, isLoading: branchQueryLoading } =
     useGetSingleBranchQuery(branchEmail);
 
-  if (
-    groupQueryLoading ||
-    employeeQueryLoading ||
-    membersQueryLoading ||
-    branchQueryLoading
-  ) {
+  if (branchQueryLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -94,13 +179,16 @@ const Membership = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Map through all image files and upload each to Cloudinary
-      const uploadedImageUrls = await Promise.all(
-        data.attachment.map(async (attachments) => {
-          const imageUrl = await uploadImageToCloudinary(attachments[0]);
-          return imageUrl;
-        })
-      );
+      // Check if attachment exists and process it
+      const uploadedImageUrls =
+        data.attachment[0].length > 0
+          ? await Promise.all(
+              data.attachment.map(async (attachments) => {
+                const imageUrl = await uploadImageToCloudinary(attachments[0]);
+                return imageUrl;
+              })
+            )
+          : []; // Default to an empty array if no attachments
 
       const [
         memberPhotoImageUrl,
@@ -126,10 +214,8 @@ const Membership = () => {
         phoneNo: data.phoneNo,
         email: data.email,
         memberNid: data.memberNid,
-        admissionFees: Number(data.admissionFees),
-        accountBalance: Number(data?.shareAmount) || 0,
         dateOfBirth: data.dateOfBirth,
-        age: Number(data.age),
+        age: Number(age),
         gender: data.gender,
         fatherHusbandName: data.father_husbandName,
         profession: data.profession,
@@ -161,6 +247,7 @@ const Membership = () => {
     } catch (err) {
       console.log(err);
     }
+
   };
 
   const handleSelectChange = () => {
@@ -209,7 +296,9 @@ const Membership = () => {
                 {...register("groupName")}
               >
                 <option value="" disabled>
-                  Select Group Name
+                  {groupQueryLoading
+                    ? "Loading Groups..."
+                    : "Select Group Name"}
                 </option>
                 {groupData?.data?.map((item) => (
                   <option key={item._id} value={item?._id}>
@@ -283,34 +372,6 @@ const Membership = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="admissionFees">
-                Admission Fees
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="number"
-                id="admissionFees"
-                placeholder="Admission Fees"
-                {...register("admissionFees")}
-                required={true}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="shareAmount">
-                Share Amount
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="number"
-                id="shareAmount"
-                placeholder="Share Amount"
-                {...register("shareAmount")}
-                required={true}
-              />
-            </div>
-
-            <div className="flex flex-col">
               <label className="font-semibold" htmlFor="dateOfBirth">
                 Date Of Birth*
               </label>
@@ -334,7 +395,7 @@ const Membership = () => {
                 type="number"
                 id="age"
                 placeholder="Age"
-                value={age}
+                defaultValue={age}
                 readOnly
                 {...register("age")}
                 required={true}
@@ -348,9 +409,13 @@ const Membership = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="gender"
+                required
+                defaultValue=""
                 {...register("gender")}
               >
-                <option>Select Gender</option>
+                <option value="" disabled>
+                  Select Gender
+                </option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
@@ -392,10 +457,13 @@ const Membership = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="gender"
+                required
+                defaultValue=""
                 {...register("religion")}
-                required={true}
               >
-                <option>Select Religion</option>
+                <option value="" disabled>
+                  Select Religion
+                </option>
                 <option value="muslim">Muslim</option>
                 <option value="hindu">Hindu</option>
                 <option value="buddhist">Buddhist</option>
@@ -463,6 +531,11 @@ const Membership = () => {
             </div>
 
             <div className="flex flex-col">
+              {memberPhotoError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {memberPhotoError}
+                </p>
+              )}
               <label className="font-semibold" htmlFor="memberPhoto">
                 Member Photo
               </label>
@@ -472,10 +545,16 @@ const Membership = () => {
                 id="memberPhoto"
                 {...register("memberPhoto")}
                 required={true}
+                onChange={validateMemberPhotoSize}
               />
             </div>
 
             <div className="flex flex-col">
+              {signaturePhotoError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {signaturePhotoError}
+                </p>
+              )}
               <label className="font-semibold" htmlFor="signature">
                 Signature
               </label>
@@ -485,10 +564,16 @@ const Membership = () => {
                 id="signature"
                 {...register("signature")}
                 required={true}
+                onChange={handleSignature}
               />
             </div>
 
             <div className="flex flex-col">
+              {nidFirstPhotoError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {nidFirstPhotoError}
+                </p>
+              )}
               <label className="font-semibold" htmlFor="nidFrontPart">
                 Nid (Front Part)
               </label>
@@ -498,10 +583,16 @@ const Membership = () => {
                 id="nidFrontPart"
                 {...register("nidFrontPart")}
                 required={true}
+                onChange={handleNidFirstPart}
               />
             </div>
 
             <div className="flex flex-col">
+              {nidSeconedPhotoError && (
+                <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                  {nidSeconedPhotoError}
+                </p>
+              )}
               <label className="font-semibold" htmlFor="nidBackPart">
                 Nid (Back Part)
               </label>
@@ -511,6 +602,7 @@ const Membership = () => {
                 id="nidBackPart"
                 {...register("nidBackPart")}
                 required={true}
+                onChange={handleNidSeconedPart}
               />
             </div>
 
@@ -539,9 +631,15 @@ const Membership = () => {
                 <select
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
                   id="referenceEmployee"
+                  required
+                  defaultValue=""
                   {...register("referenceEmployee")}
                 >
-                  <option>Select Employee</option>
+                  <option value="" disabled>
+                    {employeeQueryLoading
+                      ? "Loading Employee..."
+                      : "Select Employee"}
+                  </option>
                   {employeeData?.data?.map((item) => (
                     <option key={item._id} value={item?._id}>
                       {item?.employeeName}
@@ -559,9 +657,15 @@ const Membership = () => {
                 <select
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
                   id="referenceMember"
+                  required
+                  defaultValue=""
                   {...register("referenceMember")}
                 >
-                  <option>Select Member</option>
+                  <option value="" disabled>
+                    {membersQueryLoading
+                      ? "Loading Member..."
+                      : "Select Member"}
+                  </option>
                   {membershipData?.data?.map((item) => (
                     <option key={item._id} value={item?._id}>
                       {item?.memberName}
@@ -574,15 +678,26 @@ const Membership = () => {
             {attachments.map((_, index) => (
               <div className="flex" key={index}>
                 <div>
-                  <label className="font-bold" htmlFor={`attachment-${index}`}>
-                    Attachment:
-                  </label>
+                  <div className="flex">
+                    <label
+                      className="font-bold"
+                      htmlFor={`attachment-${index}`}
+                    >
+                      Attachment:
+                    </label>
+                    {attachmentsPhotoError && (
+                      <p className="mx-auto mr-2 text-red-500 z-10 font-semibold text-[15px] -mb-6 text-center">
+                        {attachmentsPhotoError}
+                      </p>
+                    )}
+                  </div>
                   <input
                     className="py-2 px-2 my-1 rounded-sm employeeInput"
                     type="file"
                     id={`attachment-${index}`}
                     placeholder="Profile Image"
                     {...register(`attachment[${index}]`)}
+                    onChange={handleAttachment}
                   />
                 </div>
                 {index > 0 && (

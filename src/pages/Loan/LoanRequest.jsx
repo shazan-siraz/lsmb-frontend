@@ -1,34 +1,45 @@
-import { useSelector } from "react-redux";
-import Loading from "../../components/Loading/Loading";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetPendingLoanQuery } from "../../redux/features/loan/loanApi";
 import LoanList from "./LoanList";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
 import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { clearToastMessage } from "../../redux/features/auth/toastSlice";
+import { toast, ToastContainer } from "react-toastify";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const LoanRequest = () => {
-  const { email } = useSelector(useCurrentUser);
-  const { data: loanQueryData, isLoading: loanQueryLoading } =
-    useGetPendingLoanQuery(email);
+  const { branchEmail } = useGetBranchEmail();
+  const dispatch = useDispatch();
 
-  if (loanQueryLoading) {
-    return <Loading isLoading="true"></Loading>;
-  }
+  const { data: loanQueryData, isLoading: loanQueryLoading } =
+    useGetPendingLoanQuery(branchEmail);
+
+  const toastMessage = useSelector((state) => state.toast.message);
+
+  useEffect(() => {
+    if (toastMessage) {
+      toast.success(toastMessage);
+      dispatch(clearToastMessage()); // টোস্ট মেসেজটি ক্লিয়ার করুন
+    }
+  }, [toastMessage, dispatch]);
 
   return (
     <div>
+      <ToastContainer></ToastContainer>
       <div>
         <div className="flex justify-between px-5 py-2 font-semibold text-[20px]">
           <h1>Pending Loan List</h1>
           <NavLink
             to="/dashboard/loan-create"
-            className="border-2 rounded hover:bg-slate-500 hover:text-white transition-all duration-300 ease-in-out px-3"
+            className="text-[18px] border-2 rounded hover:bg-slate-500 hover:text-white transition-all duration-300 ease-in-out px-3"
           >
-            <p>Loan Create</p>
+            Loan Create
           </NavLink>
         </div>
-        <div className="border-b my-2"></div>
+        
+        <div className="border-b"></div>
 
-        <div className="p-5">
+        <div className="px-5 py-1">
           <table className="employeeTable">
             <thead className="bg-slate-600 text-white uppercase">
               <tr>
@@ -47,9 +58,21 @@ const LoanRequest = () => {
               </tr>
             </thead>
             <tbody>
-              {loanQueryData?.data.map((item, index) => (
-                <LoanList key={item._id} item={item} index={index}></LoanList>
-              ))}
+              {loanQueryLoading ? (
+                // Show loading rows as placeholders
+                Array(1)
+                  .fill()
+                  .map((_, index) => (
+                    <tr key={index}>
+                      <td colSpan="12" className="text-center">Loading...</td>
+                    </tr>
+                  ))
+                
+              ) : (
+                loanQueryData?.data.map((item, index) => (
+                  <LoanList key={item._id} item={item} index={index} />
+                ))
+              )}
             </tbody>
           </table>
         </div>

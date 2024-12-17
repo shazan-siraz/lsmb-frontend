@@ -8,7 +8,10 @@ import { ToastContainer } from "react-toastify";
 import { useForm } from "react-hook-form";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import generateUniqueTxnId from "../../utils/createTransactionId/generateTransactionId";
-import { useCreateSavingCollectionMutation } from "../../redux/features/savingCollection/savingCollectionApi";
+import {
+  useCreateSavingCollectionMutation,
+  useGetTotalSavingAmountByOneMemberQuery,
+} from "../../redux/features/savingCollection/savingCollectionApi";
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
@@ -21,6 +24,9 @@ const SavingTransaction = () => {
   const { data: singleMemberData, isLoading: singleMemberQueryLoading } =
     useGetSingleMembershipQuery(id);
 
+  const { data: totalSavingAmountByOneMember } =
+    useGetTotalSavingAmountByOneMemberQuery(singleMemberData?.data?._id);
+
   const [createSavingCollection, { isLoading: createSavingCollectionLoading }] =
     useCreateSavingCollectionMutation();
 
@@ -28,10 +34,10 @@ const SavingTransaction = () => {
     return <LoadingComponent></LoadingComponent>;
   }
 
+
   const onSubmit = async (data) => {
     const SavingCollectionData = {
       memberId: singleMemberData?.data._id,
-      memberEmail: singleMemberData?.data?.email,
       branchEmail: singleMemberData?.data?.branchEmail,
       companyEmail: singleMemberData?.data?.companyEmail,
       dateOfCollection: data.dateOfCollection,
@@ -41,7 +47,6 @@ const SavingTransaction = () => {
     };
 
     const res = await createSavingCollection(SavingCollectionData);
-
 
     if (res?.data?.success === true) {
       dispatch(setToastMessage("Saving Collection Successfully!"));
@@ -87,7 +92,7 @@ const SavingTransaction = () => {
           <div className="flex items-center gap-2">
             <FaDatabase className="text-[30px]" />
             <p className="text-[30px] font-semibold">
-              {singleMemberData?.data?.accountBalance}
+              {totalSavingAmountByOneMember?.data || 0}
             </p>
           </div>
         </div>

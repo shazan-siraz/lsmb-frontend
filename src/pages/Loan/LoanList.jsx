@@ -4,10 +4,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NavLink } from "react-router-dom";
 
-
 const LoanList = ({ item, index }) => {
-  const [activeLoan, {isLoading: activeLoanLoading}] = useUpdateLoanMutation();
-
+  const [activeLoan, { isLoading: activeLoanLoading }] =
+    useUpdateLoanMutation();
 
   const handleUpdateStatus = async (id) => {
     const updatedStatusData = {
@@ -21,7 +20,7 @@ const LoanList = ({ item, index }) => {
       toast.success(
         `${item.memberOfApplying?.groupName} Loan is Active Successfully`
       );
-      window.location.reload()
+      window.location.reload();
     }
   };
 
@@ -29,7 +28,11 @@ const LoanList = ({ item, index }) => {
     <tr>
       <td>{index + 1} </td>
       <td>
-        <NavLink target="_blank" to={`/dashboard/single-member/${item.memberOfApplying?._id}`} className="border border-lime-900 px-4 py-2 rounded-md hover:bg-slate-800 hover:text-white">
+        <NavLink
+          target="_blank"
+          to={`/dashboard/single-member/${item.memberOfApplying?._id}`}
+          className="border border-lime-900  px-4 py-2 rounded-md hover:bg-slate-800 hover:text-white"
+        >
           <button>{item.memberOfApplying?.memberName}</button>
         </NavLink>
       </td>

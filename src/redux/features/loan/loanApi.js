@@ -65,7 +65,15 @@ const loanApi = baseApi.injectEndpoints({
         url: `/loan/getTotalLoanAmountWithoutPorcessFees/${email}`,
         method: "GET",
       }),
-      invalidatesTags: ["savingTransaction"],
+      providesTags: ["savingTransaction"],
+    }),
+
+    getLastLoanDocument: builder.query({
+      query: (email) => ({
+        url: `/loan/getLastLoanDocument/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["savingTransaction"],
     }),
 
     searchLoan: builder.query({
@@ -87,5 +95,6 @@ export const {
   useUpdateLoanMutation,
   useGetOverdueLoanQuery,
   useGetTotalLoanAmountWithoutPorcessFeesQuery,
+  useGetLastLoanDocumentQuery,
   useSearchLoanQuery,
 } = loanApi;

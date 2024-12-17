@@ -28,8 +28,8 @@ const SavingTransactionModal = ({ savingModalData }) => {
         transactionNote: data.transactionNote,
       };
 
-        const res = await updateSavingTxn(updateSavingTxnData);
-        console.log(res);
+      const res = await updateSavingTxn(updateSavingTxnData);
+      console.log(res);
     } catch (err) {
       console.log(err);
     }
@@ -57,6 +57,7 @@ const SavingTransactionModal = ({ savingModalData }) => {
                   className="py-2 px-2 my-1 border rounded employeeInput"
                   type="number"
                   id="amount"
+                  defaultValue={savingModalData?.savingsAmount}
                   placeholder="Enter Amount"
                   {...register("amount")}
                   required={true}
@@ -70,6 +71,7 @@ const SavingTransactionModal = ({ savingModalData }) => {
                   className="py-2 px-2 my-1 border rounded-sm employeeInput"
                   type="text"
                   id="txnNote"
+                  defaultValue={savingModalData?.transactionNote}
                   placeholder="Transaction Note"
                   {...register("transactionNote")}
                 />

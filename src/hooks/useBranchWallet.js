@@ -4,7 +4,6 @@ import { useGetSingleBranchQuery } from "../redux/features/branch/branchApi";
 import { useGetSingleEmployeeQuery } from "../redux/features/employee/employeeApi";
 import { useGetTotalLoanAmountWithoutPorcessFeesQuery } from "../redux/features/loan/loanApi";
 import { useGetTotalLoanCollectionAmountQuery } from "../redux/features/loanCollection/loanCollectionApi";
-import { useGetTotalMemberAccountBalaceAndProcessFeesQuery } from "../redux/features/membership/membershipApi";
 import { useGetTotalDpsCollectionBalaceQuery } from "../redux/features/dpsCollection/dpsCollectionApi";
 import { useGetTotalSavingWithdrawQuery } from "../redux/features/savingWithdraw/savingWithdraw";
 import { useGetTotalSavingtxnAmountQuery } from "../redux/features/savingCollection/savingCollectionApi";
@@ -44,11 +43,6 @@ export const useBranchWallet = () => {
     isLoading: totalLoanCollectionAmountLoading,
   } = useGetTotalLoanCollectionAmountQuery(branchEmail);
 
-  const {
-    data: TotalMemberAccountBalaceAndProcessFees,
-    isLoading: TotalMemberAccountBalaceAndProcessFeesLoading,
-  } = useGetTotalMemberAccountBalaceAndProcessFeesQuery(branchEmail);
-
   const { data: totalDpsCollectionBalanceData } =
     useGetTotalDpsCollectionBalaceQuery(branchEmail);
 
@@ -60,11 +54,9 @@ export const useBranchWallet = () => {
     singleEmployeeLoading ||
     totalSavingTxnAmountLoading ||
     totalLoanCollectionAmountLoading ||
-    getTotalLoanAmountWithoutProcessFeesLoading ||
-    TotalMemberAccountBalaceAndProcessFeesLoading;
+    getTotalLoanAmountWithoutProcessFeesLoading;
 
   const addedBranchWallet =
-    TotalMemberAccountBalaceAndProcessFees?.data +
     totalSavingTxnAmount?.data +
     totalLoanCollectionAmountData?.data +
     totalDpsCollectionBalanceData?.data;

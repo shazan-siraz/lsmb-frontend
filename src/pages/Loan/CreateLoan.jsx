@@ -1,29 +1,37 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useRef, useState } from "react";
-import { useGetAllMembershipQuery } from "../../redux/features/membership/membershipApi";
+import { useEffect, useRef, useState } from "react";
+import {
+  useGetAllMembershipQuery,
+  useSearchMemberQuery,
+} from "../../redux/features/membership/membershipApi";
 import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeApi";
 import { Divider } from "antd";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary/uploadImageToCloudinary";
-import { useCreateLoanMutation } from "../../redux/features/loan/loanApi";
+import {
+  useCreateLoanMutation,
+  useGetLastLoanDocumentQuery,
+} from "../../redux/features/loan/loanApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux";
-import { useCurrentUser } from "../../redux/features/auth/authSlice";
+import debounce from "lodash/debounce";
 import { FaMinus } from "react-icons/fa";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useBranchWallet } from "../../hooks/useBranchWallet";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import incrementLoanNumber from "../../utils/incrementLoanNumber/incrementLoanNumber";
+import { useDispatch } from "react-redux";
+import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
 const CreateLoan = () => {
-  const { email } = useSelector(useCurrentUser);
+  const dispatch = useDispatch();
   const { branchEmail } = useGetBranchEmail();
   const { register, handleSubmit, reset } = useForm();
   const selectRef = useRef(null);
-  const guarantorRef = useRef(null);
+  const guarantorRef = useRef();
   const [selectedRefValue, setSelectedRefValue] = useState("");
-  const [guarantorRefValue, setGuarantorRefValue] = useState("");
+  const [guarantorRefValue, setGuarantorRefValue] = useState("employee");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoanAmount, setIsLoanAmount] = useState("");
   const [percentOfInterest, setPercentOfInterest] = useState("");
@@ -31,6 +39,47 @@ const CreateLoan = () => {
   const [nominees, setNominees] = useState([{ id: Date.now() }]);
   const [installmentNumber, setInstallmentNumber] = useState();
   const { branchWallet } = useBranchWallet();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [membership, setIsMembership] = useState();
+  const [memberId, setMemberId] = useState();
+  const [memberPhone, setMemberPhone] = useState();
+  const [memberName, setMemberName] = useState();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handler = debounce(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500); // 500ms debounce
+    handler();
+    return () => {
+      handler.cancel();
+    };
+  }, [searchQuery]);
+
+  const { data: searchMemberData } = useSearchMemberQuery({
+    query: debouncedQuery || undefined,
+    email: branchEmail,
+  });
+
+  const handleInputChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    // যদি ইনপুট ফিল্ড খালি না থাকে, তাহলে ড্রপডাউন দেখান
+    setDropdownVisible(query.length > 0);
+  };
+
+  const handleSelect = (id, memberName, memberId, memberPhone) => {
+    setSearchQuery(memberName); // নির্বাচিত নাম ইনপুটে সেট করা হবে
+    setMemberId(memberId);
+    setMemberName(memberName);
+    setMemberPhone(memberPhone);
+    setIsMembership(id);
+    setDropdownVisible(false); // ড্রপডাউন বন্ধ করা হবে
+  };
 
   const handleAddNominee = () => {
     setNominees([...nominees, { id: Date.now() }]);
@@ -41,18 +90,19 @@ const CreateLoan = () => {
     setNominees(nominees.filter((nominee) => nominee.id !== id));
   };
 
-  const { data: branchData, isLoading: branchQueryLoading } =
-    useGetSingleBranchQuery(email);
-  const { data: memberShipData, isLoading: membershipQueryLoading } =
-    useGetAllMembershipQuery(branchEmail);
-  const { data: employeeData } = useGetAllEmployeeQuery();
+  const { data: branchData, isLoading: branchLoading } = useGetSingleBranchQuery(branchEmail);
+  const { data: memberShipData } = useGetAllMembershipQuery(branchEmail);
+    useGetLastLoanDocumentQuery(branchEmail);
+  const { data: employeeData } = useGetAllEmployeeQuery(branchEmail);
   const [createLoan] = useCreateLoanMutation();
 
-  if (branchQueryLoading || membershipQueryLoading) {
-    return <LoadingComponent></LoadingComponent>;
-  }
+ 
 
   const companyEmail = branchData?.data?.company?.companyEmail;
+
+  if (branchLoading) {
+    return <LoadingComponent></LoadingComponent>;
+  }
 
   const handleSelectChange = () => {
     const selectedValue = selectRef.current.value;
@@ -82,60 +132,54 @@ const CreateLoan = () => {
       if (branchWallet < Number(data?.loanAmount)) {
         toast.error("Insufficient Balance!");
         setIsLoading(false);
-      } else {
-        const singleMemberData = memberShipData?.data?.find(
-          (item) => item._id === data?.memberOfApplying
-        );
-
-        const memberName = singleMemberData.memberName;
-        const memberPhone = singleMemberData.phoneNo;
-
-        // Map through all image files and upload each to Cloudinary
-        const attachmentImageUrls = await Promise.all(
-          data.attachment.map(async (attachments) => {
-            const imageUrl = await uploadImageToCloudinary(attachments[0]);
-            return imageUrl;
-          })
-        );
-
-        const loanData = {
-          memberOfApplying: data.memberOfApplying,
-          memberName: memberName,
-          memberPhone: memberPhone,
-          branchEmail: email,
-          companyEmail: companyEmail,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          loanNo: data.loanNo,
-          loanAmount: data.loanAmount,
-          percentageOfInterest: data.percentageOfInterest,
-          processFees: Number(data.processFees),
-          insurance: data.insurance,
-          installmentMode: {
-            numberOfInstallment: data.numberOfInstallment,
-            installType: data.installType,
-            totalReceivable: data.totalReceivable,
-          },
-          installmentAmount: data.installmentAmount,
-          attachment: attachmentImageUrls,
-          loanType: data.loanType,
-          guarantorEmployee: data.guarantorEmployee || null,
-          gurantorMember: data.guarantorMember || null,
-          loanGuarantor: data.loanGuarantor,
-          status: "Pending",
-        };
-
-        const res = await createLoan(loanData);
-
-        console.log(res);
-
-        if (res?.data?.data) {
-          toast.success("Loan is Created Successfully");
-          reset();
-        }
-
-        setIsLoading(false);
       }
+
+      // Map through all image files and upload each to Cloudinary
+      const attachmentImageUrls =
+        data.attachment[0].length > 0
+          ? await Promise.all(
+              data.attachment.map(async (attachments) => {
+                const imageUrl = await uploadImageToCloudinary(attachments[0]);
+                return imageUrl;
+              })
+            )
+          : [];
+
+      const loanData = {
+        memberOfApplying: membership,
+        memberId: memberId,
+        memberName: memberName,
+        memberPhone: memberPhone,
+        branchEmail: branchEmail,
+        companyEmail: companyEmail,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        loanAmount: data.loanAmount,
+        percentageOfInterest: data.percentageOfInterest,
+        processFees: Number(data.processFees),
+        insurance: data.insurance,
+        installmentMode: {
+          numberOfInstallment: data.numberOfInstallment,
+          installType: data.installType,
+          totalReceivable: data.totalReceivable,
+        },
+        installmentAmount: data.installmentAmount,
+        attachment: attachmentImageUrls,
+        loanType: data.loanType,
+        guarantorEmployee: data.guarantorEmployee || null,
+        gurantorMember: data.guarantorMember || null,
+        loanGuarantor: data.loanGuarantor,
+        status: "Pending",
+      };
+
+      const res = await createLoan(loanData);
+
+      if (res?.data?.data) {
+        dispatch(setToastMessage("Loan is Created Successfully"));
+        reset();
+      }
+
+      setIsLoading(false);
     } catch (err) {
       console.log(err);
       toast.success(err.message);
@@ -146,8 +190,8 @@ const CreateLoan = () => {
     <div className="bg-slate-100 min-h-screen">
       <div className="flex justify-between px-5 pt-2">
         <h1 className="uppercase">Loan Disbursement</h1>
-        <NavLink to="/dashboard/all-members">
-          <button>Active Loan List</button>
+        <NavLink to="/dashboard/loan-request">
+          <button>Pending Loan List</button>
         </NavLink>
       </div>
       <div className="border-b border-slate-300 my-3"></div>
@@ -155,26 +199,43 @@ const CreateLoan = () => {
       <div className="px-5">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-5">
-            <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="memberOfApplying">
-                Member Of Applying*
+            <div className="flex flex-col ">
+              <label className="font-semibold" htmlFor="memberOfLoanApplying">
+                Member Of Loan Applying*
               </label>
-              <select
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                id="memberOfApplying"
-                {...register("memberOfApplying")}
-                required
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select Loan Member
-                </option>
-                {memberShipData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item.memberName}
-                  </option>
-                ))}
-              </select>
+              <div className="relative w-full">
+                {/* ইনপুট ফিল্ড */}
+                <input
+                  type="text"
+                  className="py-2 px-2 my-1 rounded-sm membershipInput border w-full"
+                  placeholder="Type Member Name Or Phone No"
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onFocus={() => setDropdownVisible(searchQuery.length > 0)} // ইনপুটে ফোকাস করলে ড্রপডাউন দেখাবে
+                />
+
+                {/* ড্রপডাউন মেনু */}
+                {isDropdownVisible && searchMemberData?.data?.length > 0 && (
+                  <ul className="absolute z-10 bg-white border w-full rounded-sm max-h-40 overflow-y-auto">
+                    {searchMemberData?.data?.map((item) => (
+                      <li
+                        key={item._id}
+                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() =>
+                          handleSelect(
+                            item._id,
+                            item.memberName,
+                            item.memberId,
+                            item.phoneNo
+                          )
+                        }
+                      >
+                        {item.memberName} - {item.phoneNo}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col">
@@ -199,20 +260,6 @@ const CreateLoan = () => {
                 type="Date"
                 id="endDate"
                 {...register("endDate")}
-                required={true}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="loanNo">
-                Loan No*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="text"
-                id="endDate"
-                placeholder="Loan No"
-                {...register("loanNo")}
                 required={true}
               />
             </div>
@@ -413,7 +460,6 @@ const CreateLoan = () => {
                     id={`attachment-${index}`}
                     placeholder="Profile Image"
                     {...register(`attachment[${index}]`)}
-                    required
                   />
                 </div>
                 {index > 0 && (
@@ -499,7 +545,8 @@ const CreateLoan = () => {
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
                   id="guarantorEmployee"
                   {...register("guarantorEmployee")}
-                  required={true}
+                  defaultValue=""
+                  required
                 >
                   <option value="" disabled>
                     Select Guarantor Employee
@@ -523,7 +570,8 @@ const CreateLoan = () => {
                   className="py-2 px-2 my-1 rounded-sm membershipInput"
                   id="guarantorMember"
                   {...register("guarantorMember")}
-                  required={true}
+                  defaultValue=""
+                  required
                 >
                   <option value="" disabled>
                     Select Guarantor Member
@@ -625,6 +673,7 @@ const CreateLoan = () => {
               className="border border-blue-500 py-2 px-5 rounded
             hover:bg-blue-500 hover:text-white cursor-pointer"
               type="submit"
+              disabled={isLoading}
             >
               {isLoading ? (
                 <span className="loading loading-bars loading-md"></span>

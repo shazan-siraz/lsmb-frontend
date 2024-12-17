@@ -52,6 +52,22 @@ const savingCollectionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["savingTransaction"],
     }),
+
+    getTotalSavingAmountByOneMember: builder.query({
+      query: (id) => ({
+        url: `savingTransaction/getTotalSavingAmountByOneMember/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["savingTransaction"],
+    }),
+
+    getUniqueMemberSavings: builder.query({
+      query: (email) => ({
+        url: `savingTransaction/getUniqueMemberSavings/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["savingTransaction"],
+    }),
   }),
 });
 
@@ -62,4 +78,6 @@ export const {
   useGetTotalSavingtxnAmountQuery,
   useUpdateSavingTransactionMutation,
   useDeleteSavingTransactionMutation,
+  useGetTotalSavingAmountByOneMemberQuery,
+  useGetUniqueMemberSavingsQuery,
 } = savingCollectionApi;
