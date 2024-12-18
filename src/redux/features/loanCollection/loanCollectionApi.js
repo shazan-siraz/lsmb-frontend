@@ -38,11 +38,11 @@ const loanCollectionApi = baseApi.injectEndpoints({
     }),
 
     lastLoanCollection: builder.query({
-      query: (email) => ({
-        url: `/loanCollection/lastLoanCollection/${email}`,
+      query: (loanNo) => ({
+        url: `/loanCollection/lastLoanCollection/${loanNo}`,
         method: "GET",
       }),
-      invalidatesTags: ["loanCollection"],
+      providesTags: ["loanCollection"],
     }),
 
     todayLoanCollection: builder.query({
@@ -60,6 +60,14 @@ const loanCollectionApi = baseApi.injectEndpoints({
       }),
       providesTags: ["loanCollection"],
     }),
+
+    getOneAccountTotalLoanCollectionAmount: builder.query({
+      query: (id) => ({
+        url: `/loanCollection/getOneAccountTotalLoanCollectionAmount/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["loanCollection"],
+    }),
   }),
 });
 
@@ -71,4 +79,5 @@ export const {
   useGetTotalLoanCollectionAmountQuery,
   useUpdateLoanCollectionMutation,
   useDeleteLoanCollectionMutation,
+  useGetOneAccountTotalLoanCollectionAmountQuery
 } = loanCollectionApi;

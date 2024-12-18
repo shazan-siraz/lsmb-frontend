@@ -11,6 +11,7 @@ import {
 } from "../../redux/features/dpsCollection/dpsCollectionApi";
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
+import generateUniqueTxnId from "../../utils/createTransactionId/generateTransactionId";
 
 const CreateDpsCollection = () => {
   const { id } = useParams();
@@ -37,6 +38,7 @@ const CreateDpsCollection = () => {
         branchEmail: singleDpsData?.data?.branchEmail,
         companyEmail: singleDpsData?.data?.companyEmail,
         dpsId: singleDpsData?.data?._id,
+        transactionId: generateUniqueTxnId(),
         dateOfCollection: data.dateOfCollection,
         dpsAcNo: singleDpsData?.data?.dpsAcNo,
         dpsCollectionAmount: Number(data.dpsCollectionAmount),

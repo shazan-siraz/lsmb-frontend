@@ -9,6 +9,7 @@ import SavingTransactionModal from "./SavingTransactionModal";
 import Swal from "sweetalert2";
 import { useDeleteLoanCollectionMutation, useTodayLoanCollectionQuery } from "../../redux/features/loanCollection/loanCollectionApi";
 import LoanTransactionModal from "./LoanTransactionModal";
+import { useTodayDpsCollectionQuery } from "../../redux/features/dpsCollection/dpsCollectionApi";
 
 const TodayTransaction = () => {
   const { branchEmail } = useGetBranchEmail();
@@ -17,6 +18,9 @@ const TodayTransaction = () => {
     useTodaySavingCollectionQuery(branchEmail);
 
   const { data: toadyLoanTxnData } = useTodayLoanCollectionQuery(branchEmail);
+  const {data: todayDpsTxnData} = useTodayDpsCollectionQuery(branchEmail);
+
+  console.log(todayDpsTxnData?.data);
 
   const [deleteSavingTxn] = useDeleteSavingTransactionMutation();
   const [deleteLoanCollection] = useDeleteLoanCollectionMutation();
@@ -107,7 +111,7 @@ const TodayTransaction = () => {
 
   return (
     <div>
-      <div className="mb-[30px]">
+      <div className="mb-[20px]">
         <h1 className="text-center font-semibold text-[18px] pt-[10px]">
           Today Saving Transaction: {toadySavingTxnData?.data?.length}
         </h1>
@@ -157,7 +161,7 @@ const TodayTransaction = () => {
         </table>
       </div>
 
-      <div className="mb-[30px]">
+      <div className="mb-[20px]">
         <h1 className="text-center font-semibold text-[18px] pt-[10px]">
           Today Loan Transaction: {toadyLoanTxnData?.data?.length}
         </h1>
@@ -188,6 +192,56 @@ const TodayTransaction = () => {
                 <td>{item?.transactionNote}</td>
                 <td>{item?.penaltyAmount}</td>
                 <td>{item?.installmentAmount}</td>
+                <td>
+                  <div className="flex justify-center gap-5">
+                    <button className="hover:text-blue-500">
+                      <LoanTransactionModal loanTxnData={item}></LoanTransactionModal>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteLoanTxn(item?._id)}
+                      className="hover:text-blue-500"
+                    >
+                      <MdDelete className="text-[22px]" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mb-[20px]">
+        <h1 className="text-center font-semibold text-[18px] pt-[10px]">
+          Today DPS Transaction: {todayDpsTxnData?.data?.length}
+        </h1>
+        <table className="w-[95%] mx-auto mb-[60px]">
+          <thead className="bg-slate-500 text-white font-semibold">
+            <tr>
+              <td>#</td>
+              <td>TxnID</td>
+              <td>Member</td>
+              <td>Member Phone</td>
+              <td>Time</td>
+              <td>Txn Type</td>
+              <td>Txn Note</td>
+              <td>penaltyAmount</td>
+              <td>Amount</td>
+              <td className="text-center">Action</td>
+            </tr>
+          </thead>
+          <tbody>
+            {todayDpsTxnData?.data.map((item, index) => (
+              <tr key={item?._id}>
+                <td>{index + 1}</td>
+                <td>{item?.transactionId}</td>
+                <td>{item?.memberOfApplying?.memberName}</td>
+                <td>{item?.memberOfApplying?.phoneNo}</td>
+                <td>{isoDateToTime(item?.createdAt)}</td>
+                <td>DPS</td>
+                <td>{item?.transactionNote}</td>
+                <td>{item?.penaltyAmount}</td>
+                <td>{item?.dpsCollectionAmount}</td>
                 <td>
                   <div className="flex justify-center gap-5">
                     <button className="hover:text-blue-500">

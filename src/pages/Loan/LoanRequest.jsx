@@ -25,8 +25,8 @@ const LoanRequest = () => {
 
   return (
     <div>
-      <ToastContainer></ToastContainer>
       <div>
+      <ToastContainer></ToastContainer>
         <div className="flex justify-between px-5 py-2 font-semibold text-[20px]">
           <h1>Pending Loan List</h1>
           <NavLink

@@ -8,6 +8,7 @@ import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
 import { useSearchLoanQuery } from "../../redux/features/loan/loanApi";
 import { useTodayLoanCollectionQuery } from "../../redux/features/loanCollection/loanCollectionApi";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import ButtonLoading from "../../utils/ButtonLoading/ButtonLoading";
 
 const FindLoanMember = () => {
   const { branchEmail } = useGetBranchEmail();
@@ -35,13 +36,13 @@ const FindLoanMember = () => {
     };
   }, [searchQuery]);
 
-  const { data: searchLoanData } = useSearchLoanQuery({
-    query: debouncedQuery || undefined,
-    email: branchEmail,
-  });
+  const { data: searchLoanData, isLoading: searchLoanLoading } =
+    useSearchLoanQuery({
+      query: debouncedQuery || undefined,
+      email: branchEmail,
+    });
 
-  const { data: todayLoanTxnData } =
-    useTodayLoanCollectionQuery(branchEmail);
+  const { data: todayLoanTxnData } = useTodayLoanCollectionQuery(branchEmail);
 
   const handleLoanTxn = async (id) => {
     navigate(`/dashboard/loan-transaction/${id}`);
@@ -74,7 +75,7 @@ const FindLoanMember = () => {
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
               >
-                Search
+                {searchLoanLoading ? <ButtonLoading></ButtonLoading> : "Search"}
               </button>
             </div>
           </form>
@@ -85,6 +86,7 @@ const FindLoanMember = () => {
           <thead>
             <tr>
               <td>Loan No</td>
+              <td>Member Id</td>
               <td>Photo</td>
               <td>Name</td>
               <td>Phone No</td>
@@ -97,6 +99,7 @@ const FindLoanMember = () => {
             {searchLoanData?.data?.map((item) => (
               <tr key={item?._id}>
                 <td>{item?.loanNo}</td>
+                <td>{item?.memberId}</td>
                 <td>
                   <img
                     className="w-[50px]"

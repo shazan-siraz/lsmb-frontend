@@ -20,7 +20,6 @@ import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useBranchWallet } from "../../hooks/useBranchWallet";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
-import incrementLoanNumber from "../../utils/incrementLoanNumber/incrementLoanNumber";
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
 
@@ -90,13 +89,12 @@ const CreateLoan = () => {
     setNominees(nominees.filter((nominee) => nominee.id !== id));
   };
 
-  const { data: branchData, isLoading: branchLoading } = useGetSingleBranchQuery(branchEmail);
+  const { data: branchData, isLoading: branchLoading } =
+    useGetSingleBranchQuery(branchEmail);
   const { data: memberShipData } = useGetAllMembershipQuery(branchEmail);
-    useGetLastLoanDocumentQuery(branchEmail);
+  useGetLastLoanDocumentQuery(branchEmail);
   const { data: employeeData } = useGetAllEmployeeQuery(branchEmail);
   const [createLoan] = useCreateLoanMutation();
-
- 
 
   const companyEmail = branchData?.data?.company?.companyEmail;
 
@@ -176,6 +174,7 @@ const CreateLoan = () => {
 
       if (res?.data?.data) {
         dispatch(setToastMessage("Loan is Created Successfully"));
+        navigate("/dashboard/loan-request")
         reset();
       }
 

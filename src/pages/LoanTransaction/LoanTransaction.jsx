@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import {
   useCreateLoanCollectionMutation,
+  useGetOneAccountTotalLoanCollectionAmountQuery,
   useLastLoanCollectionQuery,
-  useTotalLoanCollectionQuery,
 } from "../../redux/features/loanCollection/loanCollectionApi";
 import { ToastContainer } from "react-toastify";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
@@ -21,14 +21,14 @@ const LoanTransaction = () => {
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
 
-  const { data: loanData  } =
-    useGetSingleLoanQuery(id);
+  const { data: loanData } = useGetSingleLoanQuery(id);
 
-  const {
-    data: totalLoanCollectionData  } = useTotalLoanCollectionQuery(loanData?.data?.memberOfApplying?.email);
+  const { data: oneAccountTotalLoanCollection } =
+    useGetOneAccountTotalLoanCollectionAmountQuery(loanData?.data?._id);
 
-  const { data: lastLoanCollectionData } =
-    useLastLoanCollectionQuery(loanData?.data?.memberOfApplying?.email);
+  const { data: lastLoanCollectionData } = useLastLoanCollectionQuery(
+    loanData?.data?.loanNo
+  );
 
   const [createLoanCollection, { isLoading: createLoanCollectionLoading }] =
     useCreateLoanCollectionMutation();
@@ -46,9 +46,9 @@ const LoanTransaction = () => {
   const onSubmit = async (data) => {
     const loanTransactionData = {
       loanId: _id,
+      loanNo: loanNo,
       memberId: loanData?.data?.memberOfApplying?._id,
       transactionId: generateUniqueTxnId(),
-      memberEmail: loanData?.data?.memberOfApplying?.email,
       branchEmail: branchEmail,
       companyEmail: companyEmail,
       date: data.date,
@@ -118,7 +118,7 @@ const LoanTransaction = () => {
               Outstanding
             </h2>
             <p className="border bg-white text-[18px] px-4 py-1">
-              {loanAmount - totalLoanCollectionData?.data}
+              {installmentMode?.totalReceivable  - oneAccountTotalLoanCollection?.data}
             </p>
           </div>
         </div>
@@ -160,7 +160,7 @@ const LoanTransaction = () => {
               Received
             </h2>
             <p className="border bg-white text-[18px] px-4 py-1">
-              {totalLoanCollectionData?.data}
+              {oneAccountTotalLoanCollection?.data}
             </p>
           </div>
           <div className="grid grid-cols-2">
