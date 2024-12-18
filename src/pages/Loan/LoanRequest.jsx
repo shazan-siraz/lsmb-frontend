@@ -1,27 +1,13 @@
-import { useDispatch, useSelector } from "react-redux";
 import { useGetPendingLoanQuery } from "../../redux/features/loan/loanApi";
 import LoanList from "./LoanList";
 import { NavLink } from "react-router-dom";
-import { useEffect } from "react";
-import { clearToastMessage } from "../../redux/features/auth/toastSlice";
-import { toast, ToastContainer } from "react-toastify";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const LoanRequest = () => {
   const { branchEmail } = useGetBranchEmail();
-  const dispatch = useDispatch();
 
   const { data: loanQueryData, isLoading: loanQueryLoading } =
     useGetPendingLoanQuery(branchEmail);
-
-  const toastMessage = useSelector((state) => state.toast.message);
-
-  useEffect(() => {
-    if (toastMessage) {
-      toast.success(toastMessage);
-      dispatch(clearToastMessage()); // টোস্ট মেসেজটি ক্লিয়ার করুন
-    }
-  }, [toastMessage, dispatch]);
 
   return (
     <div>
