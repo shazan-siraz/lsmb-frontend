@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -20,11 +20,10 @@ import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useBranchWallet } from "../../hooks/useBranchWallet";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
-<<<<<<< HEAD
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
-=======
->>>>>>> 51075b4e96b81e22bcb9aac8ffa7d4cba2e56774
+
+
 
 const CreateLoan = () => {
   const { branchEmail } = useGetBranchEmail();
@@ -32,7 +31,7 @@ const CreateLoan = () => {
   const selectRef = useRef(null);
   const guarantorRef = useRef();
   const [selectedRefValue, setSelectedRefValue] = useState("");
-  const [guarantorRefValue, setGuarantorRefValue] = useState("employee");
+  const [guarantorRefValue, setGuarantorRefValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoanAmount, setIsLoanAmount] = useState("");
   const [percentOfInterest, setPercentOfInterest] = useState("");
@@ -47,6 +46,9 @@ const CreateLoan = () => {
   const [memberId, setMemberId] = useState();
   const [memberPhone, setMemberPhone] = useState();
   const [memberName, setMemberName] = useState();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = debounce(() => {
@@ -136,11 +138,11 @@ const CreateLoan = () => {
       const attachmentImageUrls =
         data.attachment[0].length > 0
           ? await Promise.all(
-              data.attachment.map(async (attachments) => {
-                const imageUrl = await uploadImageToCloudinary(attachments[0]);
-                return imageUrl;
-              })
-            )
+            data.attachment.map(async (attachments) => {
+              const imageUrl = await uploadImageToCloudinary(attachments[0]);
+              return imageUrl;
+            })
+          )
           : [];
 
       const loanData = {
@@ -172,14 +174,17 @@ const CreateLoan = () => {
 
       const res = await createLoan(loanData);
 
+      console.log(res);
+
       if (res?.data?.data) {
-<<<<<<< HEAD
         dispatch(setToastMessage("Loan is Created Successfully"));
         navigate("/dashboard/loan-request")
-=======
         toast.success("Loan Created Successfully.")
->>>>>>> 51075b4e96b81e22bcb9aac8ffa7d4cba2e56774
         reset();
+      }
+
+      if (res?.error) {
+        toast.error(res?.error?.data?.message)
       }
 
       setIsLoading(false);
@@ -526,9 +531,10 @@ const CreateLoan = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="guarantorType"
-                required
                 ref={guarantorRef} // Attach ref to the select element
                 onChange={handleGuarantorChange} // Handle the change event
+                required
+                defaultValue=""
               >
                 <option value="" disabled>
                   Select Guarantor Type

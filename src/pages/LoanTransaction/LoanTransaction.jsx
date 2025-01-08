@@ -14,6 +14,7 @@ import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
 import generateUniqueTxnId from "../../utils/createTransactionId/generateTransactionId";
+import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 
 const LoanTransaction = () => {
   const { id } = useParams();
@@ -21,7 +22,8 @@ const LoanTransaction = () => {
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
 
-  const { data: loanData } = useGetSingleLoanQuery(id);
+  const { data: loanData, isLoading: loanQueryLoading } =
+    useGetSingleLoanQuery(id);
 
   const { data: oneAccountTotalLoanCollection } =
     useGetOneAccountTotalLoanCollectionAmountQuery(loanData?.data?._id);
@@ -32,6 +34,15 @@ const LoanTransaction = () => {
 
   const [createLoanCollection, { isLoading: createLoanCollectionLoading }] =
     useCreateLoanCollectionMutation();
+
+  if (loanQueryLoading) {
+    return <LoadingComponent></LoadingComponent>;
+  }
+
+  const installmentAmount = Math.ceil(
+    loanData?.data?.installmentMode?.totalReceivable /
+      loanData?.data?.installmentMode?.numberOfInstallment
+  );
 
   const {
     _id,
@@ -118,7 +129,8 @@ const LoanTransaction = () => {
               Outstanding
             </h2>
             <p className="border bg-white text-[18px] px-4 py-1">
-              {installmentMode?.totalReceivable  - oneAccountTotalLoanCollection?.data}
+              {installmentMode?.totalReceivable -
+                oneAccountTotalLoanCollection?.data}
             </p>
           </div>
         </div>
@@ -199,6 +211,7 @@ const LoanTransaction = () => {
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 placeholder="Installment Amount"
                 type="number"
+                defaultValue={installmentAmount}
                 id="installmentAmount"
                 {...register("installmentAmount")}
                 required={true}

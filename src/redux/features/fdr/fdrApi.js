@@ -10,8 +10,8 @@ const fdrApi = baseApi.injectEndpoints({
       }),
     }),
     getAllFdr: builder.query({
-      query: () => ({
-        url: "/fdr",
+      query: (email) => ({
+        url: `/fdr/geAllFdr/${email}`,
         method: "GET",
       }),
     }),

@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { FaDatabase, FaIdCardAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetSingleMembershipQuery } from "../../redux/features/membership/membershipApi";
 import todayDateFormated from "../../utils/todayDateFormated/todayDateFormated";
 import { ToastContainer, toast } from "react-toastify";
 import { useRef, useState } from "react";
@@ -13,9 +12,16 @@ import Swal from "sweetalert2";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useDispatch } from "react-redux";
 import { setToastMessage } from "../../redux/features/auth/toastSlice";
+import {
+  useGetSingleMemberSavingTransactionQuery,
+  useGetTotalSavingAmountByOneMemberQuery,
+} from "../../redux/features/savingCollection/savingCollectionApi";
+import generateUniqueTxnId from "../../utils/createTransactionId/generateTransactionId";
+import { useBranchWallet } from "../../hooks/useBranchWallet";
 
 const SavingWithdraw = () => {
   const { id } = useParams();
+  const { branchWallet } = useBranchWallet();
   const dispatch = useDispatch();
   const withdrawAmountRef = useRef();
   const [withdrawAmountState, setWithdrawAmountState] = useState("");
@@ -24,16 +30,21 @@ const SavingWithdraw = () => {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
 
-  const { data: singleMemberData, isLoading: singleMemberDataQueryLoading } =
-    useGetSingleMembershipQuery(id);
+  const { data: singleSavingMember, isLoading: singleSavingMemberLoading } =
+    useGetSingleMemberSavingTransactionQuery(id);
+
+  const { data: totalSavingAmount } = useGetTotalSavingAmountByOneMemberQuery(
+    singleSavingMember?.data?.memberId?._id
+  );
+
+  const { data: totalSavingWithdraw } = useGetOneMemberAllSavingWithdrawQuery(
+    singleSavingMember?.data?.memberId?._id
+  );
 
   const [addSavingWithdraw, { isLoading: withdrawLoading }] =
     useCreateSavingWithdrawMutation();
 
-  const { data: totalSavingsWithdraw } =
-    useGetOneMemberAllSavingWithdrawQuery(id);
-
-  if (singleMemberDataQueryLoading) {
+  if (singleSavingMemberLoading) {
     return <LoadingComponent></LoadingComponent>;
   }
 
@@ -45,16 +56,16 @@ const SavingWithdraw = () => {
   const onSubmit = async (data) => {
     try {
       const savingWithdrawData = {
-        memberId: singleMemberData?.data._id,
-        branchEmail: singleMemberData?.data?.branchEmail,
-        companyEmail: singleMemberData?.data?.companyEmail,
+        memberId: singleSavingMember?.data?.memberId?._id,
+        branchEmail: singleSavingMember?.data.branchEmail,
+        companyEmail: singleSavingMember?.data.companyEmail,
         dateOfWithdraw: data.dateOfWithdraw,
         mrSlipNo: data.mrSlipNo,
         withdrawAmount: withdrawAmountState,
         serviceCharge: data.serviceCharge || 0,
         totalPayableAmount: withdrawAmountState,
+        transactionId: generateUniqueTxnId(),
         withdrawTransactionInfo: data.withdrawTransactionInfo,
-        status: "Active",
       };
 
       const result = await Swal.fire({
@@ -68,8 +79,13 @@ const SavingWithdraw = () => {
       });
 
       if (result.isConfirmed) {
-        if (withdrawAmountState > singleMemberData?.data?.accountBalance) {
+        if (
+          withdrawAmountState >
+          totalSavingAmount?.data - totalSavingWithdraw?.data
+        ) {
           toast.error("Insufficient Balance");
+        } else if (withdrawAmountState > branchWallet) {
+          toast.error("Insufficient Balance in Branch Wallet");
         } else {
           const res = await addSavingWithdraw(savingWithdrawData);
 
@@ -80,6 +96,10 @@ const SavingWithdraw = () => {
               )
             );
             navigate("/dashboard/withdraw");
+          }
+
+          if (res?.error) {
+            toast.error(res?.error?.data?.message);
           }
         }
       }
@@ -99,28 +119,29 @@ const SavingWithdraw = () => {
       <div className="flex justify-around items-center  py-4">
         <div className="flex items-center gap-2 text-[20px] font-semibold">
           <img
-            className="w-[80px] h-[40px]"
-            src={singleMemberData?.data?.signature}
+            className="w-[50px]"
+            src={singleSavingMember?.data?.memberId?.memberPhoto}
             alt=""
           />
+          <p className="text-[20px]">
+            {singleSavingMember?.data?.memberId?.memberName}
+          </p>
         </div>
         <div className="flex items-center gap-2 text-[20px] font-semibold">
+          <p>Signature:</p>
           <img
-            className="w-[50px]"
-            src={singleMemberData?.data?.memberPhoto}
+            className="w-[80px] h-[40px]"
+            src={singleSavingMember?.data?.memberId?.signature}
             alt=""
           />
-          <p className="text-[20px]">{singleMemberData?.data.memberName}</p>
         </div>
         <div className="flex items-center gap-2 text-[20px] font-semibold">
           <FaIdCardAlt />
-          <p>{singleMemberData?.data.memberId}</p>
+          <p>{singleSavingMember?.data.memberId?.memberId}</p>
         </div>
         <div className="flex items-center gap-2 text-[20px] font-semibold">
           <FaDatabase />
-          <p>
-            {singleMemberData?.data.accountBalance - totalSavingsWithdraw?.data}
-          </p>
+          <p>{totalSavingAmount?.data - totalSavingWithdraw?.data}</p>
         </div>
       </div>
 

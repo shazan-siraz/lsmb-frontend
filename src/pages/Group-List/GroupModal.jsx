@@ -40,12 +40,7 @@ const GroupModal = ({ modalData }) => {
       <p onClick={showModal}>
         <FaEdit />
       </p>
-      <Modal
-        open={open}
-        title="Quick Access"
-        onCancel={handleCancel}
-        footer={[]}
-      >
+      <Modal open={open} title="Group Edit" onCancel={handleCancel} footer={[]}>
         <div>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-2 gap-5 items-center py-5 px-5">

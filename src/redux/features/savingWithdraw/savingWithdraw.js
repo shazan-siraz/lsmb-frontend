@@ -26,6 +26,22 @@ const savingWithdrawApi = baseApi.injectEndpoints({
       }),
       providesTags: ["savingWithdraw"],
     }),
+
+    todaySavingWithdraw: builder.query({
+      query: (email) => ({
+        url: `/savingWithdraw/todaySavingWithdraw/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["savingWithdraw"],
+    }),
+
+    getAllSavingWithdraw: builder.query({
+      query: (email) => ({
+        url: `/savingWithdraw/getAllSavingWithdraw/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["savingWithdraw"],
+    }),
   }),
 });
 
@@ -33,4 +49,6 @@ export const {
   useCreateSavingWithdrawMutation,
   useGetTotalSavingWithdrawQuery,
   useGetOneMemberAllSavingWithdrawQuery,
+  useTodaySavingWithdrawQuery,
+  useGetAllSavingWithdrawQuery,
 } = savingWithdrawApi;

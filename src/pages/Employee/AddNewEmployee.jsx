@@ -193,12 +193,15 @@ const AddNewEmployee = () => {
       ]);
 
       // Map through all image files and upload each to Cloudinary
-      const uploadedImageUrls = await Promise.all(
-        data.attachment.map(async (attachments) => {
-          const imageUrl = await uploadImageToCloudinary(attachments[0]);
-          return imageUrl;
-        })
-      );
+      const uploadedImageUrls =
+        data.attachment[0].length > 0
+          ? await Promise.all(
+              data.attachment.map(async (attachments) => {
+                const imageUrl = await uploadImageToCloudinary(attachments[0]);
+                return imageUrl;
+              })
+            )
+          : []; // Default to an empty array if no attachments
 
       const employeeData = {
         password: data?.employeePassword,

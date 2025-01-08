@@ -11,9 +11,35 @@ const dpsCollectionApi = baseApi.injectEndpoints({
       invalidatesTags: ["dpsCollection"],
     }),
 
+    updateDpsCollection: builder.mutation({
+      query: (data) => ({
+        url: "/dpsCollection/updateDpsCollection",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["dpsCollection"],
+    }),
+
+    deleteDpsCollection: builder.mutation({
+      query: (data) => ({
+        url: "/dpsCollection/deleteDpsCollection",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["dpsCollection"],
+    }),
+
     getAllDpsCollection: builder.query({
       query: (email) => ({
         url: `/dpsCollection/${email}`,
+        method: "GET",
+      }),
+      providesTags: ["dpsCollection"],
+    }),
+
+    getAllDpsCollectionByOneAc: builder.query({
+      query: (id) => ({
+        url: `/dpsCollection/getAllDpsCollectionByOneAc/${id}`,
         method: "GET",
       }),
       providesTags: ["dpsCollection"],
@@ -26,10 +52,10 @@ const dpsCollectionApi = baseApi.injectEndpoints({
       }),
       providesTags: ["dpsCollection"],
     }),
-    
+
     getTotalDpsBalaceByOneDpsAc: builder.query({
-      query: (dpsAcNo) => ({
-        url: `/dpsCollection/getTotalDpsBalaceByOneDpsAc/${dpsAcNo}`,
+      query: (dpsId) => ({
+        url: `/dpsCollection/getTotalDpsBalaceByOneDpsAc/${dpsId}`,
         method: "GET",
       }),
       providesTags: ["dpsCollection"],
@@ -47,8 +73,11 @@ const dpsCollectionApi = baseApi.injectEndpoints({
 
 export const {
   useCreateDpsCollectionMutation,
+  useUpdateDpsCollectionMutation,
+  useDeleteDpsCollectionMutation,
   useGetAllDpsCollectionQuery,
   useTodayDpsCollectionQuery,
   useGetTotalDpsBalaceByOneDpsAcQuery,
-  useGetTotalDpsCollectionBalaceQuery
+  useGetTotalDpsCollectionBalaceQuery,
+  useGetAllDpsCollectionByOneAcQuery
 } = dpsCollectionApi;

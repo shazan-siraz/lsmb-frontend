@@ -9,6 +9,10 @@ import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { toast, ToastContainer } from "react-toastify";
 import { clearToastMessage } from "../../redux/features/auth/toastSlice";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import { useGetSingleMemberSavingTransactionQuery } from "../../redux/features/savingCollection/savingCollectionApi";
+import { useTodaySavingWithdrawQuery } from "../../redux/features/savingWithdraw/savingWithdraw";
+import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
+import { useTodayDpsWithdrawQuery } from "../../redux/features/dpsWithdraw/dpsWithdrawApi";
 
 const Withdraw = () => {
   const { branchEmail, isLoading } = useGetBranchEmail();
@@ -46,6 +50,13 @@ const Withdraw = () => {
     email: branchEmail,
   });
 
+  const { data: singleSavingMember } = useGetSingleMemberSavingTransactionQuery(
+    membership,
+    {
+      skip: !membership,
+    }
+  );
+
   const { data: singleDpsData } = useGetSingleDpsQuery(membership, {
     skip: !membership,
   });
@@ -53,6 +64,11 @@ const Withdraw = () => {
   const { data: singleFdrData } = useGetSingleFdrQuery(membership, {
     skip: !membership,
   });
+
+  const { data: todaySavingWithdrawData } =
+    useTodaySavingWithdrawQuery(branchEmail);
+
+  const { data: todayDpsWithdrawData } = useTodayDpsWithdrawQuery(branchEmail);
 
   if (isLoading) {
     return <LoadingComponent></LoadingComponent>;
@@ -72,16 +88,17 @@ const Withdraw = () => {
   };
 
   const handleSelect = (id, memberName) => {
-
-    setSearchQuery(memberName ); // নির্বাচিত নাম ইনপুটে সেট করা হবে
+    setSearchQuery(memberName); // নির্বাচিত নাম ইনপুটে সেট করা হবে
     setDropdownVisible(false); // ড্রপডাউন বন্ধ করা হবে
     setIsMembership(id);
   };
 
-
-
   const handleNavigateWithdraw = () => {
-    if (accountType === "dps") {
+    if (accountType === "savings") {
+      singleSavingMember?.data === null
+        ? setRouteErr("Savings A/C Not Available!")
+        : navigate(`/dashboard/withdraw/${accountType}/${membership}`);
+    } else if (accountType === "dps") {
       singleDpsData?.data === null
         ? setRouteErr("Dps A/C Not Available!")
         : navigate(`/dashboard/withdraw/${accountType}/${membership}`);
@@ -127,7 +144,9 @@ const Withdraw = () => {
                     <li
                       key={item._id}
                       className="py-2 px-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelect(item._id, item.memberName, item.phoneNo)}
+                      onClick={() =>
+                        handleSelect(item._id, item.memberName, item.phoneNo)
+                      }
                     >
                       {item.memberName} - {item.phoneNo}
                     </li>
@@ -151,17 +170,6 @@ const Withdraw = () => {
           </div>
         </div>
         <div className="text-center py-5">
-          {/* <NavLink
-            to={
-              membership === undefined
-                ? ""
-                : `/dashboard/withdraw/${accountType}/${membership}`
-            }
-            className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointerm transition-all duration-300 ease-in-out"
-          >
-            NEXT
-          </NavLink> */}
-
           <button
             onClick={() => handleNavigateWithdraw()}
             className="border border-blue-500 py-2 px-5 rounded hover:bg-blue-500 hover:text-white cursor-pointerm transition-all duration-300 ease-in-out"
@@ -169,6 +177,122 @@ const Withdraw = () => {
             NEXT
           </button>
         </div>
+      </div>
+
+      <div className="mt-[20px]">
+        <h1 className="text-center font-semibold text-[18px] pt-[10px]">
+          Today Savings Withdraw: {todaySavingWithdrawData?.data?.length}
+        </h1>
+        <table className="w-[95%] mx-auto mb-[30px]">
+          <thead className="bg-slate-500 text-white font-semibold">
+            <tr>
+              <td>#</td>
+              <td>TxnID</td>
+              <td>Member</td>
+              <td>Member Phone</td>
+              <td>Time</td>
+              <td>Txn Type</td>
+              <td>MR/SlipNo</td>
+              <td>Amount</td>
+              <td>Company Profit</td>
+              <td className="text-center">Action</td>
+            </tr>
+          </thead>
+          <tbody>
+            {todaySavingWithdrawData?.data?.map((item, index) => (
+              <tr key={item?._id}>
+                <td>{index + 1}</td>
+                <td>{item?.transactionId}</td>
+                <td>{item?.memberId?.memberName}</td>
+                <td>{item?.memberId?.phoneNo}</td>
+                <td>{isoDateToTime(item?.createdAt)}</td>
+                <td>Savings</td>
+                <td>{item?.mrSlipNo}</td>
+                <td>{item?.withdrawAmount}</td>
+                <td>{item?.serviceCharge}</td>
+                <td>{item?.installmentAmount}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="7" className="text-right">
+                Total:
+              </td>
+              <td>
+                {todaySavingWithdrawData?.data?.reduce(
+                  (total, item) => total + (item?.withdrawAmount || 0),
+                  0
+                )}
+              </td>
+              <td>
+                {todaySavingWithdrawData?.data?.reduce(
+                  (total, item) => total + (item?.serviceCharge || 0),
+                  0
+                )}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div className="mt-[20px] pb-[10px]">
+        <h1 className="text-center font-semibold text-[18px] pt-[10px]">
+          Today DPS Withdraw: {todayDpsWithdrawData?.data?.length}
+        </h1>
+        <table className="w-[95%] mx-auto mb-[30px]">
+          <thead className="bg-slate-500 text-white font-semibold">
+            <tr>
+              <td>#</td>
+              <td>ID</td>
+              <td>Member</td>
+              <td>Member Phone</td>
+              <td>Time</td>
+              <td>Txn Type</td>
+              <td>MR/SlipNo</td>
+              <td>Amount</td>
+              <td>Company Profit</td>
+              <td className="text-center">Action</td>
+            </tr>
+          </thead>
+          <tbody>
+            {todayDpsWithdrawData?.data?.map((item, index) => (
+              <tr key={item?._id}>
+                <td>{index + 1}</td>
+                <td>{item?._id}</td>
+                <td>{item?.memberOfApplying?.memberName}</td>
+                <td>{item?.memberOfApplying?.phoneNo}</td>
+                <td>{isoDateToTime(item?.createdAt)}</td>
+                <td>Dps</td>
+                <td>{item?.mrSlipNo}</td>
+                <td>{item?.amount}</td>
+                <td>{item?.serviceCharge}</td>
+                <td>{item?.installmentAmount}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="7" className="text-right">
+                Total:
+              </td>
+              <td>
+                {todayDpsWithdrawData?.data?.reduce(
+                  (total, item) => total + (item?.amount || 0),
+                  0
+                )}
+              </td>
+              <td>
+                {todayDpsWithdrawData?.data?.reduce(
+                  (total, item) => total + (item?.serviceCharge || 0),
+                  0
+                )}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     </div>
   );

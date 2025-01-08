@@ -17,7 +17,6 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import Membership from "../pages/Membership/Membership";
 import DpsCreate from "../pages/Dps/DpsCreate";
 import FdrCreate from "../pages/Fdr/FdrCreate";
-import ExpenseCreate from "../pages/Expense/ExpenseCreate";
 import EmployeeList from "../pages/Employee/EmployeeList";
 import AddNewEmployee from "../pages/Employee/AddNewEmployee";
 import GroupLIst from "../pages/Group-List/GroupLIst";
@@ -68,6 +67,16 @@ import FindDpsAccount from "../pages/DpsCollection/FindDpsAccount";
 import DpsCollection from "../pages/DpsCollection/CreateDpsCollection";
 import UpdateMember from "../pages/Membership/UpdateMember";
 import TodayTransaction from "../pages/TodayTransaction/TodayTransaction";
+import BankAc from "../pages/Banking/BankAc";
+import BankTransaction from "../pages/Banking/BankTransaction";
+import BankTxnStatement from "../pages/Banking/BankTxnStatement";
+import PartialIncome from "../pages/Banking/PartialIncome";
+import ExpenseCategory from "../pages/Expense/ExpenseCategory";
+import BranchExpense from "../pages/Expense/BranchExpense";
+import ExpenseReport from "../pages/Expense/ExpenseReport";
+import ExpenseCreate from "../pages/Expense/ExpenseCreate";
+import DailyLedger from "../pages/Ledger/DailyLedger";
+
 
 const router = createBrowserRouter([
   {
@@ -345,6 +354,42 @@ const router = createBrowserRouter([
       {
         path: "today-collection",
         element: <TodayTransaction></TodayTransaction>
+      },
+      {
+        path: "bank-list",
+        element: <BankAc></BankAc>
+      },
+      {
+        path: "bank-transaction",
+        element: <BankTransaction></BankTransaction>
+      },
+      {
+        path: "bank-txn-statement",
+        element: <BankTxnStatement></BankTxnStatement>
+      },
+      {
+        path: "partial-income",
+        element: <PartialIncome></PartialIncome>
+      },
+      {
+        path: "expenseCategory",
+        element: <ExpenseCategory></ExpenseCategory>
+      },
+      {
+        path: "branchExpense",
+        element: <BranchExpense></BranchExpense>
+      },
+      {
+        path: "expenseReport",
+        element: <ExpenseReport></ExpenseReport>
+      },
+      {
+        path: "expenseCreate",
+        element: <ExpenseCreate></ExpenseCreate>
+      },
+      {
+        path: "dailyLedger",
+        element: <DailyLedger></DailyLedger>
       },
     ],
   },

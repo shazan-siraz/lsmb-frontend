@@ -28,8 +28,8 @@ const SavingTransactionModal = ({ savingModalData }) => {
         transactionNote: data.transactionNote,
       };
 
-      const res = await updateSavingTxn(updateSavingTxnData);
-      console.log(res);
+      await updateSavingTxn(updateSavingTxnData);
+
     } catch (err) {
       console.log(err);
     }

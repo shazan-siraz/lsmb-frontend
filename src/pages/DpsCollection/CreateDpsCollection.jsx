@@ -23,11 +23,13 @@ const CreateDpsCollection = () => {
   const [createDpsCollection, { isLoading: dpsCollectionMutationLoading }] =
     useCreateDpsCollectionMutation();
   const { data: totalDpsBalance } = useGetTotalDpsBalaceByOneDpsAcQuery(
-    singleDpsData?.data?.dpsAcNo,
+    singleDpsData?.data?._id,
     {
-      skip: !singleDpsData?.data?.dpsAcNo,
+      skip: !singleDpsData?.data?._id,
     }
   );
+
+  console.log(singleDpsData);
 
   const onSubmit = async (data) => {
     try {

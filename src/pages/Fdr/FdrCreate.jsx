@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import debounce from "lodash/debounce";
 import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,15 +9,49 @@ import { useGetAllEmployeeQuery } from "../../redux/features/employee/employeeAp
 import { useCreateFdrMutation } from "../../redux/features/fdr/fdrApi";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import { useSearchMemberQuery } from "../../redux/features/membership/membershipApi";
 
 const FdrCreate = () => {
   const { branchEmail } = useGetBranchEmail();
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [memberId, setMemberId] = useState();
   const { register, handleSubmit, reset } = useForm();
   const [inputDepositValue, setInputDepositValue] = useState("");
   const [interestPercent, setInterestPercent] = useState("");
   const [durationOfYear, setDurationOfYear] = useState("");
   const [revenueType, setRevenueType] = useState("");
   const [totalInterest, setTotalInterest] = useState("");
+
+  useEffect(() => {
+    const handler = debounce(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500); // 500ms debounce
+    handler();
+    return () => {
+      handler.cancel();
+    };
+  }, [searchQuery]);
+
+  const { data: searchMemberData } = useSearchMemberQuery({
+    query: debouncedQuery || undefined,
+    email: branchEmail,
+  });
+
+  const handleInputChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    // যদি ইনপুট ফিল্ড খালি না থাকে, তাহলে ড্রপডাউন দেখান
+    setDropdownVisible(query.length > 0);
+  };
+
+  const handleSelect = (id, memberName) => {
+    setSearchQuery(memberName); // নির্বাচিত নাম ইনপুটে সেট করা হবে
+    setDropdownVisible(false); // ড্রপডাউন বন্ধ করা হবে
+    setMemberId(id);
+  };
 
   const handleFixedDepositChange = (event) => {
     const value = event.target.value;
@@ -177,30 +212,22 @@ const FdrCreate = () => {
   const [addFdr, { isLoading: fdrCreateLoading, error }] =
     useCreateFdrMutation();
 
-  if (membersDataLoading || employeeDataLoading || singleBranchQueryLoading) {
-    return (
-      <div className="h-screen w-full flex justify-center items-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
-  }
-
   const onSubmit = async (data) => {
     try {
       const fdrData = {
-        memberOfFdrApplying: data.memberOfFdrApplying,
+        memberOfFdrApplying: memberId,
         branchEmail: branchEmail,
         companyEmail: singleBranchData?.data?.companyEmail,
         FdrStart: data.FdrStart,
-        FdrAcNo: data.FdrAcNo,
         FixedDepositAmount: parseInt(data.FixedDepositAmount),
-        durationOfYear: data.durationOfYear,
+        durationOfYear: Number(data.durationOfYear),
         revenueType: data.revenueType,
         returnInterest: parseInt(data.returnInterest),
         interest: interestPercent,
         totalInterest: totalInterest,
-        referenceEmployee: data.referenceEmployee,
-        referenceMember: data.referenceMember,
+        referenceEmployee: data.referenceEmployee || null,
+        referenceMember: data.referenceMember || null,
+        status: "Active",
       };
 
       const res = await addFdr(fdrData);
@@ -224,9 +251,14 @@ const FdrCreate = () => {
     <div className="bg-[#EBECED] h-screen">
       <div className="flex justify-between px-5 pt-2">
         <h1 className="font-semibold text-[20px]">Make A New FDR</h1>
-        <NavLink to="/dashboard/all-members">
-          <button>Add New Member</button>
-        </NavLink>
+        <button>
+          <NavLink
+            className="text-[16px] font-semibold border border-slate-500 hover:bg-slate-500 px-5 py-[6px] transition-all duration-300 ease-in-out rounded uppercase hover:text-white"
+            to="/dashboard/active-fdr"
+          >
+            Active FDR
+          </NavLink>
+        </button>
       </div>
 
       <div className="border-b border-slate-300 my-3"></div>
@@ -234,24 +266,36 @@ const FdrCreate = () => {
       <div className="px-5">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-3 gap-5">
-            <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="memberOfFdrApplying">
-                Member Of Applying*
+            <div className="flex flex-col ">
+              <label className="font-semibold" htmlFor="memberOfDpsApplying">
+                Member Of FDR Applying*
               </label>
-              <select
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                id="memberOfFdrApplying"
-                {...register("memberOfFdrApplying")}
-                defaultValue=""
-                required={true}
-              >
-                <option value="" disabled>Select FDR Member</option>
-                {memberShipData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item?.memberName}
-                  </option>
-                ))}
-              </select>
+              <div className="relative w-full">
+                {/* ইনপুট ফিল্ড */}
+                <input
+                  type="text"
+                  className="py-2 px-2 my-1 rounded-sm membershipInput border w-full"
+                  placeholder="Type Member Name Or Phone No"
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onFocus={() => setDropdownVisible(searchQuery.length > 0)} // ইনপুটে ফোকাস করলে ড্রপডাউন দেখাবে
+                />
+
+                {/* ড্রপডাউন মেনু */}
+                {isDropdownVisible && searchMemberData?.data?.length > 0 && (
+                  <ul className="absolute z-10 bg-white border w-full rounded-sm max-h-40 overflow-y-auto">
+                    {searchMemberData?.data?.map((item) => (
+                      <li
+                        key={item._id}
+                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleSelect(item._id, item.memberName)}
+                      >
+                        {item.memberName} - {item.phoneNo}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col">
@@ -264,20 +308,6 @@ const FdrCreate = () => {
                 id="FdrStart"
                 defaultValue={formattedToday} // Set default value to today's date
                 {...register("FdrStart")}
-                required={true}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="FdrAcNo">
-                FDR A/C No.*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="text"
-                id="FdrAcNo"
-                placeholder="FDR A/C No"
-                {...register("FdrAcNo")}
                 required={true}
               />
             </div>
@@ -309,7 +339,9 @@ const FdrCreate = () => {
                 defaultValue=""
                 required={true}
               >
-                <option value="" disabled>Select FDR Term</option>
+                <option value="" disabled>
+                  Select FDR Term
+                </option>
                 <option value="1">1 Year</option>
                 <option value="2">2 Year</option>
                 <option value="3">3 Year</option>
@@ -335,7 +367,9 @@ const FdrCreate = () => {
                 defaultValue=""
                 required={true}
               >
-                <option value="" disabled>Select Revenue Type</option>
+                <option value="" disabled>
+                  Select Revenue Type
+                </option>
                 <option value="Monthly">Monthly</option>
                 <option value="Yearly">Yearly</option>
                 <option value="Fixed">Fixed</option>
@@ -392,41 +426,55 @@ const FdrCreate = () => {
 
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="referenceEmployee">
-                Reference Employee*
+                Reference Employee
               </label>
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceEmployee"
+                defaultValue="" // Default value set to empty
                 {...register("referenceEmployee")}
-                defaultValue=""
-                required={true}
               >
-                <option value="" disabled>Select Reference Employee</option>
-                {employeeData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item?.employeeName}
+                <option value="" disabled>
+                  Select Reference Employee
+                </option>
+                {employeeDataLoading ? (
+                  <option value="" disabled>
+                    Loading...
                   </option>
-                ))}
+                ) : (
+                  employeeData?.data.map((item) => (
+                    <option key={item._id} value={item?._id}>
+                      {item?.employeeName}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
             <div className="flex flex-col">
               <label className="font-semibold" htmlFor="referenceMember">
-                Reference Member*
+                Reference Member
               </label>
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceMember"
-                {...register("referenceMember")}
                 defaultValue=""
-                required={true}
+                {...register("referenceMember")}
               >
-                <option value="" disabled>Select Reference Member</option>
-                {memberShipData?.data.map((item) => (
-                  <option key={item._id} value={item?._id}>
-                    {item?.memberName}
+                <option value="" disabled>
+                  Select Reference Member
+                </option>
+                {membersDataLoading ? (
+                  <option value="" disabled>
+                    Loading...
                   </option>
-                ))}
+                ) : (
+                  memberShipData?.data.map((item) => (
+                    <option key={item._id} value={item?._id}>
+                      {item?.memberName}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
           </div>

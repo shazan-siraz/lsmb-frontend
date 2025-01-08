@@ -2,9 +2,22 @@ import { useGetPendingLoanQuery } from "../../redux/features/loan/loanApi";
 import LoanList from "./LoanList";
 import { NavLink } from "react-router-dom";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
+import { toast, ToastContainer } from "react-toastify"
+import { useDispatch, useSelector } from "react-redux";
+import { clearToastMessage } from "../../redux/features/auth/toastSlice";
+import { useEffect } from "react";
 
 const LoanRequest = () => {
   const { branchEmail } = useGetBranchEmail();
+  const dispatch = useDispatch();
+  const toastMessage = useSelector((state) => state.toast.message);
+
+  useEffect(() => {
+    if (toastMessage) {
+      toast.success(toastMessage);
+      dispatch(clearToastMessage()); // টোস্ট মেসেজটি ক্লিয়ার করুন
+    }
+  }, [toastMessage, dispatch]);
 
   const { data: loanQueryData, isLoading: loanQueryLoading } =
     useGetPendingLoanQuery(branchEmail);
@@ -12,7 +25,7 @@ const LoanRequest = () => {
   return (
     <div>
       <div>
-      <ToastContainer></ToastContainer>
+        <ToastContainer></ToastContainer>
         <div className="flex justify-between px-5 py-2 font-semibold text-[20px]">
           <h1>Pending Loan List</h1>
           <NavLink
@@ -22,7 +35,7 @@ const LoanRequest = () => {
             Loan Create
           </NavLink>
         </div>
-        
+
         <div className="border-b"></div>
 
         <div className="px-5 py-1">
@@ -53,7 +66,7 @@ const LoanRequest = () => {
                       <td colSpan="12" className="text-center">Loading...</td>
                     </tr>
                   ))
-                
+
               ) : (
                 loanQueryData?.data.map((item, index) => (
                   <LoanList key={item._id} item={item} index={index} />

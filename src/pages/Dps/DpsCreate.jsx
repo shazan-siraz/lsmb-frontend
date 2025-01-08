@@ -13,7 +13,6 @@ import { useCreateDpsMutation } from "../../redux/features/dps/dpsApi";
 import LoadingComponent from "../../utils/LoadingComponent/LoadingComponent";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 import { useGetSingleBranchQuery } from "../../redux/features/branch/branchApi";
-import generateDpsAccountNo from "../../utils/generateDpsAcNo/generateDpsAcNo";
 
 const DpsCreate = () => {
   const { branchEmail } = useGetBranchEmail();
@@ -364,14 +363,13 @@ const DpsCreate = () => {
         branchEmail: branchEmail,
         companyEmail: singleBranchData?.data?.companyEmail,
         dpsStart: data.dpsStart,
-        dpsAcNo: data.dpsAcNo,
         startingBalance: Number(data.startingBalance),
         durationOfYear: Number(data.durationOfYear),
         installmentType: data.installmentType,
         returnInterest: Number(data.returnInterest),
         returnAmount: totalAmount,
-        referenceEmployee: data.referenceEmployee,
-        referenceMember: data.referenceMember,
+        referenceEmployee: data?.referenceEmployee || null,
+        referenceMember: data?.referenceMember || null,
         status: "Active",
       };
 
@@ -381,6 +379,7 @@ const DpsCreate = () => {
         toast.success(`DPS created Successfully`);
         reset();
       }
+     
     } catch (err) {
       toast.error(err.data.message);
     }
@@ -453,21 +452,6 @@ const DpsCreate = () => {
                 id="DpsStart"
                 defaultValue={formattedToday} // Set default value to today's date
                 {...register("dpsStart")}
-                required={true}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-semibold" htmlFor="DpsAcNo">
-                DPS A/C No.*
-              </label>
-              <input
-                className="py-2 px-2 my-1 rounded-sm membershipInput"
-                type="text"
-                id="DpsAcNo"
-                value={generateDpsAccountNo()}
-                placeholder="DPS A/C No"
-                {...register("dpsAcNo")}
                 required={true}
               />
             </div>
@@ -574,14 +558,12 @@ const DpsCreate = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceEmployee"
+                defaultValue="" // Default value set to empty
                 {...register("referenceEmployee")}
-                defaultValue=""
-                required={true}
               >
                 <option value="" disabled>
                   Select Reference Employee
                 </option>
-
                 {employeeDataLoading ? (
                   <option value="" disabled>
                     Loading...
@@ -603,9 +585,8 @@ const DpsCreate = () => {
               <select
                 className="py-2 px-2 my-1 rounded-sm membershipInput"
                 id="referenceMember"
-                {...register("referenceMember")}
                 defaultValue=""
-                required={true}
+                {...register("referenceMember")}
               >
                 <option value="" disabled>
                   Select Reference Member

@@ -29,6 +29,9 @@ import BoothSidebar from "../BoothSidebar/BoothSidebar";
 import PackageSidebar from "../PackageSidebar/PackageSidebar";
 import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 import FieldOfficerSidebar from "../FieldOfficerSidebar/FieldOfficerSidebar";
+import BankingSidebar from "../Banking/BankingSidebar";
+import ExpenseSidebar from "../Expense/ExpenseSidebar";
+import LedgerSidebar from "../Ledger/LedgerSidebar";
 
 const Sidebar = () => {
   const { role } = useSelector(useCurrentUser);
@@ -175,6 +178,15 @@ const Sidebar = () => {
 
               {/* Company Sidebar */}
               <CompanySidebar></CompanySidebar>
+
+              {/* Banking Sidebar */}
+              <BankingSidebar></BankingSidebar>
+
+              {/* Expense Sidebar */}
+              <ExpenseSidebar></ExpenseSidebar>
+
+              {/* Ledger Sidebar */}
+              <LedgerSidebar></LedgerSidebar>
 
               {/* Modal Button */}
               {role === "branch" && (

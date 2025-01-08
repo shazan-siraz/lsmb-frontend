@@ -74,6 +74,12 @@ export const baseApi = createApi({
     "loanCollection",
     "dps",
     "dpsCollection",
+    "dpsWithdraw",
+    "banking",
+    "bankTransaction",
+    "partialIncome",
+    "expenseCategory",
+    "expense",
   ],
   endpoints: () => ({}),
 });

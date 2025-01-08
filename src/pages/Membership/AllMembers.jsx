@@ -37,10 +37,6 @@ const AllMembers = () => {
     return <LoadingComponent></LoadingComponent>;
   }
 
-  const handleEditMember = (id) => {
-    console.log(id);
-  };
-
   return (
     <div className="bg-slate-100 min-h-screen">
       <div className="px-5 pt-5 flex justify-between">
@@ -56,8 +52,9 @@ const AllMembers = () => {
         <table className="employeeTable">
           <thead>
             <tr className="uppercase font-semibold">
-              <th className="text-center">ID</th>
+              <th className="text-center">SL</th>
               <th className="text-center">Member Name</th>
+              <th className="text-center">ID</th>
               <th className="text-center">Member Phone</th>
               <th className="text-center">Gender</th>
               <th className="text-center">Group</th>
@@ -68,10 +65,19 @@ const AllMembers = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.data?.map((item) => (
+            {data?.data?.map((item, index) => (
               <tr key={item._id}>
+                <td>{index + 1}</td>
+                <td>
+                  <NavLink
+                    target="_blank"
+                    to={`/dashboard/single-member/${item?._id}`}
+                    className="border border-lime-900 px-4 py-1 rounded-md hover:bg-slate-800 hover:text-white"
+                  >
+                    <button>{item?.memberName}</button>
+                  </NavLink>
+                </td>
                 <td>{item.memberId}</td>
-                <td>{item.memberName}</td>
                 <td>{item.phoneNo}</td>
                 <td>{item.gender}</td>
                 <td>{item.group?.groupTitle}</td>
@@ -100,9 +106,12 @@ const AllMembers = () => {
                       >
                         Edit
                       </NavLink>
-                      <button className="text-start hover:bg-slate-100 px-3 py-1 uppercase font-semibold">
+                      <NavLink
+                        to={`/dashboard/single-member/${item._id}`}
+                        className="text-start hover:bg-slate-100 px-3 py-1 uppercase font-semibold"
+                      >
                         Profile
-                      </button>
+                      </NavLink>
                     </div>
                   )}
                 </td>

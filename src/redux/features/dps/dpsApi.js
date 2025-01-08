@@ -34,6 +34,14 @@ const dpsApi = baseApi.injectEndpoints({
       providesTags: ["dps"],
     }),
 
+    getAllDpsAcByOneMember: builder.query({
+      query: (id) => ({
+        url: `/dps/getAllDpsAcByOneMember/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["dps"],
+    }),
+
     searchDpsAccount: builder.query({
       query: ({ query, email }) => ({
         url: `/dps/searchDpsAccount?query=${query}&email=${email}`,
@@ -50,5 +58,6 @@ export const {
   useGetAllDpsQuery,
   useGetSingleDpsQuery,
   useGetSingleDpsByIdQuery,
-  useSearchDpsAccountQuery
+  useSearchDpsAccountQuery,
+  useGetAllDpsAcByOneMemberQuery
 } = dpsApi;

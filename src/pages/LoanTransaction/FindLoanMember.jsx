@@ -42,14 +42,9 @@ const FindLoanMember = () => {
       email: branchEmail,
     });
 
-<<<<<<< HEAD
-  const { data: todayLoanTxnData } = useTodayLoanCollectionQuery(branchEmail);
-=======
-  console.log(searchLoanData);
-
   const { data: todayLoanTxnData } =
     useTodayLoanCollectionQuery(branchEmail);
->>>>>>> 51075b4e96b81e22bcb9aac8ffa7d4cba2e56774
+
 
   const handleLoanTxn = async (id) => {
     navigate(`/dashboard/loan-transaction/${id}`);
@@ -161,6 +156,19 @@ const FindLoanMember = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="6" className="text-right">
+                Total:
+              </td>
+              <td>
+                {todayLoanTxnData?.data?.reduce(
+                  (total, item) => total + (item?.installmentAmount || 0),
+                  0
+                )}
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

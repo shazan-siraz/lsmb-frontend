@@ -7,9 +7,16 @@ import { isoDateToTime } from "../../utils/isoDateToTime/isoDateToTime";
 import { MdDelete } from "react-icons/md";
 import SavingTransactionModal from "./SavingTransactionModal";
 import Swal from "sweetalert2";
-import { useDeleteLoanCollectionMutation, useTodayLoanCollectionQuery } from "../../redux/features/loanCollection/loanCollectionApi";
+import {
+  useDeleteLoanCollectionMutation,
+  useTodayLoanCollectionQuery,
+} from "../../redux/features/loanCollection/loanCollectionApi";
 import LoanTransactionModal from "./LoanTransactionModal";
-import { useTodayDpsCollectionQuery } from "../../redux/features/dpsCollection/dpsCollectionApi";
+import {
+  useDeleteDpsCollectionMutation,
+  useTodayDpsCollectionQuery,
+} from "../../redux/features/dpsCollection/dpsCollectionApi";
+import DpsTransactionModal from "./DpsTransactionModal";
 
 const TodayTransaction = () => {
   const { branchEmail } = useGetBranchEmail();
@@ -18,12 +25,11 @@ const TodayTransaction = () => {
     useTodaySavingCollectionQuery(branchEmail);
 
   const { data: toadyLoanTxnData } = useTodayLoanCollectionQuery(branchEmail);
-  const {data: todayDpsTxnData} = useTodayDpsCollectionQuery(branchEmail);
-
-  console.log(todayDpsTxnData?.data);
+  const { data: todayDpsTxnData } = useTodayDpsCollectionQuery(branchEmail);
 
   const [deleteSavingTxn] = useDeleteSavingTransactionMutation();
   const [deleteLoanCollection] = useDeleteLoanCollectionMutation();
+  const [deleteDpsCollection] = useDeleteDpsCollectionMutation();
 
   const handleDeleteSavingTxn = async (id) => {
     const result = await Swal.fire({
@@ -109,13 +115,55 @@ const TodayTransaction = () => {
     }
   };
 
+  const handleDeleteDpsTxn = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure Delete DPS Txn?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await deleteDpsCollection({ id });
+
+        if (res?.data) {
+          await Swal.fire({
+            title: "Deleted!",
+            text: "Dps Transaction is deleted!",
+            icon: "success",
+          });
+        }
+
+        if (res?.error) {
+          Swal.fire({
+            title: "Error!",
+            text: `${res?.error?.message}`,
+            icon: "error",
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting transaction:", error);
+
+        Swal.fire({
+          title: "Error!",
+          text: "An error occurred while deleting the transaction.",
+          icon: "error",
+        });
+      }
+    }
+  };
+
   return (
     <div>
-      <div className="mb-[20px]">
+      <div>
         <h1 className="text-center font-semibold text-[18px] pt-[10px]">
           Today Saving Transaction: {toadySavingTxnData?.data?.length}
         </h1>
-        <table className="w-[95%] mx-auto mb-[60px]">
+        <table className="w-[95%] mx-auto mb-[30px]">
           <thead className="bg-slate-500 text-white font-semibold">
             <tr>
               <td>#</td>
@@ -158,14 +206,28 @@ const TodayTransaction = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="7" className="text-right">
+                Total:
+              </td>
+              <td>
+                {toadySavingTxnData?.data?.reduce(
+                  (total, item) => total + (item?.savingsAmount || 0),
+                  0
+                )}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
-      <div className="mb-[20px]">
+      <div>
         <h1 className="text-center font-semibold text-[18px] pt-[10px]">
           Today Loan Transaction: {toadyLoanTxnData?.data?.length}
         </h1>
-        <table className="w-[95%] mx-auto mb-[60px]">
+        <table className="w-[95%] mx-auto mb-[30px]">
           <thead className="bg-slate-500 text-white font-semibold">
             <tr>
               <td>#</td>
@@ -195,7 +257,9 @@ const TodayTransaction = () => {
                 <td>
                   <div className="flex justify-center gap-5">
                     <button className="hover:text-blue-500">
-                      <LoanTransactionModal loanTxnData={item}></LoanTransactionModal>
+                      <LoanTransactionModal
+                        loanTxnData={item}
+                      ></LoanTransactionModal>
                     </button>
                     <button
                       onClick={() => handleDeleteLoanTxn(item?._id)}
@@ -208,14 +272,34 @@ const TodayTransaction = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="7" className="text-right">
+                Total:
+              </td>
+              <td>
+                {toadyLoanTxnData?.data?.reduce(
+                  (total, item) => total + (item?.penaltyAmount || 0),
+                  0
+                )}
+              </td>
+              <td>
+                {toadyLoanTxnData?.data?.reduce(
+                  (total, item) => total + (item?.installmentAmount || 0),
+                  0
+                )}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
-      <div className="mb-[20px]">
+      <div className="pb-[5px]">
         <h1 className="text-center font-semibold text-[18px] pt-[10px]">
           Today DPS Transaction: {todayDpsTxnData?.data?.length}
         </h1>
-        <table className="w-[95%] mx-auto mb-[60px]">
+        <table className="w-[95%] mx-auto mb-[30px]">
           <thead className="bg-slate-500 text-white font-semibold">
             <tr>
               <td>#</td>
@@ -245,10 +329,12 @@ const TodayTransaction = () => {
                 <td>
                   <div className="flex justify-center gap-5">
                     <button className="hover:text-blue-500">
-                      <LoanTransactionModal loanTxnData={item}></LoanTransactionModal>
+                      <DpsTransactionModal
+                        dpsModalData={item}
+                      ></DpsTransactionModal>
                     </button>
                     <button
-                      onClick={() => handleDeleteLoanTxn(item?._id)}
+                      onClick={() => handleDeleteDpsTxn(item?._id)}
                       className="hover:text-blue-500"
                     >
                       <MdDelete className="text-[22px]" />
@@ -258,6 +344,26 @@ const TodayTransaction = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="7" className="text-right">
+                Total:
+              </td>
+              <td>
+                {todayDpsTxnData?.data?.reduce(
+                  (total, item) => total + (item?.penaltyAmount || 0),
+                  0
+                )}
+              </td>
+              <td>
+                {todayDpsTxnData?.data?.reduce(
+                  (total, item) => total + (item?.dpsCollectionAmount || 0),
+                  0
+                )}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

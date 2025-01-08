@@ -11,6 +11,15 @@ const membershipApi = baseApi.injectEndpoints({
       invalidatesTags: ["membership"],
     }),
 
+    updateMembership: builder.mutation({
+      query: (data) => ({
+        url: "/membership/updateMembership",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["membership"],
+    }),
+
     getAllMembership: builder.query({
       query: (email) => ({
         url: `/membership/getAllMember/${email}`,
@@ -47,6 +56,7 @@ const membershipApi = baseApi.injectEndpoints({
 
 export const {
   useCreateMembershipMutation,
+  useUpdateMembershipMutation,
   useGetAllMembershipQuery,
   useGetSingleMembershipQuery,
   useGetTotalMemberAccountBalaceAndProcessFeesQuery,

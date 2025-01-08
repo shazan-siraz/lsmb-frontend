@@ -164,6 +164,25 @@ const FindDpsAccount = () => {
                   </tr>
                 ))}
           </tbody>
+          <tfoot>
+            <tr className="font-semibold">
+              <td colSpan="7" className="text-right">
+                Total:
+              </td>
+              <td>
+                {todayDpsCollectionData?.data?.reduce(
+                  (total, item) => total + (item?.dpsCollectionAmount || 0),
+                  0
+                )}
+              </td>
+              <td>
+                {todayDpsCollectionData?.data?.reduce(
+                  (total, item) => total + (item?.penaltyAmount || 0),
+                  0
+                )}
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

@@ -2,9 +2,11 @@ import { NavLink } from "react-router-dom";
 import { useGetAllFdrQuery } from "../../redux/features/fdr/fdrApi";
 import { timeFormat } from "../../utils/timeFormat/timeFormat";
 import { FaEdit } from "react-icons/fa";
+import { useGetBranchEmail } from "../../hooks/useGetBranchEmail";
 
 const ActiveFdr = () => {
-  const { data: fdrData, isLoading: fdrDataQueryLoading } = useGetAllFdrQuery();
+  const { branchEmail } = useGetBranchEmail();
+  const { data: fdrData, isLoading: fdrDataQueryLoading } = useGetAllFdrQuery(branchEmail);
 
   if (fdrDataQueryLoading) {
     return (
@@ -14,29 +16,24 @@ const ActiveFdr = () => {
     );
   }
 
-  console.log(fdrData.data.map(item => console.log(item.memberOfFdrApplying
-  )));
+  console.log(
+    fdrData.data.map((item) => console.log(item.memberOfFdrApplying))
+  );
 
   return (
     <div>
       <div>
-        <div className="flex justify-between items-center px-5 pb-3 pt-5">
+        <div className="flex justify-between items-center px-5">
           <h1 className="text-[20px] font-semibold">Active FDR List</h1>
           <div className="grid grid-cols-2 gap-5">
             <input
               className="py-2 px-2 my-1 rounded-sm membershipInput"
               type="text"
             />
-            <button
-              className="bg-slate-500 py-2 px-2 text-white font-semibold my-1 rounded-md max-w-[100px] hover:bg-slate-600"
-              type="Submit"
-            >
-              Search
-            </button>
           </div>
           <button>
             <NavLink
-              className="text-[20px] font-semibold"
+              className="text-[16px] font-semibold border border-slate-500 hover:bg-slate-500 px-5 py-[6px] transition-all duration-300 ease-in-out rounded uppercase hover:text-white"
               to="/dashboard/fdr-create"
             >
               Add New FDR
@@ -44,9 +41,9 @@ const ActiveFdr = () => {
             ,
           </button>
         </div>
-        <div className="border-b my-2 border-slate-300"></div>
+        <div className="border-b border-slate-300"></div>
 
-        <div className="p-5">
+        <div className="px-5 py-2">
           <table className="employeeTable">
             <thead className="bg-slate-600 text-white uppercase text-center">
               <tr>
